@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { login } from './support/auth'
+import { isMobile, login } from './support/auth'
 
 async function addToCart(
   page: Page,
@@ -11,7 +11,7 @@ async function addToCart(
   if (edition) await page.getByRole('radio', { name: edition }).click()
   for (let i = 1; i < quantity; i++)
     await page.getByRole('button', { name: 'Aumentar quantidade' }).click()
-  await page.getByRole('button', { name: 'Comprar', exact: true }).click()
+  await page.getByRole('button', { name: /^Comprar( NFT)?$/ }).click()
   await expect(page).toHaveURL('/carrinho')
 }
 
@@ -41,7 +41,8 @@ test.describe('Detalhe do NFT', () => {
       page.getByRole('status').filter({ hasText: 'Limite de 5 por pedido' }),
     ).toBeVisible()
     await expect(plus).toBeDisabled()
-    await expect(page.getByLabel('Quantidade', { exact: true })).toHaveText('5')
+    // Papel "status" (output): ignora o contador da outra versão (desktop/celular), que está oculto.
+    await expect(page.getByRole('status', { name: 'Quantidade' })).toHaveText('5')
   })
 
   test('favoritar exige login', async ({ page }) => {
@@ -85,7 +86,10 @@ test.describe('Carrinho', () => {
     await addToCart(page, 'emerald-ape-042', { quantity: 2 })
     const item = cartItem(page, 'Emerald Ape #042')
     await expect(item).toContainText('2.38 ETH')
-    await expect(page.getByRole('link', { name: 'Carrinho, 2 itens' })).toBeVisible()
+    // Contador do carrinho no cabeçalho (no celular, a tela do carrinho não tem cabeçalho).
+    if (!isMobile(page)) {
+      await expect(page.getByRole('link', { name: 'Carrinho, 2 itens' })).toBeVisible()
+    }
 
     await item.getByRole('button', { name: /Aumentar quantidade/ }).click()
     await expect(item).toContainText('3.57 ETH')

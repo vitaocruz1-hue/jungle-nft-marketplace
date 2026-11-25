@@ -20,7 +20,7 @@ test.describe('Conta e sessão', () => {
 
   test('validação do cadastro e conflito de e-mail', async ({ page }) => {
     await page.goto('/cadastro')
-    await page.getByRole('button', { name: 'Criar conta', exact: true }).click()
+    await page.getByRole('button', { name: /^Criar (conta|perfil)$/ }).click()
     await expect(page.getByRole('textbox', { name: 'Nome de usuário' })).toBeFocused()
     await expect(page.getByText('Informe um e-mail válido.')).toBeVisible()
 
@@ -28,7 +28,7 @@ test.describe('Conta e sessão', () => {
     await page.getByRole('textbox', { name: 'E-mail', exact: true }).fill('ana@kurio.dev')
     await page.getByLabel('Senha', { exact: true }).fill('Segura123')
     await page.getByLabel('Confirmar senha').fill('Segura123')
-    await page.getByRole('button', { name: 'Criar conta', exact: true }).click()
+    await page.getByRole('button', { name: /^Criar (conta|perfil)$/ }).click()
 
     const email = page.getByRole('textbox', { name: 'E-mail', exact: true })
     await expect(email).toHaveAttribute('aria-invalid', 'true')

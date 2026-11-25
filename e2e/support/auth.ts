@@ -5,15 +5,19 @@ export const USERS = {
   bruno: { email: 'bruno@kurio.dev', password: 'Kurio@123', username: 'bruno.nft' },
 } as const
 
-/** Abre o menu (no celular) e clica em "Entrar". */
+/** Abaixo de 768 px o app usa o layout mobile do Figma (barra de abas inferior). */
+export function isMobile(page: Page) {
+  return (page.viewportSize()?.width ?? 1440) < 768
+}
+
+function tabBar(page: Page) {
+  return page.getByRole('navigation', { name: 'Navegação inferior' })
+}
+
+/** Desktop: "Entrar" no cabeçalho. Celular: ícone de conta na barra de abas. */
 async function openLogin(page: Page) {
-  const width = page.viewportSize()?.width ?? 1440
-  if (width < 640) {
-    await page.getByRole('button', { name: 'Abrir menu' }).click()
-    await page.getByRole('dialog', { name: 'Menu' }).getByRole('link', { name: 'Entrar' }).click()
-  } else {
-    await page.getByRole('banner').getByRole('link', { name: 'Entrar' }).click()
-  }
+  if (isMobile(page)) await tabBar(page).getByRole('link', { name: 'Entrar' }).click()
+  else await page.getByRole('banner').getByRole('link', { name: 'Entrar' }).click()
 }
 
 export async function login(page: Page, email: string, password: string) {
@@ -27,12 +31,26 @@ export async function login(page: Page, email: string, password: string) {
 }
 
 export async function expectLoggedIn(page: Page, username: string) {
-  const width = page.viewportSize()?.width ?? 1440
-  if (width < 640) {
-    await page.getByRole('button', { name: 'Abrir menu' }).click()
-    await expect(page.getByRole('dialog', { name: 'Menu' }).getByText(username)).toBeVisible()
-    await page.keyboard.press('Escape')
+  if (isMobile(page)) {
+    await expect(tabBar(page).getByRole('link', { name: `Perfil de ${username}` })).toBeVisible()
   } else {
     await expect(page.getByRole('banner').getByText(username)).toBeVisible()
+  }
+}
+
+/** Desktop: menu da conta no cabeçalho. Celular: "Sair" no menu "Meu perfil". */
+export async function logout(page: Page) {
+  if (isMobile(page)) {
+    await page.goto('/perfil')
+    await page
+      .getByRole('navigation', { name: 'Meu perfil' })
+      .getByRole('button', { name: 'Sair' })
+      .click()
+  } else {
+    await page
+      .getByRole('banner')
+      .getByRole('button', { name: /Conta de/ })
+      .click()
+    await page.getByRole('menuitem', { name: 'Sair' }).click()
   }
 }

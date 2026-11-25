@@ -56,7 +56,7 @@ test.describe('Regressão visual @visual', () => {
   test('carrinho', async ({ page }) => {
     for (const id of ['emerald-ape-042', 'violet-nomad-314']) {
       await page.goto(`/nft/${id}`)
-      await page.getByRole('button', { name: 'Comprar', exact: true }).click()
+      await page.getByRole('button', { name: /^Comprar( NFT)?$/ }).click()
       await expect(page).toHaveURL('/carrinho')
     }
     await expect(page.getByRole('heading', { name: 'Colecionadores também viram' })).toBeVisible()
@@ -68,7 +68,7 @@ test.describe('Regressão visual @visual', () => {
     await page.goto('/')
     await login(page, 'ana@kurio.dev', 'Kurio@123')
     await page.goto('/nft/emerald-ape-042')
-    await page.getByRole('button', { name: 'Comprar', exact: true }).click()
+    await page.getByRole('button', { name: /^Comprar( NFT)?$/ }).click()
     await expect(page).toHaveURL('/carrinho')
     await page.goto('/pagamento')
     await expect(page.getByRole('button', { name: 'Revisar pedido' })).toBeVisible()

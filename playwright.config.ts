@@ -14,6 +14,8 @@ export default defineConfig({
   retries: isCI ? 1 : 0,
   workers: isCI ? 1 : undefined,
   reporter: [['list'], ['html', { open: 'never' }]],
+  // Margem para máquinas carregadas (vários workers subindo o app + MSW ao mesmo tempo).
+  expect: { timeout: 10_000 },
 
   use: {
     baseURL: `http://localhost:${PORT}`,

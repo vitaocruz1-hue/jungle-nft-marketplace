@@ -1,24 +1,7 @@
 import { expect, test } from '@playwright/test'
 
-import { expectLoggedIn, login } from './support/auth'
+import { expectLoggedIn, login, logout } from './support/auth'
 import { mocks, useScenario } from './support/mocks'
-
-async function logout(page: import('@playwright/test').Page) {
-  const width = page.viewportSize()?.width ?? 1440
-  if (width < 640) {
-    await page.getByRole('button', { name: 'Abrir menu' }).click()
-    await page
-      .getByRole('dialog', { name: 'Menu' })
-      .getByRole('button', { name: /Conta de/ })
-      .click()
-  } else {
-    await page
-      .getByRole('banner')
-      .getByRole('button', { name: /Conta de/ })
-      .click()
-  }
-  await page.getByRole('menuitem', { name: 'Sair' }).click()
-}
 
 test.describe('Sessão', () => {
   test('sessão expirada leva ao login e volta para a mesma página', async ({ page }) => {

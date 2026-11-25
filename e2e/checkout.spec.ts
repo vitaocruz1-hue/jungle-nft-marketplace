@@ -1,11 +1,11 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { login } from './support/auth'
+import { isMobile, login } from './support/auth'
 import { mocks, useScenario } from './support/mocks'
 
 async function addToCart(page: Page, nftId: string) {
   await page.goto(`/nft/${nftId}`)
-  await page.getByRole('button', { name: 'Comprar', exact: true }).click()
+  await page.getByRole('button', { name: /^Comprar( NFT)?$/ }).click()
   await expect(page).toHaveURL('/carrinho')
 }
 
@@ -28,10 +28,12 @@ test.describe('Pagamento e confirmação', () => {
       .getByRole('link', { name: /Emerald Ape #042/ })
       .first()
       .click()
-    await page.getByRole('button', { name: 'Comprar', exact: true }).click()
+    await page.getByRole('button', { name: /^Comprar( NFT)?$/ }).click()
     await page.getByRole('link', { name: 'Conectar e finalizar' }).click()
 
     // Validação: campo obrigatório vazio impede a revisão.
+    // No celular, os dados do colecionador ficam numa seção recolhível.
+    if (isMobile(page)) await page.getByRole('button', { name: /Dados do colecionador/ }).click()
     await page.getByRole('textbox', { name: 'Nome do perfil' }).fill('')
     await page.getByRole('button', { name: 'Revisar pedido' }).click()
     await expect(page.getByText('Informe o nome do perfil.')).toBeVisible()
@@ -140,7 +142,8 @@ test.describe('Tempo real', () => {
     // Evento repetido e evento com versão antiga não mudam nada.
     await mocks(page, (m) => m.replayLastEvent())
     await mocks(page, (m) => m.emitStaleNftEvent('emerald-ape-042'))
-    await page.getByRole('link', { name: 'Início', exact: true }).first().click()
+    // Volta à Início sem recarregar (o cache foi atualizado pelos eventos).
+    await page.getByRole('link', { name: 'Continuar explorando' }).click()
     const card = page.locator('article', { hasText: 'Emerald Ape #042' })
     await expect(card).toContainText('1.50 ETH')
     await expect(card).not.toContainText('999')

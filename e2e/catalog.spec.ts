@@ -3,9 +3,12 @@ import { expect, test } from '@playwright/test'
 import {
   cardNames,
   cardPrices,
+  chooseSort,
   closeFilters,
   openFilters,
   results,
+  searchFor,
+  sortCombobox,
   waitForResults,
 } from './support/catalog'
 
@@ -55,16 +58,16 @@ test.describe('Catálogo da Início', () => {
     expect(await cardNames(page)).toContain('Golden Signal #160')
     expect(await cardNames(page)).not.toContain('Golden Beat #207') // Música, mas Polygon
 
-    // Ordenação
-    await page.getByRole('combobox', { name: 'Ordenar por:' }).click()
-    await page.getByRole('option', { name: 'Maior preço' }).click()
+    // Ordenação (no celular, fica dentro da gaveta de filtros)
+    await chooseSort(page, 'Maior preço')
     await expect(page).toHaveURL(/sort=price-desc/)
     const prices = await cardPrices(page)
     expect(prices).toEqual([...prices].sort((a, b) => b - a))
 
     // F5 mantém tudo
     await page.reload()
-    await expect(page.getByRole('combobox', { name: 'Ordenar por:' })).toHaveText(/Maior preço/)
+    await expect(await sortCombobox(page)).toHaveText(/Maior preço/)
+    await closeFilters(page)
     expect(await cardPrices(page)).toEqual(prices)
 
     // Voltar no histórico restaura cada estado anterior
@@ -96,15 +99,11 @@ test.describe('Catálogo da Início', () => {
     for (const price of prices) expect(price).toBeGreaterThanOrEqual(minPrice)
   })
 
-  test('busca pelo cabeçalho combina com os filtros e pode ser limpa', async ({ page }) => {
+  test('busca combina com os filtros e pode ser limpa', async ({ page }) => {
     await page.goto('/?category=music')
     await waitForResults(page)
 
-    await page.getByRole('button', { name: 'Buscar NFTs' }).click()
-    const dialog = page.getByRole('dialog', { name: 'Buscar NFTs' })
-    await expect(dialog.getByRole('searchbox', { name: 'Termo de busca' })).toBeFocused()
-    await dialog.getByRole('searchbox', { name: 'Termo de busca' }).fill('signal')
-    await dialog.getByRole('button', { name: 'Buscar' }).click()
+    await searchFor(page, 'signal')
 
     await expect(page).toHaveURL(/search=signal/)
     await expect(page).toHaveURL(/category=music/)
