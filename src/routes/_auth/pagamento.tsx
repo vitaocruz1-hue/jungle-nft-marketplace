@@ -1,8 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { AlertTriangleIcon, CheckCircle2Icon, Loader2Icon } from 'lucide-react'
+import {
+  AlertTriangleIcon,
+  CheckCircle2Icon,
+  ChevronDownIcon,
+  Loader2Icon,
+  MoreVerticalIcon,
+} from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 
+import { BackButton } from '@/components/back-button'
 import { Breadcrumb } from '@/components/breadcrumb'
 import { FormField } from '@/components/form-field'
 import { Container } from '@/components/layout/container'
@@ -150,15 +158,24 @@ function CheckoutPage() {
   }
 
   return (
-    <Container className="pt-8">
-      <Breadcrumb
-        items={[
-          { label: 'Início', link: { to: '/' } },
-          { label: 'Mercado', link: { to: '/', hash: 'catalogo' } },
-          { label: 'Pagamento' },
-        ]}
-      />
-      <h1 className="sr-only">Pagamento</h1>
+    <Container className="pt-4 md:pt-8">
+      <div className="max-md:hidden">
+        <Breadcrumb
+          items={[
+            { label: 'Início', link: { to: '/' } },
+            { label: 'Mercado', link: { to: '/', hash: 'catalogo' } },
+            { label: 'Pagamento' },
+          ]}
+        />
+      </div>
+      {/* Celular (Figma mobile): "voltar" + título. No desktop, só para leitores de tela. */}
+      <div className="relative flex min-h-9 items-center justify-center md:block md:min-h-0">
+        <BackButton fallback="/carrinho" className="absolute left-0 md:hidden" />
+        <h1 className="text-lg font-bold md:sr-only">
+          <span className="md:hidden">Pagamento com carteira</span>
+          <span className="max-md:hidden">Pagamento</span>
+        </h1>
+      </div>
       <div className="mt-6">{content}</div>
     </Container>
   )
@@ -182,6 +199,10 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
     () => ({ ...defaults, ...loadDraft(userId) }) as BuyerForm & { walletId?: string },
   )
   const [walletId, setWalletId] = useState(initial.walletId ?? wallets[0]?.id)
+  // Rede controlada: select no desktop, lista de opções no celular (mesmo valor).
+  const [network, setNetwork] = useState<NetworkId>(initial.network)
+  // Celular: os dados do colecionador ficam numa seção recolhível (já preenchida).
+  const [buyerOpen, setBuyerOpen] = useState(false)
   const [buyer, setBuyer] = useState<BuyerForm | null>(null)
   const [quote, setQuote] = useState<Quote | null>(null)
   const [staleReason, setStaleReason] = useState<string | null>(null)
@@ -217,7 +238,7 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
 
   function persistDraft() {
     if (!formRef.current) return
-    saveDraft(userId, { ...readBuyer(formRef.current), walletId })
+    saveDraft(userId, { ...readBuyer(formRef.current), network, walletId })
   }
 
   function requestQuote(form: BuyerForm) {
@@ -234,11 +255,13 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
 
   function handleReview(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const form = readBuyer(event.currentTarget)
+    const form = { ...readBuyer(event.currentTarget), network }
     const found = validateBuyer(form, wallet)
     setErrors(found)
     if (Object.keys(found).length > 0) {
       setAlert('Revise os campos destacados.')
+      // No celular, abre "Dados do colecionador" antes de levar o foco ao erro.
+      flushSync(() => setBuyerOpen(true))
       return focusFirstError(formRef.current, found)
     }
     persistDraft()
@@ -323,6 +346,120 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
           </p>
         )}
 
+        {/* Celular (Figma mobile): carteiras cadastradas e escolha da rede. */}
+        {!reviewing && (
+          <div className="space-y-7 md:hidden">
+            <fieldset disabled={busy} aria-labelledby="carteira-conectada-titulo">
+              <div className="flex items-baseline justify-between gap-3">
+                <h2 id="carteira-conectada-titulo" className="text-base font-bold">
+                  Carteira conectada
+                </h2>
+                <Link to="/carteiras" className="text-sm font-bold text-highlight">
+                  Trocar carteira
+                </Link>
+              </div>
+              {wallets.length === 0 ? (
+                <p className="mt-3 text-sm">
+                  Você ainda não tem carteiras.{' '}
+                  <Link to="/carteiras" className="text-highlight underline">
+                    Cadastre uma carteira
+                  </Link>
+                  .
+                </p>
+              ) : (
+                <div className="mt-3 space-y-3">
+                  {wallets.map((w) => (
+                    <div
+                      key={w.id}
+                      className="flex items-center gap-3 rounded-2xl bg-card px-4 py-3.5"
+                    >
+                      <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-4">
+                        <input
+                          type="radio"
+                          name="walletId-mobile"
+                          value={w.id}
+                          checked={w.id === walletId}
+                          onChange={() => {
+                            setWalletId(w.id)
+                            setConnection('disconnected')
+                          }}
+                          className="size-4 shrink-0 accent-primary"
+                        />
+                        <span className="min-w-0 text-sm">
+                          <span className="block font-bold">{w.nickname}</span>
+                          <span className="block truncate text-muted-foreground">
+                            {w.ensName ? `${w.ensName}.eth` : shortAddress(w.address)}
+                          </span>
+                          <span className="block text-muted-foreground">
+                            Rede {NETWORK_LABELS[w.network]}
+                          </span>
+                        </span>
+                      </label>
+                      <Link
+                        to="/carteiras"
+                        aria-label={`Editar carteira ${w.nickname}`}
+                        className="grid size-8 place-items-center rounded-full text-muted-foreground hover:bg-secondary"
+                      >
+                        <MoreVerticalIcon aria-hidden="true" className="size-4" />
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {errors.walletId && (
+                <p className="mt-2 text-xs font-semibold text-destructive">{errors.walletId}</p>
+              )}
+            </fieldset>
+
+            <fieldset disabled={busy}>
+              <legend className="text-base font-bold">Carteira e rede</legend>
+              <div className="mt-3 space-y-3">
+                {NETWORK_IDS.map((id) => (
+                  <label
+                    key={id}
+                    className="flex cursor-pointer items-center gap-3 rounded-2xl bg-card px-4 py-3"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="grid size-9 place-items-center rounded-full bg-secondary text-sm font-bold text-highlight"
+                    >
+                      {NETWORK_LABELS[id].charAt(0)}
+                    </span>
+                    <span className="flex-1 text-sm">{NETWORK_LABELS[id]}</span>
+                    <input
+                      type="radio"
+                      name="network-mobile"
+                      value={id}
+                      checked={network === id}
+                      onChange={() => setNetwork(id)}
+                      className="size-4 accent-primary"
+                    />
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <button
+              type="button"
+              aria-expanded={buyerOpen}
+              aria-controls="dados-colecionador"
+              onClick={() => setBuyerOpen((open) => !open)}
+              className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl bg-card px-4 py-3 text-left"
+            >
+              <span className="min-w-0">
+                <span className="block text-sm font-bold">Dados do colecionador</span>
+                <span className="block truncate text-xs text-muted-foreground">
+                  {initial.displayName} · {initial.email}
+                </span>
+              </span>
+              <ChevronDownIcon
+                aria-hidden="true"
+                className={cn('size-5 shrink-0 transition-transform', buyerOpen && 'rotate-180')}
+              />
+            </button>
+          </div>
+        )}
+
         {/* Revisão: dados congelados até confirmar ou voltar para editar. */}
         <section hidden={!reviewing} aria-labelledby="revisao-titulo">
           <h2
@@ -371,8 +508,13 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
         </section>
 
         {/* Formulário (fica no DOM durante a revisão para preservar os valores). */}
-        <fieldset hidden={reviewing} disabled={busy} className="min-w-0">
-          <legend className="text-lg font-bold">Perfil do colecionador</legend>
+        <fieldset
+          id="dados-colecionador"
+          hidden={reviewing}
+          disabled={busy}
+          className={cn('min-w-0 max-md:mt-5', !buyerOpen && 'max-md:hidden')}
+        >
+          <legend className="text-lg font-bold max-md:sr-only">Perfil do colecionador</legend>
           <div className="mt-4 grid gap-x-6 gap-y-5 md:grid-cols-2">
             <FormField
               id="pg-nome"
@@ -398,9 +540,11 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
               label="Rede"
               placeholder="Selecione uma rede"
               options={NETWORK_OPTIONS}
-              defaultValue={initial.network}
+              value={network}
+              onValueChange={(value) => setNetwork(value as NetworkId)}
               required
               error={errors.network}
+              className="max-md:hidden"
             />
             <FormField
               id="pg-perfil"
@@ -412,6 +556,7 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
             />
             <FormField
               id="pg-endereco"
+              className="max-md:hidden"
               label="Endereço da carteira"
               readOnly
               value={wallet?.address ?? ''}
@@ -420,6 +565,7 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
             />
             <FormField
               id="pg-ens-secundaria"
+              className="max-md:hidden"
               label="ENS ou carteira secundária (opcional)"
               readOnly
               value={wallet?.secondaryAddress ?? ''}
@@ -427,6 +573,7 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
             />
             <FormField
               id="pg-tipo"
+              className="max-md:hidden"
               label="Tipo de carteira"
               readOnly
               value={wallet ? WALLET_TYPE_LABELS[wallet.type] : ''}
@@ -461,7 +608,7 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
           </div>
 
           {secondary && (
-            <label className="mt-6 flex cursor-pointer items-center gap-2 text-sm">
+            <label className="mt-6 flex cursor-pointer items-center gap-2 text-sm max-md:hidden">
               <input
                 type="checkbox"
                 checked={walletId === secondary.id}
@@ -492,7 +639,7 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
       </div>
 
       <aside aria-labelledby="seus-nfts-titulo" className="space-y-6">
-        <section>
+        <section className={cn(!reviewing && 'max-md:hidden')}>
           <h2 id="seus-nfts-titulo" className="text-lg font-bold">
             Seus NFTs
           </h2>
@@ -529,7 +676,7 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
           )}
         </section>
 
-        <dl className="space-y-2.5 text-sm" aria-live="polite">
+        <dl className={cn('space-y-2.5 text-sm', !reviewing && 'max-md:hidden')} aria-live="polite">
           <div className="flex justify-between">
             <dt>Subtotal</dt>
             <dd className="text-base tabular-nums">{displayEth(totals.subtotal)}</dd>
@@ -551,7 +698,15 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
           </div>
         </dl>
 
-        <fieldset disabled={busy || reviewing}>
+        {/* Celular: só o total (Figma mobile); detalhamento na revisão. */}
+        {!reviewing && (
+          <p className="flex items-baseline justify-end gap-6 text-lg font-bold md:hidden">
+            Total:
+            <span className="text-xl text-highlight">{displayEth(totals.total)}</span>
+          </p>
+        )}
+
+        <fieldset disabled={busy || reviewing} className="max-md:hidden">
           <legend className="mx-auto text-base font-bold">Carteira e rede</legend>
           {wallets.length === 0 ? (
             <p className="mt-3 text-sm">
@@ -652,7 +807,7 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
             type="button"
             onClick={() => void confirmPurchase()}
             disabled={busy || staleReason !== null}
-            className="h-11 w-full text-base font-bold"
+            className="h-11 w-full text-base font-bold max-md:h-14 max-md:rounded-full max-md:bg-[linear-gradient(90deg,#cf884b,#b77843)]"
           >
             {orderMutation.isPending
               ? 'Enviando pedido…'
@@ -664,7 +819,7 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
           <Button
             type="submit"
             disabled={busy || wallets.length === 0}
-            className="h-11 w-full text-base font-bold"
+            className="h-11 w-full text-base font-bold max-md:h-14 max-md:rounded-full max-md:bg-[linear-gradient(90deg,#cf884b,#b77843)]"
           >
             {quoteMutation.isPending ? 'Calculando cotação…' : 'Revisar pedido'}
           </Button>
