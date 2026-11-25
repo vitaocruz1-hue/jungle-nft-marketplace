@@ -1,13 +1,8 @@
 import { http, HttpResponse, type DefaultBodyType, type PathParams } from 'msw'
 
-import { EMAIL_PATTERN } from '@/contracts/auth'
-import { NETWORK_IDS } from '@/contracts/catalog'
 import type { ApiErrorBody } from '@/contracts/common'
 import {
-  ENS_NAME_PATTERN,
-  REFERRAL_CODE_PATTERN,
-  WALLET_ADDRESS_PATTERN,
-  WALLET_TYPES,
+  validateWallet,
   type Wallet,
   type WalletConnection,
   type WalletInput,
@@ -23,31 +18,6 @@ import { apiUrl, errorResponse, readJson } from '../utils/http'
 function walletsOf(userId: string) {
   db.state.wallets[userId] ??= { primary: null, secondary: null }
   return db.state.wallets[userId]
-}
-
-/** Valida os campos do formulário "Carteiras" (mesmas regras do front). */
-export function validateWallet(input: Partial<WalletInput>) {
-  const errors: Record<string, string> = {}
-  if (!input.displayName?.trim()) errors.displayName = 'Informe o nome de exibição.'
-  if (!input.nickname?.trim()) errors.nickname = 'Informe um apelido para a carteira.'
-  if (!input.network || !NETWORK_IDS.includes(input.network)) errors.network = 'Selecione uma rede.'
-  if (!input.profileName?.trim()) errors.profileName = 'Informe o nome do perfil.'
-  if (!input.address || !WALLET_ADDRESS_PATTERN.test(input.address))
-    errors.address = 'Use um endereço 0x com 40 caracteres hexadecimais.'
-  if (
-    input.secondaryAddress &&
-    !WALLET_ADDRESS_PATTERN.test(input.secondaryAddress) &&
-    !input.secondaryAddress.endsWith('.eth')
-  )
-    errors.secondaryAddress = 'Use um endereço 0x ou um nome .eth.'
-  if (!input.type || !WALLET_TYPES.includes(input.type))
-    errors.type = 'Selecione o tipo de carteira.'
-  if (!input.referralCode || !REFERRAL_CODE_PATTERN.test(input.referralCode))
-    errors.referralCode = 'Use de 4 a 12 letras maiúsculas ou números.'
-  if (!input.email || !EMAIL_PATTERN.test(input.email)) errors.email = 'Informe um e-mail válido.'
-  if (!input.ensName || !ENS_NAME_PATTERN.test(input.ensName))
-    errors.ensName = 'Use de 3 a 40 letras minúsculas, números ou hífen.'
-  return errors
 }
 
 export const walletsHandlers = [

@@ -59,6 +59,11 @@ export const mockControls = {
     return true
   },
 
+  /** Quantos pedidos existem (os testes provam que não houve duplicação). */
+  ordersCount() {
+    return db.state.orders.length
+  },
+
   replayLastEvent,
   emitStaleNftEvent,
   dropConnections,

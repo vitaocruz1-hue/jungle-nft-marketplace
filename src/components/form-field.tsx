@@ -32,8 +32,13 @@ export function FormField({
 
   return (
     <div className={className}>
-      <Label htmlFor={id} className={cn('mb-2 text-sm', hideLabel && 'sr-only')}>
+      <Label htmlFor={id} className={cn('mb-2 text-sm font-normal', hideLabel && 'sr-only')}>
         {label}
+        {props.required && !hideLabel && (
+          <span aria-hidden="true" className="-ml-1 text-base text-highlight">
+            *
+          </span>
+        )}
       </Label>
       <div className="relative">
         <Input
