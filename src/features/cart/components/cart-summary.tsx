@@ -64,10 +64,10 @@ function CouponForm({ cart }: { cart: Cart }) {
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <Label htmlFor="cupom" className="text-sm font-bold">
+      <Label htmlFor="cupom" className="text-sm font-bold max-md:sr-only">
         Código promocional
       </Label>
-      <div className="mt-3 flex">
+      <div className="mt-3 flex max-md:mt-0 max-md:rounded-full max-md:bg-[#2f1d15] max-md:p-1">
         <Input
           ref={inputRef}
           id="cupom"
@@ -76,12 +76,12 @@ function CouponForm({ cart }: { cart: Cart }) {
           placeholder="Digite o código promocional..."
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? 'cupom-erro' : undefined}
-          className="h-10 rounded-r-none border-primary bg-transparent text-xs uppercase placeholder:normal-case"
+          className="h-10 rounded-r-none border-primary bg-transparent text-xs uppercase placeholder:normal-case max-md:h-11 max-md:rounded-l-full max-md:border-0 max-md:pl-4"
         />
         <Button
           type="submit"
           disabled={apply.isPending}
-          className="h-10 rounded-l-none px-5 text-base font-bold"
+          className="h-10 rounded-l-none px-5 text-base font-bold max-md:h-11 max-md:rounded-full max-md:bg-[linear-gradient(90deg,#8a5a33,#c98348)]"
         >
           {apply.isPending ? 'Aplicando…' : 'Aplicar'}
         </Button>
@@ -112,11 +112,17 @@ export function CartSummary({ cart, blockedReason }: CartSummaryProps) {
   ]
 
   return (
-    <section aria-labelledby="resumo-titulo" className="lg:sticky lg:top-6">
-      <h2 id="resumo-titulo" className="border-b border-[#442c1a] pb-3 text-lg font-bold">
+    <section
+      aria-labelledby="resumo-titulo"
+      className="max-md:-mx-5 max-md:rounded-t-[28px] max-md:bg-[#221411] max-md:px-6 max-md:pt-6 max-md:pb-8 lg:sticky lg:top-6"
+    >
+      <h2
+        id="resumo-titulo"
+        className="border-b border-[#442c1a] pb-3 text-lg font-bold max-md:sr-only"
+      >
         Resumo da carteira
       </h2>
-      <div className="mt-6">
+      <div className="mt-6 max-md:mt-0">
         <CouponForm cart={cart} />
       </div>
 
@@ -148,7 +154,7 @@ export function CartSummary({ cart, blockedReason }: CartSummaryProps) {
         asChild={!blockedReason}
         disabled={Boolean(blockedReason)}
         aria-describedby={blockedReason ? 'checkout-bloqueado' : undefined}
-        className="mt-6 h-10 w-full text-base font-bold"
+        className="mt-6 h-10 w-full text-base font-bold max-md:h-14 max-md:rounded-full max-md:bg-[linear-gradient(90deg,#cf884b,#b77843)]"
       >
         {blockedReason ? (
           <span>Conectar e finalizar</span>

@@ -31,6 +31,43 @@ function IssueNotice({ item }: { item: CartItem }) {
   )
 }
 
+interface StepperProps {
+  item: CartItem
+  busy: boolean
+  limit: number
+  onChange: (quantity: number) => void
+  buttonClassName: string
+}
+
+function Stepper({ item, busy, limit, onChange, buttonClassName }: StepperProps) {
+  return (
+    <div className="flex items-center gap-2">
+      <Button
+        size="icon"
+        className={buttonClassName}
+        aria-label={`Diminuir quantidade de ${item.name}`}
+        disabled={busy || item.quantity <= 1}
+        onClick={() => onChange(item.quantity - 1)}
+      >
+        <MinusIcon className="size-3.5" />
+      </Button>
+      <span className="min-w-5 text-center" aria-live="polite">
+        <span className="sr-only">Quantidade: </span>
+        {item.quantity}
+      </span>
+      <Button
+        size="icon"
+        className={buttonClassName}
+        aria-label={`Aumentar quantidade de ${item.name}`}
+        disabled={busy || item.quantity >= limit}
+        onClick={() => onChange(item.quantity + 1)}
+      >
+        <PlusIcon className="size-3.5" />
+      </Button>
+    </div>
+  )
+}
+
 export function CartItemRow({ item }: { item: CartItem }) {
   const update = useUpdateCartItem()
   const remove = useRemoveCartItem()
@@ -57,86 +94,100 @@ export function CartItemRow({ item }: { item: CartItem }) {
     })
   }
 
+  const image = (className: string) => (
+    <img
+      src={item.image.src}
+      alt=""
+      width={item.image.width}
+      height={item.image.height}
+      loading="lazy"
+      className={cn('object-cover', className)}
+    />
+  )
+
+  const nameLink = (
+    <Link
+      to="/nft/$nftId"
+      params={{ nftId: item.nftId }}
+      className="block truncate text-[13px] font-bold hover:text-highlight md:text-base"
+    >
+      {item.name}
+    </Link>
+  )
+
+  const removeButton = (className?: string) => (
+    <Button
+      variant="ghost"
+      size="icon"
+      className={cn('hover:bg-secondary', className)}
+      aria-label={`Remover ${item.name} do carrinho`}
+      disabled={busy}
+      onClick={handleRemove}
+    >
+      <Trash2Icon className="size-5" />
+    </Button>
+  )
+
   return (
     <li
       aria-busy={busy}
       className={cn(
-        'grid grid-cols-[70px_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-3 bg-card pr-3 transition-opacity md:grid-cols-[70px_minmax(0,1fr)_120px_110px_120px_40px] md:gap-x-4',
+        'bg-card transition-opacity max-md:overflow-hidden max-md:rounded-2xl',
         busy && 'opacity-70',
         item.issues.length > 0 && 'outline-1 outline-primary/60',
       )}
     >
-      <img
-        src={item.image.src}
-        alt=""
-        width={item.image.width}
-        height={item.image.height}
-        loading="lazy"
-        className="size-[70px] object-cover"
-      />
-
-      <div className="min-w-0 py-2">
-        <Link
-          to="/nft/$nftId"
-          params={{ nftId: item.nftId }}
-          className="block truncate text-sm font-bold hover:text-highlight sm:text-base"
-        >
-          {item.name}
-        </Link>
-        <p className="truncate text-xs text-muted-foreground sm:text-sm">
-          ID do token: {item.tokenId}
+      {/* Desktop/tablet: linha da tabela do Figma (NFT, preço, edições, total). */}
+      <div className="hidden grid-cols-[70px_minmax(0,1fr)_120px_110px_120px_40px] items-center gap-x-4 pr-3 md:grid">
+        {image('size-[70px]')}
+        <div className="min-w-0 py-2">
+          {nameLink}
+          <p className="truncate text-sm text-muted-foreground">ID do token: {item.tokenId}</p>
+          <p className="truncate text-xs text-muted-foreground">Edição {item.editionLabel}</p>
+        </div>
+        <p className="text-base font-bold text-muted-foreground">
+          <span className="sr-only">Preço unitário: </span>
+          {displayEth(item.unitPrice)}
         </p>
-        <p className="truncate text-xs text-muted-foreground">Edição {item.editionLabel}</p>
+        <Stepper
+          item={item}
+          busy={busy}
+          limit={limit}
+          onChange={changeQuantity}
+          buttonClassName="h-6 w-5 rounded-full"
+        />
+        <p className="text-base font-bold text-highlight">
+          <span className="sr-only">Total do item: </span>
+          {displayEth(item.lineTotal)}
+        </p>
+        {removeButton()}
       </div>
 
-      <p className="row-start-2 text-sm font-bold text-muted-foreground md:row-start-auto md:text-base">
-        <span className="sr-only">Preço unitário: </span>
-        {displayEth(item.unitPrice)}
-      </p>
-
-      <div className="col-start-2 row-start-2 flex items-center gap-2 justify-self-center md:col-start-auto md:row-start-auto md:justify-self-start">
-        <Button
-          size="icon"
-          className="h-6 w-5 rounded-full"
-          aria-label={`Diminuir quantidade de ${item.name}`}
-          disabled={busy || item.quantity <= 1}
-          onClick={() => changeQuantity(item.quantity - 1)}
-        >
-          <MinusIcon className="size-3.5" />
-        </Button>
-        <span className="min-w-5 text-center" aria-live="polite">
-          <span className="sr-only">Quantidade: </span>
-          {item.quantity}
-        </span>
-        <Button
-          size="icon"
-          className="h-6 w-5 rounded-full"
-          aria-label={`Aumentar quantidade de ${item.name}`}
-          disabled={busy || item.quantity >= limit}
-          onClick={() => changeQuantity(item.quantity + 1)}
-        >
-          <PlusIcon className="size-3.5" />
-        </Button>
+      {/* Celular (Figma mobile): card com arte, nome, edição, total e quantidade. */}
+      <div className="flex md:hidden">
+        {image('size-[94px] shrink-0')}
+        <div className="min-w-0 flex-1 py-2.5 pl-3">
+          {nameLink}
+          <p className="truncate text-[13px] text-muted-foreground">Edição: {item.editionLabel}</p>
+          <p className="mt-1.5 text-base font-bold text-highlight">
+            <span className="sr-only">Total do item: </span>
+            {displayEth(item.lineTotal)}
+          </p>
+        </div>
+        <div className="flex flex-col items-end justify-between py-1.5 pr-3 pl-2">
+          {removeButton('size-7')}
+          <Stepper
+            item={item}
+            busy={busy}
+            limit={limit}
+            onChange={changeQuantity}
+            buttonClassName="size-6 rounded-full"
+          />
+        </div>
       </div>
-
-      <p className="col-start-3 row-start-2 text-sm font-bold text-highlight md:col-start-auto md:row-start-auto md:text-base">
-        <span className="sr-only">Total do item: </span>
-        {displayEth(item.lineTotal)}
-      </p>
-
-      <Button
-        variant="ghost"
-        size="icon"
-        className="col-start-3 row-start-1 justify-self-end hover:bg-secondary md:col-start-auto md:row-start-auto"
-        aria-label={`Remover ${item.name} do carrinho`}
-        disabled={busy}
-        onClick={handleRemove}
-      >
-        <Trash2Icon className="size-5" />
-      </Button>
 
       {item.issues.length > 0 && (
-        <div role="status" className="col-span-full px-3 pb-3 text-xs md:pl-[86px]">
+        <div role="status" className="px-3 pb-3 text-xs md:pl-[86px]">
           <IssueNotice item={item} />
         </div>
       )}

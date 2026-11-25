@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { ShoppingCartIcon } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { BackButton } from '@/components/back-button'
 import { Breadcrumb } from '@/components/breadcrumb'
 import { Container } from '@/components/layout/container'
 import { QueryError } from '@/components/query-error'
@@ -76,15 +77,22 @@ function CartPage() {
   const cart = query.data
 
   return (
-    <Container className="pt-8">
-      <Breadcrumb
-        items={[
-          { label: 'Início', link: { to: '/' } },
-          { label: 'Mercado', link: { to: '/', hash: 'catalogo' } },
-          { label: 'Carrinho' },
-        ]}
-      />
-      <h1 className="sr-only">Carrinho de NFTs</h1>
+    <Container className="pt-4 md:pt-8">
+      <div className="max-md:hidden">
+        <Breadcrumb
+          items={[
+            { label: 'Início', link: { to: '/' } },
+            { label: 'Mercado', link: { to: '/', hash: 'catalogo' } },
+            { label: 'Carrinho' },
+          ]}
+        />
+      </div>
+      {/* Celular (Figma mobile): "voltar" + título centralizado. No desktop o título
+          fica só para leitores de tela (a trilha acima cumpre esse papel). */}
+      <div className="relative flex min-h-9 items-center justify-center md:block md:min-h-0">
+        <BackButton className="absolute left-0 md:hidden" />
+        <h1 className="text-lg font-bold md:sr-only">Carrinho de NFTs</h1>
+      </div>
 
       <div className="mt-4">
         {query.isPending ? (
@@ -110,7 +118,7 @@ function CartPage() {
             </Button>
           </div>
         ) : cart ? (
-          <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_332px] lg:gap-20">
+          <div className="grid grid-cols-1 gap-6 md:gap-12 lg:grid-cols-[minmax(0,1fr)_332px] lg:gap-20">
             <section aria-labelledby="itens-titulo">
               <h2 id="itens-titulo" className="sr-only">
                 Itens do carrinho
