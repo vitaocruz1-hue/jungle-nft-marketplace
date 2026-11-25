@@ -38,6 +38,41 @@ export default defineConfig([
     rules: { 'react-refresh/only-export-components': 'off' },
   },
   {
+    // Regras da stack obrigatória: toda chamada REST passa pelo Axios e a
+    // interface nunca acessa a API simulada diretamente.
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/mocks/**', 'src/main.tsx'],
+    rules: {
+      'no-restricted-globals': [
+        'error',
+        { name: 'fetch', message: 'Use o apiClient (Axios) de @/lib/api-client.' },
+      ],
+      'no-restricted-properties': [
+        'error',
+        { object: 'window', property: 'fetch', message: 'Use o apiClient (Axios).' },
+        { object: 'globalThis', property: 'fetch', message: 'Use o apiClient (Axios).' },
+      ],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/mocks', '@/mocks/*', '**/mocks', '**/mocks/*'],
+              message: 'O app não pode importar a API simulada (src/mocks).',
+            },
+          ],
+        },
+      ],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'ImportExpression[source.value=/mocks/]',
+          message: 'O app não pode importar a API simulada (src/mocks).',
+        },
+      ],
+    },
+  },
+  {
     // Testes e arquivos de configuração rodam no Node, não no navegador.
     files: ['e2e/**/*.ts', '*.config.ts'],
     languageOptions: { globals: globals.node },

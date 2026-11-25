@@ -29,3 +29,6 @@ npm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
+
+# Exportações do Figma (referência local, não versionar)
+design/
