@@ -2,7 +2,7 @@ import { keepPreviousData, queryOptions } from '@tanstack/react-query'
 
 import type { NftListParams } from '@/contracts/catalog'
 
-import { getFeatured, getNft, getNfts } from './api'
+import { getFeatured, getNft, getNfts, getRelatedNfts } from './api'
 
 /**
  * Chaves do cache do catálogo. Cada combinação de filtros tem a sua chave,
@@ -15,6 +15,7 @@ export const catalogKeys = {
   details: () => [...catalogKeys.all, 'detail'] as const,
   detail: (nftId: string) => [...catalogKeys.details(), nftId] as const,
   featured: () => [...catalogKeys.all, 'featured'] as const,
+  related: (nftId: string) => [...catalogKeys.all, 'related', nftId] as const,
 }
 
 export function nftListQueryOptions(params: NftListParams) {
@@ -37,5 +38,12 @@ export function nftDetailQueryOptions(nftId: string) {
   return queryOptions({
     queryKey: catalogKeys.detail(nftId),
     queryFn: ({ signal }) => getNft(nftId, signal),
+  })
+}
+
+export function relatedNftsQueryOptions(nftId: string) {
+  return queryOptions({
+    queryKey: catalogKeys.related(nftId),
+    queryFn: ({ signal }) => getRelatedNfts(nftId, signal),
   })
 }

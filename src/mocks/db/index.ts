@@ -9,7 +9,7 @@ import { createUserFixtures, type UserRecord } from './fixtures/users'
 
 const STORAGE_KEY = 'kurio:mock-db'
 /** Mude ao alterar o formato do estado: dados antigos são descartados. */
-const SCHEMA_VERSION = 2
+const SCHEMA_VERSION = 3
 
 export interface SessionRecord {
   token: string

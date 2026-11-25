@@ -49,6 +49,57 @@ export const LARGE_ART = {
   },
 } satisfies Record<string, NftImage>
 
+const DETAIL_ALTS: Record<Character, [string, string]> = {
+  emerald: [
+    'Close do rosto com óculos redondos de lentes verdes',
+    'Detalhe da jaqueta college verde e do pingente de esmeralda',
+  ],
+  sage: ['Close do rosto sob o chapéu bucket verde-oliva', 'Detalhe do moletom roxo com cordões'],
+  neon: ['Close do rosto com brinco dourado', 'Detalhe da gola alta verde e do blazer bege'],
+  golden: [
+    'Close do rosto com fones de ouvido verdes',
+    'Detalhe da jaqueta bomber clara com zíper dourado',
+  ],
+}
+
+const ART_FILE: Record<Character, string> = {
+  emerald: 'emerald-ape',
+  sage: 'sage-nomad',
+  neon: 'neon-vessel',
+  golden: 'golden-beat',
+}
+
+/** Galeria: arte principal (maior quando existe) + dois detalhes. */
+function buildGallery(character: Character): NftImage[] {
+  const main = character === 'emerald' ? LARGE_ART.emerald : ART[character]
+  const [faceAlt, outfitAlt] = DETAIL_ALTS[character]
+  const file = ART_FILE[character]
+  return [
+    main,
+    { src: `/images/nfts/${file}-face.webp`, alt: faceAlt, width: 496, height: 496 },
+    { src: `/images/nfts/${file}-outfit.webp`, alt: outfitAlt, width: 496, height: 496 },
+  ]
+}
+
+const REVIEWERS = ['Marina T.', 'Caio R.', 'Lia M.', 'Otávio P.', 'Rafa N.', 'Júlia S.'] as const
+const COMMENTS = [
+  'Arte impecável, os detalhes em alta resolução valem cada ETH.',
+  'Compra tranquila e a procedência está toda registrada.',
+  'Uma das minhas peças favoritas da coleção.',
+  'Ótima edição, chegou na carteira em minutos.',
+  'Cores lindas, combina com o resto da minha coleção.',
+] as const
+
+function buildReviews(id: string, count: number): NftDetail['reviews'] {
+  return Array.from({ length: Math.min(count, 3) }, (_, i) => ({
+    id: `${id}-review-${i + 1}`,
+    author: random.pick(REVIEWERS),
+    rating: random.int(4, 5),
+    comment: random.pick(COMMENTS),
+    createdAt: new Date(Date.UTC(2026, 9, 1 + i * 9)).toISOString(),
+  }))
+}
+
 const COLLECTIONS: Record<Character, { id: string; name: string; creator: string }> = {
   emerald: { id: 'kurio-apes', name: 'Kurio Apes', creator: 'Nova Sato' },
   sage: { id: 'nomad-club', name: 'Nomad Club', creator: 'Iris Vale' },
@@ -289,6 +340,7 @@ function buildRecord(seed: Seed, index: number): NftRecord {
   const network = seed.network ?? random.pick(NETWORK_IDS)
   const networkName = network.charAt(0).toUpperCase() + network.slice(1)
   const image = ART[seed.character]
+  const reviewCount = random.int(3, 48)
 
   return {
     id,
@@ -310,11 +362,12 @@ function buildRecord(seed: Seed, index: number): NftRecord {
     ],
     attributes: [...TRAITS[seed.character].slice(0, 2), rarity],
     rating: random.int(40, 50) / 10,
-    reviewCount: random.int(3, 48),
+    reviewCount,
     royaltyPercent: 5,
     contractAddress: `0x${hex(4)}...${hex(4)}`,
-    gallery: [image],
+    gallery: buildGallery(seed.character),
     editions,
+    reviews: buildReviews(id, reviewCount),
     listedAt: new Date(BASE_DATE - index * 7 * HOUR).toISOString(),
     isNew: index < 14,
     isTrending: index % 4 === 1 || index % 7 === 0,

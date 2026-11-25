@@ -78,6 +78,14 @@ export interface NftEdition {
   maxPerOrder: number
 }
 
+export interface NftReview {
+  id: string
+  author: string
+  rating: number
+  comment: string
+  createdAt: string
+}
+
 export interface NftDetail extends NftSummary {
   tokenId: string
   collection: { id: string; name: string }
@@ -92,6 +100,7 @@ export interface NftDetail extends NftSummary {
   contractAddress: string
   gallery: NftImage[]
   editions: NftEdition[]
+  reviews: NftReview[]
 }
 
 /** Parâmetros de GET /api/nfts. */

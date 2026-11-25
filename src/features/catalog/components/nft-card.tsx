@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 /** Card do catálogo: moldura 258×300 com a arte 250×250 ao centro (medidas do Figma). */
 export function NftCard({ nft, priority = false }: { nft: NftSummary; priority?: boolean }) {
   return (
-    <article className="group">
+    <article className="group relative">
       <Link
         to="/nft/$nftId"
         params={{ nftId: nft.id }}

@@ -3,6 +3,7 @@ import type {
   NftDetail,
   NftListParams,
   NftListResponse,
+  NftSummary,
 } from '@/contracts/catalog'
 import { apiClient } from '@/lib/api-client'
 
@@ -23,6 +24,13 @@ export async function getFeatured(signal?: AbortSignal) {
 
 export async function getNft(nftId: string, signal?: AbortSignal) {
   const { data } = await apiClient.get<NftDetail>(`/nfts/${encodeURIComponent(nftId)}`, {
+    signal,
+  })
+  return data
+}
+
+export async function getRelatedNfts(nftId: string, signal?: AbortSignal) {
+  const { data } = await apiClient.get<NftSummary[]>(`/nfts/${encodeURIComponent(nftId)}/related`, {
     signal,
   })
   return data

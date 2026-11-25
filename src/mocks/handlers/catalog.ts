@@ -207,6 +207,22 @@ export const catalogHandlers = [
     },
   ),
 
+  /** "Mais desta coleção": mesma coleção primeiro, completando com a mesma categoria. */
+  http.get<{ nftId: string }, DefaultBodyType, NftSummary[] | ApiErrorBody>(
+    apiUrl('/nfts/:nftId/related'),
+    async ({ params }) => {
+      await simulateNetwork()
+      const nft = db.findNft(params.nftId)
+      if (!nft) return errorResponse(404, 'NOT_FOUND', 'NFT não encontrado.')
+      const others = db.state.nfts.filter((n) => n.id !== nft.id)
+      const sameCollection = others.filter((n) => n.collection.id === nft.collection.id)
+      const sameCategory = others.filter(
+        (n) => n.category === nft.category && n.collection.id !== nft.collection.id,
+      )
+      return HttpResponse.json([...sameCollection, ...sameCategory].slice(0, 8).map(toSummary))
+    },
+  ),
+
   http.get<{ nftId: string }, DefaultBodyType, NftDetail | ApiErrorBody>(
     apiUrl('/nfts/:nftId'),
     async ({ params }) => {
