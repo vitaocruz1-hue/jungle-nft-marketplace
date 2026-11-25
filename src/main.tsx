@@ -17,3 +17,9 @@ if (env.enableMocks) {
 
 const { renderApp } = await import('./app')
 renderApp(rootElement)
+
+// Painel de cenários da demonstração (só existe com os mocks ligados).
+if (env.enableMocks) {
+  const { mountScenarioPanel } = await import('@/mocks/devtools/mount')
+  mountScenarioPanel()
+}
