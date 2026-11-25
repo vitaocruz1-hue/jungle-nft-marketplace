@@ -1,5 +1,5 @@
 import { Link, useRouterState } from '@tanstack/react-router'
-import { LogInIcon, MenuIcon, ShoppingCartIcon } from 'lucide-react'
+import { MenuIcon } from 'lucide-react'
 import { useState } from 'react'
 
 import { notifyComingSoon } from '@/lib/coming-soon'
@@ -15,6 +15,7 @@ import {
 import { cn } from '@/lib/utils'
 
 import { Container } from './container'
+import { AccountButton, CartLink } from './header-actions'
 import { SearchDialog } from './search-dialog'
 
 const navItemClass =
@@ -94,18 +95,8 @@ export function SiteHeader() {
           <div className="flex items-center gap-1 sm:gap-3">
             <SearchDialog />
 
-            <Button asChild variant="ghost" size="icon" className="relative hover:bg-secondary">
-              <Link to="/carrinho" aria-label="Carrinho">
-                <ShoppingCartIcon className="size-5" />
-              </Link>
-            </Button>
-
-            <Button asChild className="ml-1 hidden h-9 px-3 text-base sm:inline-flex">
-              <Link to="/login">
-                <LogInIcon className="size-5" />
-                Entrar
-              </Link>
-            </Button>
+            <CartLink />
+            <AccountButton className="ml-1 hidden sm:inline-flex" />
 
             <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
               <SheetTrigger asChild>
@@ -137,12 +128,9 @@ function MenuSheetLinks({ onNavigate }: { onNavigate: () => void }) {
         onNavigate={onNavigate}
         className="flex flex-col gap-5 [&_a]:h-auto [&_button]:h-auto"
       />
-      <Button asChild className="h-10 text-base sm:hidden">
-        <Link to="/login" onClick={onNavigate}>
-          <LogInIcon className="size-5" />
-          Entrar
-        </Link>
-      </Button>
+      <div className="sm:hidden" onClickCapture={onNavigate}>
+        <AccountButton className="h-10 w-full justify-start" />
+      </div>
     </div>
   )
 }

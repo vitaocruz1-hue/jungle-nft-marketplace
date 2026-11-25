@@ -41,7 +41,7 @@ export function NftCard({ nft, priority = false }: { nft: NftSummary; priority?:
           {displayEth(nft.price)}
         </span>
         {nft.compareAtPrice && (
-          <span className="text-muted-foreground">
+          <span className="text-muted-foreground line-through">
             <span className="sr-only">Preço anterior: </span>
             {displayEth(nft.compareAtPrice)}
           </span>

@@ -1,17 +1,19 @@
 import type { QueryClient } from '@tanstack/react-query'
-import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
+import { createRootRouteWithContext, HeadContent, Outlet } from '@tanstack/react-router'
 
 import { Container } from '@/components/layout/container'
 import { SiteFooter } from '@/components/layout/site-footer'
 import { SiteHeader } from '@/components/layout/site-header'
 import { NotFound } from '@/components/not-found'
 import { Toaster } from '@/components/ui/sonner'
+import { useSessionExpiryHandler } from '@/features/auth/hooks'
 
 export interface RouterContext {
   queryClient: QueryClient
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
+  head: () => ({ meta: [{ title: 'Kurio · Marketplace de NFTs' }] }),
   component: RootLayout,
   notFoundComponent: () => (
     <Container>
@@ -21,8 +23,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 })
 
 function RootLayout() {
+  useSessionExpiryHandler()
+
   return (
     <>
+      <HeadContent />
       <a
         href="#conteudo"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
