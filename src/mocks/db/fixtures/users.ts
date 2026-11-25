@@ -9,6 +9,8 @@ export interface UserRecord {
   displayName: string
   bio: string
   avatarUrl: string | null
+  ensName: string
+  walletNickname: string
   passwordSalt: string
   passwordHash: string
   createdAt: string
@@ -23,6 +25,8 @@ export function createUserFixtures(): UserRecord[] {
       displayName: 'Ana Souza',
       bio: 'Colecionadora de arte generativa desde 2021.',
       avatarUrl: null,
+      ensName: 'anasouza',
+      walletNickname: 'Cofre principal',
       passwordSalt: 's4lt-ana-01',
       passwordHash: '6dc229f0d749cf0821133058b238256f86b536ef4b5c18a7e9a7efe59439dd0e',
       createdAt: '2026-01-10T12:00:00.000Z',
@@ -34,6 +38,8 @@ export function createUserFixtures(): UserRecord[] {
       displayName: 'Bruno Lima',
       bio: 'Fã de música on-chain.',
       avatarUrl: null,
+      ensName: 'brunolima',
+      walletNickname: 'Carteira do Bruno',
       passwordSalt: 's4lt-bruno-02',
       passwordHash: '35bb74146abc4b980215fb9b943fc2a2db1d4b3a013b7022c717bdea45c4f2c2',
       createdAt: '2026-03-02T12:00:00.000Z',

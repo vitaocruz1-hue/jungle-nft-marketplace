@@ -61,7 +61,7 @@ export function useToggleFavorite() {
       return { previous }
     },
     onError: (error, _variables, context) => {
-      if (user && context?.previous)
+      if (user && context?.previous !== undefined)
         queryClient.setQueryData(favoritesKey(user.id), context.previous)
       toast.error('Não foi possível atualizar seus favoritos', {
         description: getErrorMessage(error),
@@ -70,6 +70,10 @@ export function useToggleFavorite() {
     onSuccess: (data, { favorite }) => {
       if (user) queryClient.setQueryData(favoritesKey(user.id), data)
       toast.success(favorite ? 'Adicionado aos favoritos' : 'Removido dos favoritos')
+    },
+    // Sucesso ou falha: confere com a API (cobre o caso de não haver estado anterior).
+    onSettled: () => {
+      if (user) void queryClient.invalidateQueries({ queryKey: favoritesKey(user.id) })
     },
   })
 }

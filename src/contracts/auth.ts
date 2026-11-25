@@ -8,6 +8,9 @@ export interface User {
   displayName: string
   bio: string
   avatarUrl: string | null
+  /** Nome ENS sem ".eth". */
+  ensName: string
+  walletNickname: string
 }
 
 /** POST /api/auth/login */
@@ -49,3 +52,25 @@ export function validatePassword(password: string): string | null {
 }
 
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+/** PATCH /api/profile */
+export interface UpdateProfileRequest {
+  displayName: string
+  username: string
+  email: string
+  ensName: string
+  walletNickname: string
+}
+
+/** PUT /api/profile/avatar — imagem como data URL (até 1 MB). */
+export interface UpdateAvatarRequest {
+  dataUrl: string
+}
+
+export const AVATAR_MAX_BYTES = 1024 * 1024
+
+/** POST /api/profile/password */
+export interface ChangePasswordRequest {
+  currentPassword: string
+  newPassword: string
+}

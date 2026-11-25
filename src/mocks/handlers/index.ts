@@ -7,6 +7,7 @@ import { catalogHandlers } from './catalog'
 import { failureHandlers } from './failures'
 import { favoritesHandlers } from './favorites'
 import { ordersHandlers } from './orders'
+import { profileHandlers } from './profile'
 import { walletsHandlers } from './wallets'
 
 /**
@@ -21,5 +22,6 @@ export const handlers: Array<RequestHandler | WebSocketHandler> = [
   ...favoritesHandlers,
   ...walletsHandlers,
   ...ordersHandlers,
+  ...profileHandlers,
   ...realtimeHandlers,
 ]

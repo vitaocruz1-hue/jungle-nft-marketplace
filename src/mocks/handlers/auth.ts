@@ -65,6 +65,8 @@ export const authHandlers = [
         displayName: username,
         bio: '',
         avatarUrl: null,
+        ensName: username.replace(/[^a-z0-9-]/g, '-'),
+        walletNickname: '',
         passwordSalt: salt,
         passwordHash: await hashPassword(salt, password),
         createdAt: new Date().toISOString(),

@@ -26,6 +26,8 @@ export function toUser(record: UserRecord): User {
     displayName: record.displayName,
     bio: record.bio,
     avatarUrl: record.avatarUrl,
+    ensName: record.ensName,
+    walletNickname: record.walletNickname,
   }
 }
 
