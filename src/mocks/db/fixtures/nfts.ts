@@ -1,5 +1,5 @@
 import type { CategoryId, NetworkId, NftDetail, NftEdition, NftImage } from '@/contracts/catalog'
-import { CATEGORY_IDS, NETWORK_IDS } from '@/contracts/catalog'
+import { CATEGORY_IDS, NETWORK_IDS, RARITIES, type Rarity } from '@/contracts/catalog'
 import { formatWei, multiplyEth, parseEth } from '@/lib/eth'
 
 /** NFT como fica guardado no "banco" simulado (detalhe + campos internos). */
@@ -123,7 +123,7 @@ const TRAITS: Record<Character, string[]> = {
   golden: ['Fones de ouvido', 'Pelagem dourada', 'Jaqueta bomber'],
 }
 
-const RARITY = ['Comum', 'Incomum', 'Raro', 'Épico'] as const
+const RARITY = RARITIES
 
 /** Gerador pseudoaleatório com semente: mesma semente → mesma sequência. */
 function createRandom(seed: number) {
@@ -214,6 +214,8 @@ interface Seed {
   category?: CategoryId
   network?: NetworkId
   soldOut?: boolean
+  /** Raridade fixa (NFTs do Figma); os demais são sorteados. */
+  rarity?: Rarity
 }
 
 /** Os 9 primeiros reproduzem a primeira página do Figma (ordem "Listados recentemente"). */
@@ -221,6 +223,7 @@ const DESIGN_SEEDS: Seed[] = [
   {
     name: 'Emerald Ape #042',
     character: 'emerald',
+    rarity: 'Raro',
     price: '1.19',
     category: 'digital-art',
     network: 'ethereum',
@@ -235,6 +238,7 @@ const DESIGN_SEEDS: Seed[] = [
   {
     name: 'Neon Vessel #552',
     character: 'neon',
+    rarity: 'Raro',
     price: '1.99',
     compareAtPrice: '2.29',
     category: 'collectibles',
@@ -349,7 +353,9 @@ function buildRecord(seed: Seed, index: number): NftRecord {
   const collection = COLLECTIONS[seed.character]
   const number = seed.name.split('#')[1] ?? '000'
   const editions = buildEditions(id, seed.price, seed.soldOut ?? false)
-  const rarity = random.pick(RARITY)
+  // Sorteia sempre (mantém a sequência pseudoaleatória) e aplica a fixa por cima.
+  const drawnRarity = random.pick(RARITY)
+  const rarity = seed.rarity ?? (DESIGN_SEEDS.includes(seed) ? 'Comum' : drawnRarity)
   const network = seed.network ?? random.pick(NETWORK_IDS)
   const networkName = network.charAt(0).toUpperCase() + network.slice(1)
   const variant = seed.variant ?? 'full'
@@ -365,6 +371,7 @@ function buildRecord(seed: Seed, index: number): NftRecord {
     category: seed.category ?? random.pick(CATEGORY_IDS),
     network,
     soldOut: seed.soldOut ?? false,
+    rarity,
     version: 1,
     tokenId: `#0${number}`,
     collection: { id: collection.id, name: collection.name },

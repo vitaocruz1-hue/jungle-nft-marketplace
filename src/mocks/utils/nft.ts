@@ -24,6 +24,7 @@ export function toSummary(nft: NftRecord): NftSummary {
     category: nft.category,
     network: nft.network,
     soldOut: nft.editions.every((e) => e.available === 0),
+    rarity: nft.rarity,
     version: nft.version,
   }
 }

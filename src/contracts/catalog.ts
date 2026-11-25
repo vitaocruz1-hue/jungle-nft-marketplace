@@ -35,6 +35,9 @@ export const NETWORK_LABELS: Record<NetworkId, string> = {
 }
 
 /** Abas do catálogo: todos, novos lançamentos, em alta. */
+export const RARITIES = ['Comum', 'Incomum', 'Raro', 'Épico'] as const
+export type Rarity = (typeof RARITIES)[number]
+
 export const CATALOG_TABS = ['all', 'new', 'trending'] as const
 export type CatalogTab = (typeof CATALOG_TABS)[number]
 
@@ -61,6 +64,8 @@ export interface NftSummary {
   network: NetworkId
   /** Todas as edições esgotadas. */
   soldOut: boolean
+  /** Raridade (Raro e Épico ganham selo no card). */
+  rarity: Rarity
   /** Aumenta a cada mudança de preço/estoque (usado para ordenar eventos). */
   version: number
 }
