@@ -74,12 +74,12 @@ function MainNav({ className, onNavigate }: { className?: string; onNavigate?: (
   )
 }
 
-export function SiteHeader() {
+export function SiteHeader({ className }: { className?: string }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const closeMenu = () => setMenuOpen(false)
 
   return (
-    <header>
+    <header className={className}>
       <Container>
         <div className="flex h-[68px] items-center justify-between gap-4 border-b border-[#8b5b33]/70">
           <Link

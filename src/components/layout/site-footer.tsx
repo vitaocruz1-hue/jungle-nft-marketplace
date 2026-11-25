@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { CategoryId } from '@/contracts/catalog'
 import { CATEGORY_LABELS } from '@/contracts/catalog'
+import { cn } from '@/lib/utils'
 
 import { Container } from './container'
 
@@ -84,9 +85,9 @@ function NewsletterForm() {
   )
 }
 
-export function SiteFooter() {
+export function SiteFooter({ className }: { className?: string }) {
   return (
-    <footer className="mt-24">
+    <footer className={cn('mt-24', className)}>
       <Container>
         <div className="bg-card">
           <div className="grid gap-10 px-6 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0 lg:px-10">

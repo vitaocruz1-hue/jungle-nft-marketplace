@@ -98,6 +98,14 @@
   [id] {
     scroll-margin-top: 1.5rem;
   }
+
+  /* Celular: barra de abas e barras de compra são fixas no rodapé. Ao rolar até
+     um elemento (foco pelo teclado, âncora), ele fica acima delas (WCAG 2.4.11). */
+  @media (width < 48rem) {
+    html {
+      scroll-padding-bottom: 12rem;
+    }
+  }
 }
 
 /* Respeita quem pediu menos movimento no sistema operacional. */

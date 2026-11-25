@@ -2,12 +2,15 @@ import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, HeadContent, Outlet } from '@tanstack/react-router'
 
 import { Container } from '@/components/layout/container'
+import { useMobileChrome } from '@/components/layout/mobile-chrome'
+import { MobileTabBar } from '@/components/layout/mobile-tab-bar'
 import { SiteFooter } from '@/components/layout/site-footer'
 import { SiteHeader } from '@/components/layout/site-header'
 import { NotFound } from '@/components/not-found'
 import { Toaster } from '@/components/ui/sonner'
 import { useSessionExpiryHandler } from '@/features/auth/hooks'
 import { useRealtimeSync } from '@/features/realtime/use-realtime-sync'
+import { cn } from '@/lib/utils'
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -26,6 +29,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 function RootLayout() {
   useSessionExpiryHandler()
   useRealtimeSync()
+  const chrome = useMobileChrome()
 
   return (
     <>
@@ -36,13 +40,17 @@ function RootLayout() {
       >
         Pular para o conteúdo
       </a>
-      <SiteHeader />
+      <SiteHeader className={cn(!chrome.header && 'max-md:hidden')} />
       {/* Altura mínima de uma tela: o rodapé não aparece (e depois "pula") enquanto o conteúdo carrega. */}
       <main id="conteudo" tabIndex={-1} className="min-h-dvh outline-none">
         <Outlet />
       </main>
-      <SiteFooter />
-      <Toaster position="bottom-right" />
+      <SiteFooter
+        className={cn(!chrome.footer && 'max-md:hidden', chrome.tabBar && 'max-md:mb-24')}
+      />
+      {chrome.tabBar && <MobileTabBar />}
+      {/* No celular, acima da barra de abas e das barras de ação fixas. */}
+      <Toaster position="bottom-right" mobileOffset={{ bottom: 120 }} />
     </>
   )
 }
