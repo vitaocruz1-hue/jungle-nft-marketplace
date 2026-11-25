@@ -147,6 +147,7 @@ export function CatalogSection() {
           ) : data ? (
             <>
               <ul
+                aria-label="Resultados do catálogo"
                 aria-busy={query.isPlaceholderData}
                 className={cn(
                   'grid grid-cols-2 gap-x-4 gap-y-8 transition-opacity sm:gap-x-6 md:grid-cols-3 xl:gap-x-8.5 xl:gap-y-12',
