@@ -2,11 +2,17 @@ import { Link } from '@tanstack/react-router'
 
 import { Skeleton } from '@/components/ui/skeleton'
 import type { NftSummary } from '@/contracts/catalog'
+import { FavoriteButton } from '@/features/favorites/components/favorite-button'
 import { displayEth } from '@/lib/eth'
 import { cn } from '@/lib/utils'
 
-/** Card do catálogo: moldura 258×300 com a arte 250×250 ao centro (medidas do Figma). */
+/**
+ * Card do catálogo. Desktop: moldura 258×300 com a arte 250×250 ao centro.
+ * Celular (Figma mobile): moldura arredondada, ♥ sobre a arte.
+ */
 export function NftCard({ nft, priority = false }: { nft: NftSummary; priority?: boolean }) {
+  const rare = nft.rarity === 'Raro' || nft.rarity === 'Épico'
+
   return (
     <article className="group relative">
       <Link
@@ -14,7 +20,7 @@ export function NftCard({ nft, priority = false }: { nft: NftSummary; priority?:
         params={{ nftId: nft.id }}
         className="block rounded-sm focus-visible:outline-offset-4"
       >
-        <div className="relative flex aspect-[258/300] items-center justify-center bg-card px-1">
+        <div className="relative flex aspect-[258/300] items-center justify-center bg-card px-1 max-md:aspect-auto max-md:rounded-[20px] max-md:bg-[#2a1a14] max-md:px-1 max-md:pt-1 max-md:pb-4">
           <img
             src={nft.image.src}
             alt={nft.image.alt}
@@ -27,8 +33,13 @@ export function NftCard({ nft, priority = false }: { nft: NftSummary; priority?:
               nft.soldOut && 'opacity-60 grayscale-[40%]',
             )}
           />
+          {rare && (
+            <span className="absolute top-4 left-0 bg-primary px-2 py-1 text-xs font-bold text-primary-foreground uppercase">
+              {nft.rarity}
+            </span>
+          )}
           {nft.soldOut && (
-            <span className="absolute top-3 left-3 rounded-sm bg-background/90 px-2 py-1 text-xs font-bold tracking-wide uppercase">
+            <span className="absolute bottom-6 left-3 rounded-sm bg-background/90 px-2 py-1 text-xs font-bold tracking-wide uppercase max-md:bottom-7">
               Esgotado
             </span>
           )}
@@ -47,6 +58,14 @@ export function NftCard({ nft, priority = false }: { nft: NftSummary; priority?:
           </span>
         )}
       </p>
+      <FavoriteButton
+        nftId={nft.id}
+        label={{
+          add: `Adicionar ${nft.name} aos favoritos`,
+          remove: `Remover ${nft.name} dos favoritos`,
+        }}
+        className="absolute top-2.5 right-2.5 md:hidden"
+      />
     </article>
   )
 }
@@ -55,7 +74,7 @@ export function NftCard({ nft, priority = false }: { nft: NftSummary; priority?:
 export function NftCardSkeleton() {
   return (
     <div>
-      <div className="flex aspect-[258/300] items-center justify-center bg-card px-1">
+      <div className="flex aspect-[258/300] items-center justify-center bg-card px-1 max-md:aspect-auto max-md:rounded-[20px] max-md:px-1 max-md:pt-1 max-md:pb-4">
         <Skeleton className="aspect-square w-full rounded-[15px] bg-card" />
       </div>
       <Skeleton className="mt-3 h-5 w-3/4" />

@@ -1,33 +1,16 @@
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { CATALOG_SORTS, type CatalogSort, type CatalogTab } from '@/contracts/catalog'
+import type { CatalogTab } from '@/contracts/catalog'
 import { cn } from '@/lib/utils'
 
 import type { CatalogSearch } from '../search-params'
+import { CatalogSort } from './catalog-sort'
 
 const TABS: { value: CatalogTab; label: string }[] = [
   { value: 'all', label: 'Todos os NFTs' },
   { value: 'new', label: 'Novos lançamentos' },
   { value: 'trending', label: 'Em alta' },
 ]
-
-const SORT_LABELS: Record<CatalogSort, string> = {
-  recent: 'Listados recentemente',
-  'price-asc': 'Menor preço',
-  'price-desc': 'Maior preço',
-  'name-asc': 'Nome (A–Z)',
-}
-
-function isCatalogSort(value: string): value is CatalogSort {
-  return (CATALOG_SORTS as readonly string[]).includes(value)
-}
 
 export function CatalogToolbar({
   search,
@@ -36,12 +19,10 @@ export function CatalogToolbar({
   search: CatalogSearch
   filtersButton?: React.ReactNode
 }) {
-  const navigate = useNavigate({ from: '/' })
-
   return (
     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <nav aria-label="Seções do catálogo">
-        <ul className="flex flex-wrap gap-x-4 gap-y-2 sm:gap-x-6">
+        <ul className="flex flex-wrap gap-x-3 gap-y-2 sm:gap-x-6">
           {TABS.map((tab) => {
             const active = search.tab === tab.value
             return (
@@ -66,40 +47,10 @@ export function CatalogToolbar({
         </ul>
       </nav>
 
-      <div className="flex min-w-0 items-center justify-between gap-3">
+      {/* No celular, filtros e ordenação ficam na gaveta (aberta pelo botão ao lado da busca). */}
+      <div className="flex min-w-0 items-center justify-between gap-3 max-md:hidden">
         {filtersButton}
-        <div className="flex min-w-0 items-center gap-2">
-          <span
-            id="ordenar-rotulo"
-            className="sr-only text-sm whitespace-nowrap sm:not-sr-only sm:text-base"
-          >
-            Ordenar por:
-          </span>
-          <Select
-            value={search.sort}
-            onValueChange={(value) => {
-              if (!isCatalogSort(value)) return
-              void navigate({
-                search: (prev) => ({ ...prev, sort: value, page: undefined }),
-                resetScroll: false,
-              })
-            }}
-          >
-            <SelectTrigger
-              aria-labelledby="ordenar-rotulo"
-              className="h-9 min-w-0 border-0 bg-transparent px-2 text-sm shadow-none hover:bg-secondary sm:text-base"
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent align="end">
-              {CATALOG_SORTS.map((sort) => (
-                <SelectItem key={sort} value={sort}>
-                  {SORT_LABELS[sort]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <CatalogSort id="ordenar" value={search.sort} />
       </div>
     </div>
   )

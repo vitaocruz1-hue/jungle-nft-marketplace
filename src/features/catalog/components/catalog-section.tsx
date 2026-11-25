@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useSearch } from '@tanstack/react-router'
 import { SlidersHorizontalIcon, XIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect } from 'react'
 
 import { QueryError } from '@/components/query-error'
 import { Button } from '@/components/ui/button'
@@ -12,14 +12,15 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 
+import { setFiltersSheetOpen, useFiltersSheetOpen } from '../filters-sheet-store'
 import { nftListQueryOptions } from '../queries'
 import { CATALOG_PAGE_SIZE, toListParams } from '../search-params'
 import { CatalogFilters } from './catalog-filters'
 import { CatalogPagination } from './catalog-pagination'
+import { CatalogSort } from './catalog-sort'
 import { CatalogToolbar } from './catalog-toolbar'
 import { NftCard, NftCardSkeleton } from './nft-card'
 import { SpotlightCard } from './spotlight-card'
@@ -31,25 +32,41 @@ function resultsLabel(total: number) {
 export function CatalogSection() {
   const search = useSearch({ from: '/' })
   const query = useQuery(nftListQueryOptions(toListParams(search)))
-  const [filtersOpen, setFiltersOpen] = useState(false)
+  const filtersOpen = useFiltersSheetOpen()
   const { data } = query
 
+  // Fecha a gaveta ao sair da Início.
+  useEffect(() => () => setFiltersSheetOpen(false), [])
+
+  // Tablet: botão na barra do catálogo. Celular: botão ao lado da busca (MobileHomeBar).
   const filtersButton = (
-    <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
-      <SheetTrigger asChild>
-        <Button variant="outline" className="h-9 border-border bg-card lg:hidden">
-          <SlidersHorizontalIcon />
-          Filtros
-        </Button>
-      </SheetTrigger>
+    <Button
+      variant="outline"
+      aria-haspopup="dialog"
+      onClick={() => setFiltersSheetOpen(true)}
+      className="h-9 border-border bg-card lg:hidden"
+    >
+      <SlidersHorizontalIcon />
+      Filtros
+    </Button>
+  )
+
+  const filtersSheet = (
+    <Sheet open={filtersOpen} onOpenChange={setFiltersSheetOpen}>
       <SheetContent side="left" className="w-[320px] gap-0 overflow-y-auto bg-background p-0">
         <SheetHeader className="px-5">
           <SheetTitle>Filtros</SheetTitle>
           <SheetDescription className="sr-only">Refine o catálogo de NFTs</SheetDescription>
         </SheetHeader>
+        <CatalogSort
+          id="ordenar-gaveta"
+          value={search.sort}
+          className="px-5 pb-4 md:hidden"
+          triggerClassName="flex-1 justify-between border border-border bg-card"
+        />
         <CatalogFilters facets={data?.facets} search={search} />
         <SheetFooter className="sticky bottom-0 bg-background">
-          <Button onClick={() => setFiltersOpen(false)} className="h-10">
+          <Button onClick={() => setFiltersSheetOpen(false)} className="h-10">
             Ver {data ? resultsLabel(data.totalItems) : 'resultados'}
           </Button>
         </SheetFooter>
@@ -61,7 +78,7 @@ export function CatalogSection() {
     <section
       id="catalogo"
       aria-labelledby="catalogo-titulo"
-      className="mt-16 grid gap-8 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[310px_minmax(0,1fr)] xl:gap-12"
+      className="mt-6 grid gap-8 md:mt-16 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[310px_minmax(0,1fr)] xl:gap-12"
     >
       <h2 id="catalogo-titulo" className="sr-only">
         Catálogo de NFTs
@@ -96,12 +113,12 @@ export function CatalogSection() {
           {data && !query.isPlaceholderData ? resultsLabel(data.totalItems) : ''}
         </p>
 
-        <div className="mt-8">
+        <div className="mt-5 md:mt-8">
           {query.isPending ? (
             <div
               aria-busy="true"
               aria-label="Carregando NFTs"
-              className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 md:grid-cols-3 xl:gap-x-8.5 xl:gap-y-12"
+              className="grid grid-cols-2 gap-x-4 gap-y-6 sm:gap-x-6 md:grid-cols-3 md:gap-y-8 xl:gap-x-8.5 xl:gap-y-12 max-md:[&>*:nth-child(even)]:mt-8"
             >
               {Array.from({ length: CATALOG_PAGE_SIZE }, (_, i) => (
                 <NftCardSkeleton key={i} />
@@ -150,7 +167,8 @@ export function CatalogSection() {
                 aria-label="Resultados do catálogo"
                 aria-busy={query.isPlaceholderData}
                 className={cn(
-                  'grid grid-cols-2 gap-x-4 gap-y-8 transition-opacity sm:gap-x-6 md:grid-cols-3 xl:gap-x-8.5 xl:gap-y-12',
+                  // Celular: grade desencontrada (coluna da direita mais baixa), como no Figma.
+                  'grid grid-cols-2 gap-x-4 gap-y-6 transition-opacity sm:gap-x-6 md:grid-cols-3 md:gap-y-8 xl:gap-x-8.5 xl:gap-y-12 max-md:[&>*:nth-child(even)]:mt-8',
                   query.isPlaceholderData && 'opacity-60',
                 )}
               >
@@ -167,6 +185,7 @@ export function CatalogSection() {
 
         <SpotlightCard className="mt-12 lg:hidden" />
       </div>
+      {filtersSheet}
     </section>
   )
 }

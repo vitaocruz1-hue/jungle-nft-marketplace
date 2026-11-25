@@ -10,6 +10,7 @@ import {
 } from '@/features/catalog/search-params'
 import { Hero } from '@/features/home/components/hero'
 import { Journal } from '@/features/home/components/journal'
+import { MobileHomeBar } from '@/features/home/components/mobile-home-bar'
 import { PromoBanners } from '@/features/home/components/promo-banners'
 
 export const Route = createFileRoute('/')({
@@ -29,6 +30,7 @@ export const Route = createFileRoute('/')({
 function HomePage() {
   return (
     <Container>
+      <MobileHomeBar />
       <Hero />
       <CatalogSection />
       <PromoBanners />
