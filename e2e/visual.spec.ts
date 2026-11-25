@@ -11,6 +11,8 @@ import { login } from './support/auth'
 // Esconde avisos (toasts), que dependem do tempo, e espera imagens/fontes.
 async function stable(page: Page) {
   await page.addStyleTag({ content: '[data-sonner-toaster]{display:none !important}' })
+  // Nada ainda carregando (skeletons) em nenhuma parte da página.
+  await expect(page.locator('[data-slot="skeleton"]:visible')).toHaveCount(0)
   await page.evaluate(() => document.fonts.ready)
   // A foto é da página inteira: carrega já as imagens com loading="lazy".
   await page.evaluate(() => {
@@ -23,6 +25,14 @@ async function stable(page: Page) {
     Array.from(document.images)
       .filter((img) => img.getClientRects().length > 0)
       .every((img) => img.complete && img.naturalWidth > 0),
+  )
+  // Baixada não é o mesmo que pintada: espera a decodificação de cada imagem.
+  await page.evaluate(() =>
+    Promise.all(
+      Array.from(document.images)
+        .filter((img) => img.getClientRects().length > 0)
+        .map((img) => img.decode().catch(() => undefined)),
+    ),
   )
 }
 

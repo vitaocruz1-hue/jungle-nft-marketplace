@@ -149,6 +149,8 @@ test.describe('Tempo real', () => {
   test('após desconexão, reconecta e reconcilia com a API', async ({ page }) => {
     await page.goto('/')
     await expect(page.locator('article', { hasText: 'Emerald Ape #042' })).toContainText('1.19 ETH')
+    // Espera o socket conectar antes de derrubá-lo.
+    await expect.poll(() => mocks(page, (m) => m.connectedClients())).toBe(1)
     await mocks(page, (m) => m.dropConnections())
     // Mudança enquanto desconectado: chega pela reconciliação REST ao reconectar.
     await mocks(page, (m) => m.changeNftPrice('emerald-ape-042', '3.33'))
