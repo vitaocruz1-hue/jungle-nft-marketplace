@@ -1,14 +1,14 @@
-import { useNavigate, useRouterState } from '@tanstack/react-router'
-import { HeartIcon, MinusIcon, PlusIcon } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
+import { HeartIcon, MinusIcon, PlusIcon, ShoppingCartIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import type { NftDetail, NftEdition } from '@/contracts/catalog'
-import { useSession } from '@/features/auth/session'
 import { useAddToCart } from '@/features/cart/queries'
-import { useFavorites, useToggleFavorite } from '@/features/favorites/queries'
+import { useFavoriteAction } from '@/features/favorites/use-favorite-action'
 import { getErrorMessage } from '@/lib/api-error'
+import { displayEth, multiplyEth } from '@/lib/eth'
 import { cn } from '@/lib/utils'
 
 /** Edição inicial: a mais barata com estoque (no Figma, a 1/50). */
@@ -27,38 +27,91 @@ function limitMessage(edition: NftEdition) {
     : `Limite de ${edition.maxPerOrder} por pedido nesta edição.`
 }
 
+interface StepperProps {
+  quantity: number
+  disabled: boolean
+  atLimit: boolean
+  describedBy?: string
+  onChange: (quantity: number) => void
+  size: 'desktop' | 'mobile'
+}
+
+function QuantityStepper({
+  quantity,
+  disabled,
+  atLimit,
+  describedBy,
+  onChange,
+  size,
+}: StepperProps) {
+  const buttonClass = size === 'desktop' ? 'h-10 w-8 rounded-full' : 'h-7 w-5 rounded-full'
+  const iconClass = size === 'desktop' ? 'size-5' : 'size-4'
+  return (
+    <div className={cn('flex items-center', size === 'desktop' ? 'gap-4' : 'gap-3')}>
+      <Button
+        type="button"
+        size="icon"
+        className={buttonClass}
+        aria-label="Diminuir quantidade"
+        disabled={disabled || quantity <= 1}
+        onClick={() => onChange(quantity - 1)}
+      >
+        <MinusIcon className={iconClass} />
+      </Button>
+      <output aria-live="polite" aria-label="Quantidade" className="min-w-4 text-center text-lg">
+        {disabled ? 0 : quantity}
+      </output>
+      <Button
+        type="button"
+        size="icon"
+        className={buttonClass}
+        aria-label="Aumentar quantidade"
+        aria-describedby={atLimit ? describedBy : undefined}
+        disabled={disabled || atLimit}
+        onClick={() => onChange(quantity + 1)}
+      >
+        <PlusIcon className={iconClass} />
+      </Button>
+    </div>
+  )
+}
+
 export function PurchasePanel({ nft }: { nft: NftDetail }) {
   const navigate = useNavigate()
-  const href = useRouterState({ select: (s) => s.location.href })
   const [editionId, setEditionId] = useState(() => defaultEdition(nft.editions)?.id)
   const [quantity, setQuantity] = useState(1)
   const addToCart = useAddToCart()
-  const { isAuthenticated } = useSession()
-  const { isFavorite } = useFavorites()
-  const toggleFavorite = useToggleFavorite()
+  const { favorite, toggleFavorite, isAuthenticated } = useFavoriteAction(nft.id)
 
   // Se o estoque mudar (ex.: evento em tempo real), a seleção se ajusta.
   const edition = nft.editions.find((e) => e.id === editionId) ?? defaultEdition(nft.editions)
   const limit = edition ? editionLimit(edition) : 0
   const safeQuantity = Math.min(Math.max(quantity, 1), Math.max(limit, 1))
   const soldOut = !edition || edition.available === 0
-  const favorite = isFavorite(nft.id)
+  const atLimit = !soldOut && safeQuantity >= limit
 
   function selectEdition(next: NftEdition) {
     setEditionId(next.id)
     setQuantity((q) => Math.min(q, Math.max(editionLimit(next), 1)))
   }
 
-  function buy() {
+  /** `goToCart`: "Comprar" leva ao carrinho; o botão de carrinho só adiciona. */
+  function add(goToCart: boolean) {
     if (!edition || soldOut) return
     addToCart.mutate(
       { nftId: nft.id, editionId: edition.id, quantity: safeQuantity },
       {
         onSuccess: () => {
-          toast.success('Adicionado ao carrinho', {
-            description: `${nft.name} · Edição ${edition.label} · ${safeQuantity} un.`,
-          })
-          void navigate({ to: '/carrinho' })
+          const description = `${nft.name} · Edição ${edition.label} · ${safeQuantity} un.`
+          if (goToCart) {
+            toast.success('Adicionado ao carrinho', { description })
+            void navigate({ to: '/carrinho' })
+          } else {
+            toast.success('Adicionado ao carrinho', {
+              description,
+              action: { label: 'Ver carrinho', onClick: () => void navigate({ to: '/carrinho' }) },
+            })
+          }
         },
         onError: (error) =>
           toast.error('Não foi possível adicionar ao carrinho', {
@@ -68,13 +121,11 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
     )
   }
 
-  function handleFavorite() {
-    if (!isAuthenticated) {
-      toast.info('Entre na sua conta para favoritar NFTs.')
-      void navigate({ to: '/login', search: { redirect: href } })
-      return
-    }
-    toggleFavorite.mutate({ nftId: nft.id, favorite: !favorite })
+  const stepper = {
+    quantity: safeQuantity,
+    disabled: soldOut,
+    atLimit,
+    onChange: setQuantity,
   }
 
   return (
@@ -124,42 +175,13 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
         )}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Button
-            type="button"
-            size="icon"
-            className="h-10 w-8 rounded-full"
-            aria-label="Diminuir quantidade"
-            disabled={soldOut || safeQuantity <= 1}
-            onClick={() => setQuantity(safeQuantity - 1)}
-          >
-            <MinusIcon className="size-5" />
-          </Button>
-          <output
-            aria-live="polite"
-            aria-label="Quantidade"
-            className="min-w-4 text-center text-lg"
-          >
-            {soldOut ? 0 : safeQuantity}
-          </output>
-          <Button
-            type="button"
-            size="icon"
-            className="h-10 w-8 rounded-full"
-            aria-label="Aumentar quantidade"
-            aria-describedby={safeQuantity >= limit ? 'limite-quantidade' : undefined}
-            disabled={soldOut || safeQuantity >= limit}
-            onClick={() => setQuantity(safeQuantity + 1)}
-          >
-            <PlusIcon className="size-5" />
-          </Button>
-        </div>
-
+      {/* Desktop/tablet: quantidade + Comprar + Favoritar na mesma linha. */}
+      <div className="flex flex-wrap items-center justify-between gap-4 max-md:hidden">
+        <QuantityStepper {...stepper} size="desktop" describedBy="limite-quantidade" />
         <div className="flex flex-wrap gap-3">
           <Button
             type="button"
-            onClick={buy}
+            onClick={() => add(true)}
             disabled={soldOut || addToCart.isPending}
             className="h-9 min-w-[115px] text-sm font-bold uppercase"
           >
@@ -168,7 +190,7 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
           <Button
             type="button"
             variant="outline"
-            onClick={handleFavorite}
+            onClick={toggleFavorite}
             aria-pressed={isAuthenticated ? favorite : undefined}
             className="h-9 border-primary bg-transparent text-sm text-highlight hover:bg-secondary hover:text-highlight"
           >
@@ -178,7 +200,7 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
         </div>
       </div>
 
-      {edition && !soldOut && safeQuantity >= limit && (
+      {atLimit && edition && (
         <p id="limite-quantidade" role="status" className="text-xs text-highlight">
           {limitMessage(edition)}
         </p>
@@ -188,6 +210,42 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
           Todas as edições deste NFT estão esgotadas.
         </p>
       )}
+
+      {/* Celular (Figma mobile): barra de compra fixa no rodapé da tela. */}
+      <div className="fixed inset-x-0 bottom-0 z-40 rounded-t-[28px] border-t border-[#3d2a1f] bg-card px-6 pt-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgb(0_0_0/0.35)] md:hidden">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span aria-hidden="true" className="text-sm font-bold text-muted-foreground">
+              Qtd.
+            </span>
+            <QuantityStepper {...stepper} size="mobile" describedBy="limite-quantidade" />
+          </div>
+          <p className="text-xl font-bold text-highlight">
+            <span className="sr-only">Total: </span>
+            {edition ? displayEth(multiplyEth(edition.price, soldOut ? 1 : safeQuantity)) : ''}
+          </p>
+        </div>
+        <div className="mt-4 flex gap-3">
+          <Button
+            type="button"
+            onClick={() => add(true)}
+            disabled={soldOut || addToCart.isPending}
+            className="h-14 flex-1 rounded-full bg-[linear-gradient(90deg,#d0884b,#b77743)] text-base font-bold"
+          >
+            {soldOut ? 'Esgotado' : addToCart.isPending ? 'Adicionando…' : 'Comprar NFT'}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => add(false)}
+            disabled={soldOut || addToCart.isPending}
+            aria-label="Adicionar ao carrinho"
+            className="size-14 rounded-full bg-[#2f1d15] text-muted-foreground hover:bg-secondary"
+          >
+            <ShoppingCartIcon className="size-5" />
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }

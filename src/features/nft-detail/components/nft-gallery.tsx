@@ -23,7 +23,7 @@ export function NftGallery({ images, name }: { images: NftImage[]; name: string 
   return (
     <div className="flex flex-col-reverse gap-4 sm:flex-row sm:gap-7">
       {images.length > 1 && (
-        <ul aria-label="Imagens do NFT" className="flex gap-3 sm:flex-col sm:gap-4">
+        <ul aria-label="Imagens do NFT" className="flex gap-3 max-md:hidden sm:flex-col sm:gap-4">
           {images.map((image, index) => (
             <li key={image.src}>
               <button
@@ -53,7 +53,7 @@ export function NftGallery({ images, name }: { images: NftImage[]; name: string 
         </ul>
       )}
 
-      <div className="relative flex-1 rounded-md bg-card p-4 sm:max-w-[444px] sm:p-5">
+      <div className="relative flex-1 rounded-md bg-card p-4 max-md:bg-transparent max-md:p-0 sm:max-w-[444px] md:p-5">
         <img
           key={current.src}
           src={current.src}
@@ -62,14 +62,41 @@ export function NftGallery({ images, name }: { images: NftImage[]; name: string 
           height={current.height}
           fetchPriority="high"
           decoding="async"
-          className="aspect-square w-full rounded-[20px] object-cover"
+          className="aspect-square w-full rounded-[20px] object-cover max-md:rounded-3xl"
         />
+        {/* Celular: pontos sobre a imagem trocam a foto da galeria. */}
+        {images.length > 1 && (
+          <div
+            role="group"
+            aria-label="Imagens do NFT"
+            className="absolute inset-x-0 bottom-10 flex justify-center gap-1 md:hidden"
+          >
+            {images.map((image, index) => (
+              <button
+                key={image.src}
+                type="button"
+                onClick={() => setSelected(index)}
+                aria-label={`Ver imagem ${index + 1} de ${images.length}: ${image.alt}`}
+                aria-pressed={index === selected}
+                className="grid size-6 cursor-pointer place-items-center rounded-full"
+              >
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'block size-2 rounded-full bg-background/80 ring-1 ring-primary',
+                    index === selected && 'bg-primary',
+                  )}
+                />
+              </button>
+            ))}
+          </div>
+        )}
         <Dialog>
           <DialogTrigger asChild>
             <button
               type="button"
               aria-label="Ampliar imagem"
-              className="absolute top-3 right-3 grid size-9 cursor-pointer place-items-center rounded-full bg-background/90 transition-colors hover:bg-background"
+              className="absolute top-3 right-3 grid size-9 cursor-pointer place-items-center rounded-full bg-background/90 transition-colors hover:bg-background max-md:hidden"
             >
               <SearchIcon className="size-5" />
             </button>

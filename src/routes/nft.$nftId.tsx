@@ -1,14 +1,16 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound, useRouter } from '@tanstack/react-router'
-import { MailIcon } from 'lucide-react'
+import { MailIcon, StarIcon } from 'lucide-react'
 
 import { LinkedinIcon, TwitterIcon } from '@/components/brand-icons'
+import { BackButton } from '@/components/back-button'
 import { Breadcrumb } from '@/components/breadcrumb'
 import { Container } from '@/components/layout/container'
 import { NotFound } from '@/components/not-found'
 import { QueryError } from '@/components/query-error'
 import { RatingStars } from '@/components/rating-stars'
 import { nftDetailQueryOptions, relatedNftsQueryOptions } from '@/features/catalog/queries'
+import { FavoriteButton } from '@/features/favorites/components/favorite-button'
 import { NftDetailSkeleton } from '@/features/nft-detail/components/nft-detail-skeleton'
 import { NftGallery } from '@/features/nft-detail/components/nft-gallery'
 import { NftTabs } from '@/features/nft-detail/components/nft-tabs'
@@ -106,23 +108,44 @@ function NftDetailPage() {
   const { data: nft } = useSuspenseQuery(nftDetailQueryOptions(nftId))
 
   return (
-    <Container className="pt-8">
-      <Breadcrumb
-        items={[
-          { label: 'Início', link: { to: '/' } },
-          { label: 'Mercado', link: { to: '/', hash: 'catalogo' } },
-          { label: nft.name },
-        ]}
-      />
+    <Container className="max-md:pb-48 md:pt-8">
+      <div className="max-md:hidden">
+        <Breadcrumb
+          items={[
+            { label: 'Início', link: { to: '/' } },
+            { label: 'Mercado', link: { to: '/', hash: 'catalogo' } },
+            { label: nft.name },
+          ]}
+        />
+      </div>
+      {/* Celular (Figma mobile): voltar e favoritar no topo. */}
+      <div className="flex items-center justify-between pt-4 pb-4 md:hidden">
+        <BackButton />
+        <FavoriteButton nftId={nft.id} className="size-9" />
+      </div>
 
-      <div className="mt-3 grid gap-8 lg:grid-cols-[572px_minmax(0,1fr)]">
+      <div className="grid gap-8 max-md:gap-0 md:mt-3 lg:grid-cols-[572px_minmax(0,1fr)]">
         <NftGallery key={nft.id} images={nft.gallery} name={nft.name} />
 
-        <article aria-labelledby="nft-titulo" className="min-w-0">
-          <h1 id="nft-titulo" className="text-2xl font-bold sm:text-[28px]">
-            {nft.name}
-          </h1>
-          <div className="mt-2 flex flex-wrap items-center justify-between gap-3 border-b border-[#442c1a] pb-3">
+        <article
+          aria-labelledby="nft-titulo"
+          className="min-w-0 max-md:relative max-md:z-10 max-md:-mx-5 max-md:-mt-8 max-md:rounded-t-[28px] max-md:bg-card max-md:px-6 max-md:pt-7 max-md:pb-6"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <h1 id="nft-titulo" className="text-2xl font-bold max-md:text-xl sm:text-[28px]">
+              {nft.name}
+            </h1>
+            <p className="flex shrink-0 items-center gap-1 rounded-full border border-primary px-2 py-0.5 text-sm md:hidden">
+              <StarIcon aria-hidden="true" className="size-3.5 fill-primary text-primary" />
+              <span className="sr-only">Nota</span>
+              <strong>{nft.rating.toFixed(1)}</strong>
+              <span>
+                ({nft.reviewCount}
+                <span className="sr-only"> avaliações</span>)
+              </span>
+            </p>
+          </div>
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-3 border-b border-[#442c1a] pb-3 max-md:hidden">
             <p className="text-xl font-bold text-highlight">
               <span className="sr-only">A partir de </span>
               {displayEth(nft.price)}
@@ -139,7 +162,7 @@ function NftDetailPage() {
             </p>
           </div>
 
-          <h2 className="mt-4 text-sm font-bold">Sobre este NFT:</h2>
+          <h2 className="mt-4 text-sm font-bold max-md:sr-only">Sobre este NFT:</h2>
           <p className="mt-2 text-sm leading-[22px] text-muted-foreground">{nft.description}</p>
 
           <div className="mt-4">
