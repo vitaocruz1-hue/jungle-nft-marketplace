@@ -179,6 +179,27 @@ protocolo. Limitações e ajustes:
   social e itens do menu do perfil (Atividade, Ofertas…) mostram "em breve" sem simular sucesso.
   "Ver no Etherscan" abre o explorador da rede com a referência simulada.
 - **Responsivo:** 390/768/1440 px; filtros em gaveta e menu lateral abaixo de 1024/768 px.
+
+### Layout mobile (abaixo de 768 px)
+
+Segue os 6 frames mobile do Figma (414 px de largura), adaptados para 390 px.
+
+- **Moldura por rota** (`components/layout/mobile-chrome.ts`): a Início não tem cabeçalho e usa a
+  barra de abas inferior. Detalhe, Carrinho, Pagamento, Login e Cadastro são telas "focadas", sem
+  cabeçalho, rodapé ou barra de abas, com botão Voltar. As telas sem frame mobile (Perfil,
+  Pedidos, 404…) têm cabeçalho, rodapé e barra de abas.
+- **Barra de abas:** o coração não tem tela no Figma e mostra "em breve". O botão central é a
+  busca: leva ao campo "Explorar coleções" da Início e o foca.
+- **Catálogo:** a ordenação fica dentro da gaveta de filtros (o Figma mobile só tem o botão de
+  filtros). O selo RARO/ÉPICO vem do campo `rarity` da API.
+- **Pagamento:** "Carteira e rede" escolhe a rede (Ethereum/Polygon/Solana), que define a taxa da
+  cotação. O Figma lista provedores de carteira (WalletConnect, MetaMask…), que a API simulada não
+  tem. O fluxo mantém "Revisar pedido" antes de "Confirmar compra" (a revisão revalida preço e
+  estoque). "Dados do colecionador" fica num bloco recolhível e abre sozinho se houver erro.
+- **Login/Cadastro:** a dica de senha ("Mínimo de 8 caracteres…") foi mantida, embora não exista no
+  frame.
+- **Barras fixas:** a barra de abas e as barras de compra são fixas. `scroll-padding-bottom` no
+  `html` impede que o elemento focado fique escondido atrás delas (WCAG 2.4.11).
 - **Acessibilidade:** link "pular para o conteúdo", foco visível, foco preso em diálogos/gavetas
   (Radix), erros ligados aos campos com foco no primeiro inválido, `aria-live` para resultados,
   mudanças de preço, totais e estado do pedido, estados não dependentes só de cor (texto
@@ -188,7 +209,7 @@ protocolo. Limitações e ajustes:
 ## Performance
 
 Medianas de 3 execuções (detalhes em `lighthouse/reports/summary.md`): desktop 97/98;
-mobile 67 (Início) e 66 (Detalhe). Acessibilidade 100, Boas práticas 96 e SEO 100 em todos.
+mobile 66 (Início) e 68 (Detalhe). Acessibilidade 100, Boas práticas 96 e SEO 100 em todos.
 
 **Causas do mobile abaixo de 90.** O perfil mobile simula CPU 4× mais lenta. O LCP (arte
 principal) depende de JavaScript: iniciar o MSW (exigido no cenário auditado), executar o React e
@@ -197,7 +218,7 @@ receber os dados simulados. O TBT vem da avaliação do React e do MSW e das ren
 
 **O que foi feito:** carregamento do app em paralelo com o MSW, com a rede aguardando o mock;
 `socket.io-client` sob demanda; code splitting por rota; imagens WebP com dimensões declaradas e
-`fetchpriority` no LCP; fonte local; altura mínima do conteúdo (CLS 0,197 → 0).
+`fetchpriority` no LCP; fonte local; altura mínima do conteúdo (CLS 0,197 → até 0,016).
 
 **Tentativas descartadas (medidas):** carregamento sequencial (MSW → app) e preload da fonte e
 da imagem do destaque. No 4G simulado os preloads disputaram banda com o JavaScript, e nenhuma

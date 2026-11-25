@@ -109,7 +109,7 @@ mesmos controles estão em `window.__kurioMocks`.
 
 ## Testes
 
-- **E2E** (`npm run test:e2e`): 40 cenários × desktop e mobile, cobrindo os 12 itens do enunciado
+- **E2E** (`npm run test:e2e`): 42 cenários × desktop e mobile, cobrindo os 12 itens do enunciado
   (catálogo, detalhe, conta, favoritos, carrinho, compra, falhas, perfil/carteiras, tempo real,
   eventos duplicados/desconexão, teclado/foco e skeletons/recuperação). Cada teste roda em um
   contexto isolado (armazenamento limpo); tempo real passa pelo `socket.io-client` e REST pelos
@@ -126,10 +126,10 @@ relatórios e ambiente em [lighthouse/reports/](lighthouse/reports/summary.md).
 
 | Página  | Perfil  | Performance | Acessibilidade | Boas práticas | SEO |    LCP |   CLS |    TBT |
 | ------- | ------- | ----------: | -------------: | ------------: | --: | -----: | ----: | -----: |
-| Início  | mobile  |          67 |            100 |            96 | 100 | 5,59 s | 0,000 | 501 ms |
-| Início  | desktop |          97 |            100 |            96 | 100 | 1,28 s | 0,002 |   7 ms |
-| Detalhe | mobile  |          66 |            100 |            96 | 100 | 5,30 s | 0,000 | 580 ms |
-| Detalhe | desktop |          98 |            100 |            96 | 100 | 1,14 s | 0,000 |   3 ms |
+| Início  | mobile  |          66 |            100 |            96 | 100 | 5,65 s | 0,016 | 513 ms |
+| Início  | desktop |          97 |            100 |            96 | 100 | 1,21 s | 0,002 |   2 ms |
+| Detalhe | mobile  |          68 |            100 |            96 | 100 | 5,36 s | 0,000 | 409 ms |
+| Detalhe | desktop |          98 |            100 |            96 | 100 | 1,13 s | 0,000 |   0 ms |
 
 Performance mobile fica abaixo de 90; causas e tentativas em
 [ARCHITECTURE.md → Performance](ARCHITECTURE.md#performance).
