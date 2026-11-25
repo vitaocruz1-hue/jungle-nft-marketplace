@@ -25,7 +25,9 @@ const activeNavItemClass =
 
 function useActiveSection() {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
-  return { isHome: pathname === '/', isMarket: pathname.startsWith('/nft') }
+  // No Figma, "Mercado" fica ativo no detalhe, no carrinho e no pagamento.
+  const isMarket = ['/nft', '/carrinho', '/pagamento'].some((path) => pathname.startsWith(path))
+  return { isHome: pathname === '/', isMarket }
 }
 
 function MainNav({ className, onNavigate }: { className?: string; onNavigate?: () => void }) {

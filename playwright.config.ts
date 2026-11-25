@@ -4,6 +4,9 @@ import { defineConfig, devices } from '@playwright/test'
 const PORT = 4180
 const isCI = !!process.env.CI
 
+const desktop = { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } }
+const mobile = { ...devices['Pixel 7'], viewport: { width: 390, height: 844 } }
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -20,14 +23,29 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
 
+  // Fluxos (desktop/mobile) e regressão visual (@visual) ficam em projetos
+  // separados: screenshots dependem do sistema operacional (fontes), então as
+  // baselines têm sufixo de plataforma e rodam com `npm run test:visual`.
   projects: [
     {
       name: 'desktop',
-      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+      grepInvert: /@visual/,
+      use: { ...desktop },
     },
     {
       name: 'mobile',
-      use: { ...devices['Pixel 7'], viewport: { width: 390, height: 844 } },
+      grepInvert: /@visual/,
+      use: { ...mobile },
+    },
+    {
+      name: 'visual-desktop',
+      grep: /@visual/,
+      use: { ...desktop },
+    },
+    {
+      name: 'visual-mobile',
+      grep: /@visual/,
+      use: { ...mobile },
     },
   ],
 
