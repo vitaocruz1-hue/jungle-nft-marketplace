@@ -1,0 +1,31 @@
+# Dependências (recriadas com `npm install`)
+node_modules/
+
+# Saída de build
+dist/
+*.tsbuildinfo
+
+# Variáveis de ambiente locais (podem ter valores pessoais)
+.env
+.env.local
+.env.*.local
+
+# Playwright: relatórios e resultados de execução
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# Lighthouse: relatórios gerados localmente
+.lighthouseci/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / sistema
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
