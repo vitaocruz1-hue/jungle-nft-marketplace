@@ -37,4 +37,9 @@ export default defineConfig([
     files: ['src/components/ui/**/*.tsx', 'src/routes/**/*.tsx'],
     rules: { 'react-refresh/only-export-components': 'off' },
   },
+  {
+    // Testes e arquivos de configuração rodam no Node, não no navegador.
+    files: ['e2e/**/*.ts', '*.config.ts'],
+    languageOptions: { globals: globals.node },
+  },
 ])
