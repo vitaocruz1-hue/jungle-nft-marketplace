@@ -8,6 +8,7 @@ import type { NftUpdatedEvent, OrderUpdatedEvent } from '@/contracts/realtime'
 import { privateKeys } from '@/features/auth/session'
 import { catalogKeys } from '@/features/catalog/queries'
 import { cartKeys } from '@/features/cart/queries'
+import { orderKeys } from '@/features/orders/queries'
 import { displayEth } from '@/lib/eth'
 
 import { notifyNftChanged } from './realtime-store'
@@ -72,11 +73,6 @@ export function applyNftUpdated(queryClient: QueryClient, event: NftUpdatedEvent
   }
 
   notifyNftChanged(event)
-}
-
-export const orderKeys = {
-  detail: (userId: string, orderId: string) =>
-    [...privateKeys.user(userId), 'orders', orderId] as const,
 }
 
 /** order.updated: atualiza o pedido e, se confirmado, o carrinho. */
