@@ -1,7 +1,11 @@
 import type { QueryClient } from '@tanstack/react-query'
-import { createRootRouteWithContext, Link, Outlet } from '@tanstack/react-router'
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 
+import { Container } from '@/components/layout/container'
+import { SiteFooter } from '@/components/layout/site-footer'
+import { SiteHeader } from '@/components/layout/site-header'
 import { NotFound } from '@/components/not-found'
+import { Toaster } from '@/components/ui/sonner'
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -9,7 +13,11 @@ export interface RouterContext {
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootLayout,
-  notFoundComponent: () => <NotFound />,
+  notFoundComponent: () => (
+    <Container>
+      <NotFound />
+    </Container>
+  ),
 })
 
 function RootLayout() {
@@ -17,23 +25,16 @@ function RootLayout() {
     <>
       <a
         href="#conteudo"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-background focus:px-4 focus:py-2"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
       >
         Pular para o conteúdo
       </a>
-
-      {/* Cabeçalho provisório: será substituído pelo do Figma. */}
-      <header className="border-b">
-        <nav aria-label="Principal" className="mx-auto flex h-16 max-w-7xl items-center px-4">
-          <Link to="/" className="text-lg font-bold">
-            NFT Marketplace
-          </Link>
-        </nav>
-      </header>
-
-      <main id="conteudo" tabIndex={-1} className="mx-auto max-w-7xl px-4 py-8 outline-none">
+      <SiteHeader />
+      <main id="conteudo" tabIndex={-1} className="outline-none">
         <Outlet />
       </main>
+      <SiteFooter />
+      <Toaster position="bottom-right" />
     </>
   )
 }
