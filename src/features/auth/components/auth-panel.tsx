@@ -40,22 +40,30 @@ export function AuthPanel({ mode, description, redirect, children }: AuthPanelPr
   const tabClass = 'transition-colors hover:text-highlight'
 
   return (
-    <div className="mx-auto w-full max-w-[500px] border-b-8 border-primary bg-card shadow-2xl">
-      <div className="relative px-6 pt-12 pb-10 sm:px-20">
+    <div className="mx-auto w-full max-w-[500px] border-primary md:border-b-8 md:bg-card md:shadow-2xl">
+      <div className="relative pt-6 pb-8 md:px-20 md:pt-12 md:pb-10">
+        {/* Celular (Figma mobile): logo no topo, sem card nem botão de fechar. */}
+        <Link
+          to="/"
+          aria-label="Kurio, página inicial"
+          className="block text-center text-[32px] font-bold tracking-wider md:hidden"
+        >
+          KURIO
+        </Link>
         <button
           type="button"
           onClick={() =>
             window.history.length > 1 ? router.history.back() : void router.navigate({ to: '/' })
           }
           aria-label="Fechar e voltar"
-          className="absolute top-3 right-3 grid size-9 cursor-pointer place-items-center rounded-sm text-highlight hover:bg-secondary"
+          className="absolute top-3 right-3 grid size-9 cursor-pointer place-items-center rounded-sm text-highlight hover:bg-secondary max-md:hidden"
         >
           <XIcon className="size-5" />
         </button>
 
         <nav
           aria-label="Acesso à conta"
-          className="flex items-center justify-center gap-2 text-lg sm:text-xl"
+          className="flex items-center justify-center gap-2 text-lg max-md:hidden sm:text-xl"
         >
           <Link
             to="/login"
@@ -76,14 +84,19 @@ export function AuthPanel({ mode, description, redirect, children }: AuthPanelPr
           </Link>
         </nav>
 
-        <h1 className="sr-only">{mode === 'login' ? 'Entrar' : 'Criar conta'}</h1>
-        <p className="mt-8 text-center text-sm leading-5">{description}</p>
+        <h1 className="mt-20 text-center text-xl font-bold md:sr-only">
+          <span className="md:hidden">
+            {mode === 'login' ? 'Entrar' : 'Criar perfil de colecionador'}
+          </span>
+          <span className="max-md:hidden">{mode === 'login' ? 'Entrar' : 'Criar conta'}</span>
+        </h1>
+        <p className="mt-8 text-center text-sm leading-5 max-md:hidden">{description}</p>
 
         <div className="mt-6">{children}</div>
       </div>
 
-      <div className="relative border-t border-[#3d2a1f] px-6 pb-10 sm:px-20">
-        <p className="mx-auto -mt-3 w-fit bg-card px-3 text-sm">Ou continue com</p>
+      <div className="relative border-t border-[#3d2a1f] pb-10 md:px-20">
+        <p className="mx-auto -mt-3 w-fit bg-background px-3 text-sm md:bg-card">Ou continue com</p>
         <div className="mt-4 space-y-3">
           {[
             { label: 'Google', icon: <GoogleIcon /> },
@@ -100,13 +113,25 @@ export function AuthPanel({ mode, description, redirect, children }: AuthPanelPr
               key={provider.label}
               type="button"
               onClick={() => notifyComingSoon(`Login com ${provider.label}`)}
-              className="flex h-10 w-full cursor-pointer items-center justify-center gap-3 rounded-sm border border-[#3d2a1f] text-sm transition-colors hover:border-primary"
+              className="flex h-10 w-full cursor-pointer items-center justify-center gap-3 rounded-sm border border-[#3d2a1f] text-sm transition-colors hover:border-primary max-md:h-11"
             >
               {provider.icon}
               Continuar com {provider.label}
             </button>
           ))}
         </div>
+        {/* Celular: no lugar das abas "Entrar | Criar conta". */}
+        <p className="mt-10 text-center text-muted-foreground md:hidden">
+          {mode === 'login' ? (
+            <Link to="/cadastro" search={{ redirect }} className="hover:text-highlight">
+              Novo na Kurio? Crie uma conta
+            </Link>
+          ) : (
+            <Link to="/login" search={{ redirect }} className="hover:text-highlight">
+              Já tem uma conta? Entre
+            </Link>
+          )}
+        </p>
       </div>
     </div>
   )

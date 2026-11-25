@@ -86,7 +86,11 @@ export function LoginForm({ onSuccess }: { onSuccess: () => void }) {
           Esqueceu a senha?
         </button>
       </div>
-      <Button type="submit" disabled={login.isPending} className="h-11 w-full text-base font-bold">
+      <Button
+        type="submit"
+        disabled={login.isPending}
+        className="h-11 w-full text-base font-bold max-md:h-14 max-md:rounded-[10px]"
+      >
         {login.isPending ? 'Entrando…' : 'Entrar'}
       </Button>
       <p className="text-center text-xs text-muted-foreground">

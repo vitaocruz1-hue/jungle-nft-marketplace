@@ -18,7 +18,7 @@ function RegisterPage() {
   const navigate = useNavigate()
 
   return (
-    <Container className="py-10 sm:py-16">
+    <Container className="pt-14 pb-10 md:py-16">
       <AuthPanel
         mode="register"
         redirect={search.redirect}

@@ -47,7 +47,7 @@ export function FormField({
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy || undefined}
           className={cn(
-            'h-10 rounded-sm border-[#3d2a1f] bg-card px-4 text-sm placeholder:text-muted-foreground/90',
+            'h-10 rounded-sm border-[#3d2a1f] bg-card px-4 text-sm placeholder:text-muted-foreground/90 max-md:h-12 max-md:rounded-[10px] max-md:bg-transparent',
             isPassword && 'pr-11',
           )}
           {...props}
