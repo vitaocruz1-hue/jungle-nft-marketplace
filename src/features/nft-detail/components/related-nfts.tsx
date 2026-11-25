@@ -6,12 +6,15 @@ import { relatedNftsQueryOptions } from '@/features/catalog/queries'
 /** "Mais desta coleção": lista horizontal com rolagem (deslize no celular). */
 export function RelatedNfts({
   nftId,
+  exclude,
   title = 'Mais desta coleção',
 }: {
   nftId: string
+  /** NFTs que não devem aparecer (ex.: os que já estão no carrinho). */
+  exclude?: string[]
   title?: string
 }) {
-  const { data, isPending, isError } = useQuery(relatedNftsQueryOptions(nftId))
+  const { data, isPending, isError } = useQuery(relatedNftsQueryOptions(nftId, exclude))
 
   // Conteúdo complementar: se falhar, a seção some sem afetar a compra.
   if (isError || (data && data.length === 0)) return null

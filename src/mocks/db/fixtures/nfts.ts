@@ -69,16 +69,25 @@ const ART_FILE: Record<Character, string> = {
   golden: 'golden-beat',
 }
 
-/** Galeria: arte principal (maior quando existe) + dois detalhes. */
-function buildGallery(character: Character): NftImage[] {
-  const main = character === 'emerald' ? LARGE_ART.emerald : ART[character]
+/** Variações de arte por personagem: inteira, close do rosto e close da roupa. */
+type ArtVariant = 'full' | 'face' | 'outfit'
+
+function artFor(character: Character, variant: ArtVariant): NftImage {
+  if (variant === 'full') return ART[character]
   const [faceAlt, outfitAlt] = DETAIL_ALTS[character]
-  const file = ART_FILE[character]
-  return [
-    main,
-    { src: `/images/nfts/${file}-face.webp`, alt: faceAlt, width: 496, height: 496 },
-    { src: `/images/nfts/${file}-outfit.webp`, alt: outfitAlt, width: 496, height: 496 },
-  ]
+  return {
+    src: `/images/nfts/${ART_FILE[character]}-${variant}.webp`,
+    alt: variant === 'face' ? faceAlt : outfitAlt,
+    width: 496,
+    height: 496,
+  }
+}
+
+/** Galeria: a arte do NFT primeiro, depois as outras duas variações. */
+function buildGallery(character: Character, variant: ArtVariant): NftImage[] {
+  const full = character === 'emerald' ? LARGE_ART.emerald : ART[character]
+  const others = (['full', 'face', 'outfit'] as const).filter((v) => v !== variant)
+  return [variant, ...others].map((v) => (v === 'full' ? full : artFor(character, v)))
 }
 
 const REVIEWERS = ['Marina T.', 'Caio R.', 'Lia M.', 'Otávio P.', 'Rafa N.', 'Júlia S.'] as const
@@ -198,6 +207,8 @@ function buildEditions(id: string, base: string, soldOut: boolean): NftEdition[]
 interface Seed {
   name: string
   character: Character
+  /** Arte do card (padrão: inteira). */
+  variant?: ArtVariant
   price: string
   compareAtPrice?: string
   category?: CategoryId
@@ -320,6 +331,8 @@ function generatedSeeds(count: number): Seed[] {
     seeds.push({
       name,
       character,
+      // 4 personagens × 3 variações = 12 artes: evita a mesma imagem lado a lado.
+      variant: (['face', 'outfit', 'full'] as const)[Math.floor(seeds.length / 4) % 3],
       price,
       compareAtPrice: onSale ? formatWei((BigInt(cents) * 10n ** 16n * 12n) / 10n) : undefined,
       soldOut: seeds.length % 13 === 5,
@@ -339,7 +352,8 @@ function buildRecord(seed: Seed, index: number): NftRecord {
   const rarity = random.pick(RARITY)
   const network = seed.network ?? random.pick(NETWORK_IDS)
   const networkName = network.charAt(0).toUpperCase() + network.slice(1)
-  const image = ART[seed.character]
+  const variant = seed.variant ?? 'full'
+  const image = artFor(seed.character, variant)
   const reviewCount = random.int(3, 48)
 
   return {
@@ -365,7 +379,7 @@ function buildRecord(seed: Seed, index: number): NftRecord {
     reviewCount,
     royaltyPercent: 5,
     contractAddress: `0x${hex(4)}...${hex(4)}`,
-    gallery: buildGallery(seed.character),
+    gallery: buildGallery(seed.character, variant),
     editions,
     reviews: buildReviews(id, reviewCount),
     listedAt: new Date(BASE_DATE - index * 7 * HOUR).toISOString(),

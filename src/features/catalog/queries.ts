@@ -15,7 +15,8 @@ export const catalogKeys = {
   details: () => [...catalogKeys.all, 'detail'] as const,
   detail: (nftId: string) => [...catalogKeys.details(), nftId] as const,
   featured: () => [...catalogKeys.all, 'featured'] as const,
-  related: (nftId: string) => [...catalogKeys.all, 'related', nftId] as const,
+  related: (nftId: string, exclude: string[] = []) =>
+    [...catalogKeys.all, 'related', nftId, exclude] as const,
 }
 
 export function nftListQueryOptions(params: NftListParams) {
@@ -41,9 +42,9 @@ export function nftDetailQueryOptions(nftId: string) {
   })
 }
 
-export function relatedNftsQueryOptions(nftId: string) {
+export function relatedNftsQueryOptions(nftId: string, exclude: string[] = []) {
   return queryOptions({
-    queryKey: catalogKeys.related(nftId),
-    queryFn: ({ signal }) => getRelatedNfts(nftId, signal),
+    queryKey: catalogKeys.related(nftId, exclude),
+    queryFn: ({ signal }) => getRelatedNfts(nftId, exclude, signal),
   })
 }

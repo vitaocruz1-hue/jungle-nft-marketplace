@@ -13,7 +13,7 @@ import { createWalletFixtures } from './fixtures/wallets'
 
 const STORAGE_KEY = 'kurio:mock-db'
 /** Mude ao alterar o formato do estado: dados antigos são descartados. */
-const SCHEMA_VERSION = 6
+const SCHEMA_VERSION = 7
 
 export interface SessionRecord {
   token: string

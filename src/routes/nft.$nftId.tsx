@@ -19,9 +19,10 @@ import { displayEth } from '@/lib/eth'
 
 export const Route = createFileRoute('/nft/$nftId')({
   loader: async ({ context: { queryClient }, params }) => {
-    void queryClient.prefetchQuery(relatedNftsQueryOptions(params.nftId))
     try {
       const nft = await queryClient.ensureQueryData(nftDetailQueryOptions(params.nftId))
+      // Recomendações só depois de saber que o NFT existe (evita um 404 inútil).
+      void queryClient.prefetchQuery(relatedNftsQueryOptions(params.nftId))
       return { name: nft.name }
     } catch (error) {
       // Acesso direto a um NFT que não existe → 404 específica.

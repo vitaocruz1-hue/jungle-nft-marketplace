@@ -137,7 +137,11 @@ function CartPage() {
       </div>
 
       {cart?.items[0] && (
-        <RelatedNfts nftId={cart.items[0].nftId} title="Colecionadores também viram" />
+        <RelatedNfts
+          nftId={cart.items[0].nftId}
+          exclude={[...new Set(cart.items.map((item) => item.nftId))]}
+          title="Colecionadores também viram"
+        />
       )}
     </Container>
   )

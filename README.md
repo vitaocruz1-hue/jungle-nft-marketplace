@@ -4,7 +4,8 @@ Solução do [desafio de frontend da Jungle Gaming](https://github.com/junglegam
 marketplace de NFTs em React + TypeScript, fiel ao Figma, com API REST e eventos em tempo real
 **simulados no navegador** (MSW + Socket.IO). Não há backend: tudo roda a partir de um checkout limpo.
 
-- **Aplicação publicada:** _(adicionar a URL da Vercel após o deploy)_
+- **Aplicação publicada:** <https://jungle-nft-marketplace-jade.vercel.app/>
+- **Repositório:** <https://github.com/vitaocruz1-hue/jungle-nft-marketplace>
 - **Arquitetura, contratos e decisões:** [ARCHITECTURE.md](ARCHITECTURE.md)
 - **Auditoria Lighthouse:** [lighthouse/reports/summary.md](lighthouse/reports/summary.md)
 

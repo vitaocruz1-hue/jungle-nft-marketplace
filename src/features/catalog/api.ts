@@ -29,8 +29,10 @@ export async function getNft(nftId: string, signal?: AbortSignal) {
   return data
 }
 
-export async function getRelatedNfts(nftId: string, signal?: AbortSignal) {
+/** Recomendações variadas; `exclude` tira da lista (ex.: o que já está no carrinho). */
+export async function getRelatedNfts(nftId: string, exclude: string[] = [], signal?: AbortSignal) {
   const { data } = await apiClient.get<NftSummary[]>(`/nfts/${encodeURIComponent(nftId)}/related`, {
+    params: exclude.length > 0 ? { exclude: exclude.join(',') } : undefined,
     signal,
   })
   return data

@@ -26,6 +26,7 @@ import { currentPrice, toDetail, toSummary } from '../utils/nft'
 import { apiUrl, errorResponse } from '../utils/http'
 
 const DEFAULT_PAGE_SIZE = 9
+const RELATED_LIMIT = 8
 const MAX_PAGE_SIZE = 48
 
 /** Remove acentos e caixa: "Música" e "musica" casam. */
@@ -180,16 +181,41 @@ export const catalogHandlers = [
   /** "Mais desta coleção": mesma coleção primeiro, completando com a mesma categoria. */
   http.get<{ nftId: string }, DefaultBodyType, NftSummary[] | ApiErrorBody>(
     apiUrl('/nfts/:nftId/related'),
-    async ({ params }) => {
+    async ({ request, params }) => {
       await simulateNetwork()
       const nft = db.findNft(params.nftId)
       if (!nft) return errorResponse(404, 'NOT_FOUND', 'NFT não encontrado.')
-      const others = db.state.nfts.filter((n) => n.id !== nft.id)
-      const sameCollection = others.filter((n) => n.collection.id === nft.collection.id)
-      const sameCategory = others.filter(
-        (n) => n.category === nft.category && n.collection.id !== nft.collection.id,
+      // ?exclude=a,b — ex.: itens que já estão no carrinho.
+      const excluded = new Set(
+        (new URL(request.url).searchParams.get('exclude') ?? '').split(',').filter(Boolean),
       )
-      return HttpResponse.json([...sameCollection, ...sameCategory].slice(0, 8).map(toSummary))
+      excluded.add(nft.id)
+
+      // Prioridade: mesma coleção, depois mesma categoria, depois os mais recentes.
+      const score = (n: NftRecord) =>
+        (n.collection.id === nft.collection.id ? 2 : 0) + (n.category === nft.category ? 1 : 0)
+      const ranked = db.state.nfts
+        .filter((n) => !excluded.has(n.id))
+        .sort((a, b) => score(b) - score(a) || b.listedAt.localeCompare(a.listedAt))
+
+      // Rodízio por personagem (arte sem o sufixo de variação): o mesmo personagem
+      // nunca aparece lado a lado e os diferentes do NFT atual vêm primeiro.
+      const character = (n: NftRecord) => n.image.src.replace(/-(face|outfit|lg)\.webp$/, '.webp')
+      const byCharacter = new Map<string, NftRecord[]>()
+      for (const n of ranked)
+        byCharacter.set(character(n), [...(byCharacter.get(character(n)) ?? []), n])
+      const own = character(nft)
+      const groups = [...byCharacter.entries()]
+        .sort(([a], [b]) => Number(a === own) - Number(b === own))
+        .map(([, list]) => list)
+      const related: NftRecord[] = []
+      for (let round = 0; related.length < RELATED_LIMIT && groups.some((g) => g[round]); round++) {
+        for (const group of groups) {
+          const item = group[round]
+          if (item && related.length < RELATED_LIMIT) related.push(item)
+        }
+      }
+      return HttpResponse.json(related.map(toSummary))
     },
   ),
 

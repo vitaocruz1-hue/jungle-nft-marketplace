@@ -42,7 +42,7 @@ O interceptor do Axios converte qualquer falha em `ApiError` (`code`, `status`, 
 | NFTs      | `GET /nfts?search&category&network&minPrice&maxPrice&tab&sort&page&pageSize` → `NftListResponse`                            | itens + paginação + contadores por filtro + faixa de preço · 400 parâmetros inválidos                                                                                           |
 |           | `GET /featured` → destaques (carrossel e "NFT em destaque")                                                                 |                                                                                                                                                                                 |
 |           | `GET /nfts/:id` → `NftDetail` (edições, galeria, avaliações)                                                                | 404                                                                                                                                                                             |
-|           | `GET /nfts/:id/related` → `NftSummary[]`                                                                                    | 404                                                                                                                                                                             |
+|           | `GET /nfts/:id/related?exclude=id1,id2` → `NftSummary[]` (até 8, alternando personagens)                                    | 404                                                                                                                                                                             |
 | Favoritos | `GET /favorites` · `PUT /favorites/:nftId` · `DELETE /favorites/:nftId` → `{nftIds}`                                        | 401 · 404 · 503 (cenário)                                                                                                                                                       |
 | Carrinho  | `GET /cart` → `Cart` (itens com preço/estoque **atuais**, avisos, cupom e totais)                                           | visitante: `X-Cart-Id`; logado: token                                                                                                                                           |
 |           | `POST /cart/items` `{nftId,editionId,quantity}` · `PATCH /cart/items/:id` `{quantity}` · `DELETE /cart/items/:id`           | 404 · 409 `OUT_OF_STOCK` · 422 limite por pedido/estoque                                                                                                                        |
@@ -154,7 +154,9 @@ protocolo. Limitações e ajustes:
   conforme o cenário.
 - Banco em memória com persistência no `localStorage` (com versão de esquema) e reset completo.
 - Fixtures determinísticas: 48 NFTs (os 9 primeiros reproduzem o Figma), 2 usuários, carteira da
-  Ana; o gerador pseudoaleatório usa semente fixa.
+  Ana; o gerador pseudoaleatório usa semente fixa. Os NFTs gerados alternam 12 artes (4 personagens
+  × inteira/rosto/roupa) e as recomendações fazem rodízio por personagem, para a mesma imagem não
+  se repetir lado a lado.
 - Cenários escolhidos por `?cenario=` ou pelo painel; controles em `window.__kurioMocks` para testes.
 
 ## Interface, acessibilidade e desvios do Figma

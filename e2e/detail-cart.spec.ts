@@ -51,6 +51,35 @@ test.describe('Detalhe do NFT', () => {
   })
 })
 
+test.describe('Recomendações', () => {
+  /** Arte de cada card de uma seção (sem o sufixo de variação = personagem). */
+  async function arts(page: Page, heading: string) {
+    const section = page.getByRole('region', { name: heading })
+    await expect(section.getByRole('article').first()).toBeVisible()
+    return section
+      .locator('article img')
+      .evaluateAll((imgs) => imgs.map((img) => (img as HTMLImageElement).getAttribute('src') ?? ''))
+  }
+
+  test('"Mais desta coleção" não repete o mesmo personagem lado a lado', async ({ page }) => {
+    await page.goto('/nft/emerald-ape-042')
+    const srcs = await arts(page, 'Mais desta coleção')
+    const characters = srcs.map((src) => src.replace(/-(face|outfit|lg)\.webp$/, '.webp'))
+    expect(srcs.length).toBeGreaterThanOrEqual(5)
+    for (let i = 1; i < characters.length; i++) expect(characters[i]).not.toBe(characters[i - 1])
+    expect(new Set(srcs).size).toBeGreaterThanOrEqual(4)
+  })
+
+  test('"Colecionadores também viram" não mostra o que já está no carrinho', async ({ page }) => {
+    await addToCart(page, 'emerald-ape-042')
+    const section = page.getByRole('region', { name: 'Colecionadores também viram' })
+    await expect(section.getByRole('article').first()).toBeVisible()
+    await expect(section.getByRole('heading', { name: 'Emerald Ape #042' })).toHaveCount(0)
+    const srcs = await arts(page, 'Colecionadores também viram')
+    for (let i = 1; i < srcs.length; i++) expect(srcs[i]).not.toBe(srcs[i - 1])
+  })
+})
+
 test.describe('Carrinho', () => {
   test('adiciona, altera quantidade, aplica cupom, remove e sobrevive ao F5', async ({ page }) => {
     await addToCart(page, 'emerald-ape-042', { quantity: 2 })
