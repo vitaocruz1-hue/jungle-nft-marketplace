@@ -17,3 +17,12 @@ export function errorResponse(
 ) {
   return HttpResponse.json<ApiErrorBody>({ error: { code, message, fieldErrors } }, { status })
 }
+
+/** Lê o corpo JSON da requisição; corpo inválido vira null (a rota responde 422). */
+export async function readJson<T>(request: Request): Promise<Partial<T> | null> {
+  try {
+    return (await request.json()) as Partial<T>
+  } catch {
+    return null
+  }
+}

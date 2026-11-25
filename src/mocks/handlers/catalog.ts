@@ -152,7 +152,7 @@ export const catalogHandlers = [
         tab: tab ?? 'all',
       }
 
-      const all = db.nfts
+      const all = db.state.nfts
       const results = all.filter((nft) => matches(nft, filters)).sort(SORTERS[sort ?? 'recent'])
       const size = pageSize ?? DEFAULT_PAGE_SIZE
       const totalPages = Math.max(1, Math.ceil(results.length / size))

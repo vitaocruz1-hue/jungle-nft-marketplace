@@ -20,7 +20,7 @@ test.describe('Catálogo da Início', () => {
       'Violet Nomad #314',
       'Ivory Baron #088',
       'Golden Beat #207',
-      'Golden Pulse #233',
+      'Golden Frequency #071',
       'Golden Signal #160',
     ])
   })

@@ -10,6 +10,7 @@ export const SCENARIOS = {
   padrao: 'Rede normal (~250 ms)',
   lento: 'Rede lenta (3 s por resposta)',
   variavel: 'Latência variável: respostas chegam fora de ordem',
+  'falha-favoritos': 'Salvar/remover favorito falha (HTTP 503)',
 } as const
 
 export type ScenarioId = keyof typeof SCENARIOS

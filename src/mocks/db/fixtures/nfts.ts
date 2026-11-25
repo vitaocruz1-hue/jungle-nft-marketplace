@@ -207,9 +207,9 @@ const DESIGN_SEEDS: Seed[] = [
     network: 'polygon',
   },
   {
-    name: 'Golden Pulse #233',
+    name: 'Golden Frequency #071',
     character: 'golden',
-    price: '0.69',
+    price: '0.59',
     category: 'music',
     network: 'solana',
   },
