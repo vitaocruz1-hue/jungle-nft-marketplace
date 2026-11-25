@@ -1,5 +1,9 @@
+import type { Order, Quote } from '@/contracts/orders'
+import type { Wallet } from '@/contracts/wallets'
+
 import { createNftFixtures, type NftRecord } from './fixtures/nfts'
 import { createUserFixtures, type UserRecord } from './fixtures/users'
+import { createWalletFixtures } from './fixtures/wallets'
 
 /**
  * "Banco de dados" da API simulada.
@@ -9,7 +13,7 @@ import { createUserFixtures, type UserRecord } from './fixtures/users'
 
 const STORAGE_KEY = 'kurio:mock-db'
 /** Mude ao alterar o formato do estado: dados antigos são descartados. */
-const SCHEMA_VERSION = 4
+const SCHEMA_VERSION = 5
 
 export interface SessionRecord {
   token: string
@@ -34,6 +38,26 @@ export interface CartRecord {
   updatedAt: string
 }
 
+export interface QuoteRecord extends Quote {
+  userId: string
+}
+
+export interface OrderRecord extends Order {
+  userId: string
+  idempotencyKey: string
+  /** Assinatura do corpo da requisição: mesma chave + corpo diferente = conflito. */
+  requestHash: string
+  /** Quando a simulação decide o resultado (confirmado/recusado). */
+  settleAt: string
+  /** Resultado decidido na criação (cenário ativo naquele momento). */
+  outcome: 'confirmed' | 'declined'
+}
+
+export interface UserWallets {
+  primary: Wallet | null
+  secondary: Wallet | null
+}
+
 export interface DbState {
   schemaVersion: number
   nfts: NftRecord[]
@@ -41,6 +65,9 @@ export interface DbState {
   sessions: SessionRecord[]
   carts: CartRecord[]
   favorites: Record<string, string[]>
+  wallets: Record<string, UserWallets>
+  quotes: QuoteRecord[]
+  orders: OrderRecord[]
   /** Contador para gerar ids legíveis e determinísticos. */
   sequence: number
 }
@@ -53,6 +80,9 @@ function createInitialState(): DbState {
     sessions: [],
     carts: [],
     favorites: { 'user-ana': ['sage-nomad-009'], 'user-bruno': [] },
+    wallets: createWalletFixtures(),
+    quotes: [],
+    orders: [],
     sequence: 1,
   }
 }

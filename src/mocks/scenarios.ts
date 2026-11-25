@@ -11,6 +11,12 @@ export const SCENARIOS = {
   lento: 'Rede lenta (3 s por resposta)',
   variavel: 'Latência variável: respostas chegam fora de ordem',
   'falha-favoritos': 'Salvar/remover favorito falha (HTTP 503)',
+  'erro-servidor': 'Catálogo responde HTTP 500',
+  instavel: 'As 2 primeiras consultas falham (503) e depois funcionam',
+  offline: 'Sem conexão: toda chamada falha e o socket é recusado',
+  'pagamento-recusado': 'A carteira recusa o pagamento (pedido recusado)',
+  'timeout-pedido': 'O pedido é criado, mas a resposta demora além do limite (timeout)',
+  'carteira-recusa': 'O usuário recusa a conexão da carteira',
 } as const
 
 export type ScenarioId = keyof typeof SCENARIOS
