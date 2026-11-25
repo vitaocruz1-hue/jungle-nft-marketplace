@@ -24,13 +24,31 @@ export interface CartItem {
   issues: CartItemIssue[]
 }
 
+export interface AppliedCoupon {
+  code: string
+  description: string
+  /** Desconto em pontos-base (1000 = 10%). */
+  basisPoints: number
+}
+
 /** GET /api/cart — carrinho do usuário logado ou do visitante (X-Cart-Id). */
 export interface Cart {
   id: string
   items: CartItem[]
   itemCount: number
+  coupon: AppliedCoupon | null
+  /** Valores calculados pela API (a interface só exibe). */
   subtotal: EthAmount
+  discount: EthAmount
+  /** Taxa de rede estimada (Ethereum) até a escolha da rede no pagamento. */
+  networkFee: EthAmount
+  total: EthAmount
   updatedAt: IsoDateTime
+}
+
+/** PUT /api/cart/coupon */
+export interface ApplyCouponRequest {
+  code: string
 }
 
 /** POST /api/cart/items */

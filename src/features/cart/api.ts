@@ -34,3 +34,13 @@ export async function acknowledgeCartChanges() {
   const { data } = await apiClient.post<Cart>('/cart/acknowledge')
   return remember(data)
 }
+
+export async function applyCoupon(code: string) {
+  const { data } = await apiClient.put<Cart>('/cart/coupon', { code })
+  return remember(data)
+}
+
+export async function removeCoupon() {
+  const { data } = await apiClient.delete<Cart>('/cart/coupon')
+  return remember(data)
+}

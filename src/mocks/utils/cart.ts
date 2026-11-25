@@ -3,12 +3,19 @@ import { CART_ID_HEADER } from '@/contracts/cart'
 import { addEth, compareEth, multiplyEth, normalizeEth } from '@/lib/eth'
 
 import { db, type CartRecord } from '../db'
+import { checkCoupon, computeTotals } from './pricing'
 
 /** Carrinho do usuário logado (cria se não existir). */
 export function getUserCart(userId: string): CartRecord {
   let cart = db.state.carts.find((c) => c.userId === userId)
   if (!cart) {
-    cart = { id: db.nextId('cart'), userId, lines: [], updatedAt: new Date().toISOString() }
+    cart = {
+      id: db.nextId('cart'),
+      userId,
+      lines: [],
+      couponCode: null,
+      updatedAt: new Date().toISOString(),
+    }
     db.state.carts.push(cart)
   }
   return cart
@@ -19,7 +26,13 @@ export function getGuestCart(request: Request): CartRecord {
   const id = request.headers.get(CART_ID_HEADER)
   let cart = id ? db.state.carts.find((c) => c.id === id && c.userId === null) : undefined
   if (!cart) {
-    cart = { id: db.nextId('cart'), userId: null, lines: [], updatedAt: new Date().toISOString() }
+    cart = {
+      id: db.nextId('cart'),
+      userId: null,
+      lines: [],
+      couponCode: null,
+      updatedAt: new Date().toISOString(),
+    }
     db.state.carts.push(cart)
   }
   return cart
@@ -46,6 +59,7 @@ export function mergeGuestCart(request: Request, userId: string) {
     if (existing) existing.quantity = Math.min(existing.quantity + line.quantity, limit)
     else target.lines.push({ ...line, id: db.nextId('line') })
   }
+  target.couponCode ??= guest.couponCode
   target.updatedAt = new Date().toISOString()
   db.state.carts = db.state.carts.filter((c) => c.id !== guest.id)
 }
@@ -78,11 +92,17 @@ export function toCart(cart: CartRecord): Cart {
       issues,
     })
   }
+  const subtotal = addEth('0', ...items.map((item) => item.lineTotal))
+  // Um cupom aplicado que venceu depois deixa de valer.
+  const couponCheck = cart.couponCode ? checkCoupon(cart.couponCode) : null
+  const coupon = couponCheck?.ok ? couponCheck.coupon : null
   return {
     id: cart.id,
     items,
     itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
-    subtotal: addEth('0', ...items.map((item) => item.lineTotal)),
+    coupon,
+    subtotal,
+    ...computeTotals(subtotal, coupon, 'ethereum'),
     updatedAt: cart.updatedAt,
   }
 }

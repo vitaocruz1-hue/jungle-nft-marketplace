@@ -1,6 +1,11 @@
 import { http, HttpResponse, type DefaultBodyType, type PathParams } from 'msw'
 
-import type { AddCartItemRequest, Cart, UpdateCartItemRequest } from '@/contracts/cart'
+import type {
+  AddCartItemRequest,
+  ApplyCouponRequest,
+  Cart,
+  UpdateCartItemRequest,
+} from '@/contracts/cart'
 import type { ApiErrorBody } from '@/contracts/common'
 
 import { db, type CartRecord } from '../db'
@@ -8,6 +13,7 @@ import { simulateNetwork } from '../scenarios'
 import { authenticate } from '../utils/auth'
 import { editionLimit, getGuestCart, getUserCart, toCart } from '../utils/cart'
 import { apiUrl, errorResponse, readJson } from '../utils/http'
+import { checkCoupon } from '../utils/pricing'
 
 type CartResolution =
   { ok: true; cart: CartRecord } | { ok: false; response: ReturnType<typeof errorResponse> }
@@ -143,6 +149,37 @@ export const cartHandlers = [
         const edition = db.findNft(line.nftId)?.editions.find((e) => e.id === line.editionId)
         if (edition) line.addedUnitPrice = edition.price
       }
+      return saveAndRespond(resolved.cart)
+    },
+  ),
+
+  http.put<PathParams, DefaultBodyType, Cart | ApiErrorBody>(
+    apiUrl('/cart/coupon'),
+    async ({ request }) => {
+      await simulateNetwork()
+      const resolved = resolveCart(request)
+      if (!resolved.ok) return resolved.response
+      const body = await readJson<ApplyCouponRequest>(request)
+      const code = String(body?.code ?? '').trim()
+      if (!code) {
+        return errorResponse(422, 'VALIDATION_ERROR', 'Informe o código.', {
+          code: 'Informe o código promocional.',
+        })
+      }
+      const check = checkCoupon(code)
+      if (!check.ok) return errorResponse(422, check.code, check.message, { code: check.message })
+      resolved.cart.couponCode = check.coupon.code
+      return saveAndRespond(resolved.cart)
+    },
+  ),
+
+  http.delete<PathParams, DefaultBodyType, Cart | ApiErrorBody>(
+    apiUrl('/cart/coupon'),
+    async ({ request }) => {
+      await simulateNetwork()
+      const resolved = resolveCart(request)
+      if (!resolved.ok) return resolved.response
+      resolved.cart.couponCode = null
       return saveAndRespond(resolved.cart)
     },
   ),

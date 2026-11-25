@@ -9,7 +9,7 @@ import { createUserFixtures, type UserRecord } from './fixtures/users'
 
 const STORAGE_KEY = 'kurio:mock-db'
 /** Mude ao alterar o formato do estado: dados antigos são descartados. */
-const SCHEMA_VERSION = 3
+const SCHEMA_VERSION = 4
 
 export interface SessionRecord {
   token: string
@@ -30,6 +30,7 @@ export interface CartRecord {
   /** null = carrinho de visitante. */
   userId: string | null
   lines: CartLineRecord[]
+  couponCode: string | null
   updatedAt: string
 }
 

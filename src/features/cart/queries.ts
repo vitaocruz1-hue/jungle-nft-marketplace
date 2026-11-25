@@ -3,7 +3,15 @@ import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/r
 import type { AddCartItemRequest, Cart } from '@/contracts/cart'
 import { useSessionToken } from '@/features/auth/session'
 
-import { acknowledgeCartChanges, addCartItem, getCart, removeCartItem, updateCartItem } from './api'
+import {
+  acknowledgeCartChanges,
+  addCartItem,
+  applyCoupon,
+  getCart,
+  removeCartItem,
+  removeCoupon,
+  updateCartItem,
+} from './api'
 
 /** O carrinho é separado por sessão: o token (ou "guest") faz parte da chave. */
 export const cartKeys = {
@@ -49,4 +57,12 @@ export function useRemoveCartItem() {
 
 export function useAcknowledgeCartChanges() {
   return useCartMutation(() => acknowledgeCartChanges())
+}
+
+export function useApplyCoupon() {
+  return useCartMutation((code: string) => applyCoupon(code))
+}
+
+export function useRemoveCoupon() {
+  return useCartMutation(() => removeCoupon())
 }
