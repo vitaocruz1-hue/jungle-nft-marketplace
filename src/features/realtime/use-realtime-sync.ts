@@ -1,12 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
-import { io } from 'socket.io-client'
+import type { Socket } from 'socket.io-client'
 
 import type { NftUpdatedEvent, OrderUpdatedEvent } from '@/contracts/realtime'
 import { REALTIME_EVENTS, SOCKET_PATH } from '@/contracts/realtime'
 import { useSession, useSessionToken } from '@/features/auth/session'
+import { whenNetworkReady } from '@/lib/network-ready'
 
-import { applyNftUpdated, applyOrderUpdated, reconcileAfterReconnect } from './apply-events'
+import { applyNftUpdated, applyOrderUpdated, reconcileOnConnect } from './apply-events'
 import { createEventFilter } from './event-filter'
 import { setConnectionStatus } from './realtime-store'
 
@@ -25,36 +26,48 @@ export function useRealtimeSync() {
   }, [user])
 
   useEffect(() => {
-    const socket = io(window.location.origin, {
-      path: SOCKET_PATH,
-      transports: ['websocket'],
-      auth: { token },
-      reconnectionDelay: 500,
-      reconnectionDelayMax: 3000,
-    })
+    let socket: Socket | undefined
+    let cancelled = false
     const filter = createEventFilter()
-    let hasConnectedBefore = false
-
     setConnectionStatus('connecting')
-    socket.on('connect', () => {
-      if (hasConnectedBefore) reconcileAfterReconnect(queryClient)
-      hasConnectedBefore = true
-      setConnectionStatus('connected')
-    })
-    socket.on('disconnect', () => setConnectionStatus('reconnecting'))
 
-    socket.on(REALTIME_EVENTS.nftUpdated, (event: NftUpdatedEvent) => {
-      if (filter.accept(event)) applyNftUpdated(queryClient, event)
-    })
-    socket.on(REALTIME_EVENTS.orderUpdated, (event: OrderUpdatedEvent) => {
-      // Defesa extra: pedido de outro usuário nunca é aplicado.
-      if (event.userId !== userIdRef.current) return
-      if (filter.accept(event)) applyOrderUpdated(queryClient, event)
-    })
+    // Importado sob demanda, só quando a rede (MSW) estiver pronta: o
+    // engine.io-client guarda a referência ao WebSocket ao ser importado.
+    void whenNetworkReady()
+      .then(() => import('socket.io-client'))
+      .then(({ io }) => {
+        if (cancelled) return
+        socket = io(window.location.origin, {
+          path: SOCKET_PATH,
+          transports: ['websocket'],
+          auth: { token },
+          reconnectionDelay: 500,
+          reconnectionDelayMax: 3000,
+        })
+        listen(socket)
+      })
+
+    function listen(socket: Socket) {
+      socket.on('connect', () => {
+        reconcileOnConnect(queryClient)
+        setConnectionStatus('connected')
+      })
+      socket.on('disconnect', () => setConnectionStatus('reconnecting'))
+
+      socket.on(REALTIME_EVENTS.nftUpdated, (event: NftUpdatedEvent) => {
+        if (filter.accept(event)) applyNftUpdated(queryClient, event)
+      })
+      socket.on(REALTIME_EVENTS.orderUpdated, (event: OrderUpdatedEvent) => {
+        // Defesa extra: pedido de outro usuário nunca é aplicado.
+        if (event.userId !== userIdRef.current) return
+        if (filter.accept(event)) applyOrderUpdated(queryClient, event)
+      })
+    }
 
     return () => {
-      socket.removeAllListeners()
-      socket.disconnect()
+      cancelled = true
+      socket?.removeAllListeners()
+      socket?.disconnect()
     }
   }, [token, queryClient])
 }

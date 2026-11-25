@@ -94,8 +94,13 @@ export function applyOrderUpdated(queryClient: QueryClient, event: OrderUpdatedE
     void queryClient.invalidateQueries({ queryKey: cartKeys.all })
 }
 
-/** Após reconectar: reconcilia com a API tudo que pode ter mudado offline. */
-export function reconcileAfterReconnect(queryClient: QueryClient) {
+/**
+ * A cada conexão (inclusive a primeira) reconcilia com a API REST o que pode
+ * ter mudado enquanto não havia socket: eventos emitidos nesse intervalo se
+ * perderiam (ex.: pedido confirmado logo após o F5). Dados iguais não
+ * redesenham a tela (structural sharing do TanStack Query).
+ */
+export function reconcileOnConnect(queryClient: QueryClient) {
   void queryClient.invalidateQueries({ queryKey: catalogKeys.all })
   void queryClient.invalidateQueries({ queryKey: cartKeys.all })
   void queryClient.invalidateQueries({ queryKey: privateKeys.all })

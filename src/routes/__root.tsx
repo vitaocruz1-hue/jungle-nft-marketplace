@@ -37,7 +37,8 @@ function RootLayout() {
         Pular para o conteúdo
       </a>
       <SiteHeader />
-      <main id="conteudo" tabIndex={-1} className="outline-none">
+      {/* Altura mínima de uma tela: o rodapé não aparece (e depois "pula") enquanto o conteúdo carrega. */}
+      <main id="conteudo" tabIndex={-1} className="min-h-dvh outline-none">
         <Outlet />
       </main>
       <SiteFooter />

@@ -3,6 +3,7 @@ import axios from 'axios'
 import { env } from '@/config/env'
 import { CART_ID_HEADER } from '@/contracts/cart'
 import { toApiError } from '@/lib/api-error'
+import { whenNetworkReady } from '@/lib/network-ready'
 import { notifySessionEnded, sessionStore } from '@/lib/session-store'
 
 /**
@@ -15,8 +16,10 @@ export const apiClient = axios.create({
   headers: { Accept: 'application/json' },
 })
 
-// Na ida: identifica o usuário (token) ou o carrinho do visitante.
-apiClient.interceptors.request.use((config) => {
+// Na ida: espera a rede (mocks) ficar pronta e identifica o usuário (token)
+// ou o carrinho do visitante.
+apiClient.interceptors.request.use(async (config) => {
+  await whenNetworkReady()
   const token = sessionStore.getToken()
   if (token) config.headers.set('Authorization', `Bearer ${token}`)
   const guestCartId = sessionStore.getGuestCartId()
