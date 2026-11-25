@@ -29,6 +29,13 @@ export default defineConfig([
       ecmaVersion: 2022,
       globals: globals.browser,
     },
+    rules: {
+      // Prefixo _ marca descarte intencional (ex.: remover campos de um objeto).
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', ignoreRestSiblings: true },
+      ],
+    },
   },
   {
     // - shadcn/ui exporta o componente e suas variantes (ex.: buttonVariants).
