@@ -42,7 +42,7 @@ test.describe('Catálogo da Início', () => {
     expect(page2).not.toContain('Emerald Ape #042')
 
     // Filtro novo volta para a página 1
-    let filters = await openFilters(page)
+    const filters = await openFilters(page)
     await filters.getByRole('link', { name: /^Música/ }).click()
     await expect(page).toHaveURL(/category=music/)
     await expect(page).not.toHaveURL(/page=/)
