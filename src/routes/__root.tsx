@@ -7,6 +7,7 @@ import { SiteHeader } from '@/components/layout/site-header'
 import { NotFound } from '@/components/not-found'
 import { Toaster } from '@/components/ui/sonner'
 import { useSessionExpiryHandler } from '@/features/auth/hooks'
+import { useRealtimeSync } from '@/features/realtime/use-realtime-sync'
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -24,6 +25,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootLayout() {
   useSessionExpiryHandler()
+  useRealtimeSync()
 
   return (
     <>

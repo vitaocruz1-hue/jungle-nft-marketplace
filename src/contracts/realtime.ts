@@ -39,5 +39,8 @@ export const REALTIME_EVENTS = {
   orderUpdated: 'order.updated',
 } as const
 
-/** Caminho do Socket.IO (mesma origem do app). */
-export const SOCKET_PATH = '/socket.io'
+/**
+ * Caminho do Socket.IO (mesma origem do app). Não usamos o padrão "/socket.io"
+ * porque o MSW reescreve esse caminho ao casar a URL do WebSocket.
+ */
+export const SOCKET_PATH = '/realtime'

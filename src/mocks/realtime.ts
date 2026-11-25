@@ -18,7 +18,7 @@ import { currentPrice } from './utils/nft'
  * WebSocket, sem salas/namespaces e sem pings automáticos (enviamos aqui).
  */
 
-const socketLink = ws.link(new RegExp(`${SOCKET_PATH.replace('.', '\\.')}/`))
+const socketLink = ws.link(new RegExp(`${SOCKET_PATH}/`))
 
 interface ClientConnection {
   io: ReturnType<typeof toSocketIo>
