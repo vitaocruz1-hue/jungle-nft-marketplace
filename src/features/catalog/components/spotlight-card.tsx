@@ -16,10 +16,13 @@ export function SpotlightCard({ className }: { className?: string }) {
   return (
     <section aria-labelledby="destaque-titulo" className={cn('bg-[#271a11] pt-12', className)}>
       <div className="px-5">
-        <h2 id="destaque-titulo" className="text-2xl font-bold text-highlight uppercase">
+        <h2
+          id="destaque-titulo"
+          className="text-2xl leading-tight font-bold text-highlight uppercase"
+        >
           NFT em destaque
         </h2>
-        <p className="mt-2 text-center text-xl font-bold uppercase">Oferta limitada</p>
+        <p className="mt-2 text-center type-heading uppercase">Oferta limitada</p>
       </div>
       {data ? (
         <Link

@@ -47,17 +47,10 @@ export function PromoBanners() {
             decoding="async"
             className="h-full min-h-[180px] w-full rounded-[15px] object-cover"
           />
-          <div className="flex flex-col items-end justify-center gap-3 p-4 text-right sm:p-6 lg:gap-2 lg:py-4 lg:pr-[31px] lg:pl-1">
-            <h2 className="text-sm leading-snug font-bold sm:text-[17px] lg:text-lg lg:leading-6">
-              {banner.title}
-            </h2>
-            <p className="text-xs leading-5 text-muted-foreground sm:text-sm sm:leading-6">
-              {banner.text}
-            </p>
-            <Button
-              asChild
-              className="mt-1 h-10 px-5 text-sm sm:text-base lg:-mt-1.5 lg:px-6 lg:text-sm"
-            >
+          <div className="flex flex-col items-end justify-center gap-2 p-4 text-right sm:p-6 lg:py-4 lg:pr-[31px] lg:pl-1">
+            <h2 className="type-title lg:type-heading">{banner.title}</h2>
+            <p className="type-body text-muted-foreground">{banner.text}</p>
+            <Button asChild className="mt-2 h-10 px-6 text-sm">
               <Link to="/" search={banner.search} hash="catalogo">
                 Explorar <ArrowRightIcon aria-hidden="true" />
                 <span className="sr-only">: {banner.title}</span>

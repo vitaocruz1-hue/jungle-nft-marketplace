@@ -66,6 +66,48 @@
 }
 
 /*
+ * Escala tipográfica (decisão de legibilidade, ver ARCHITECTURE.md): 12 / 14 / 16 / 20 / 28 px.
+ * Texto corrido com altura de linha 1.6; títulos com 1.25. Mesma fonte e cores do Figma.
+ */
+@utility type-caption {
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+@utility type-body {
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+@utility type-body-lg {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+@utility type-title {
+  font-size: 1rem;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+@utility type-heading {
+  font-size: 1.25rem;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+@utility type-display {
+  font-size: 1.75rem;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+/* Parágrafos longos: no máximo ~65 caracteres por linha. */
+@utility measure {
+  max-width: 65ch;
+}
+
+/*
  * Vidro (estilo Apple) para o que flutua sobre o conteúdo: cabeçalho ao rolar, barra de
  * abas, gavetas, diálogos, avisos e painéis. Sem suporte a backdrop-filter, fica sólido.
  * --glass-tint escolhe a cor de fundo (padrão: a dos painéis).
