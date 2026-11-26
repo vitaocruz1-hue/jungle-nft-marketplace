@@ -127,7 +127,7 @@ function CheckoutPage() {
   } else if (cartQuery.data.items.length === 0) {
     content = (
       <div className="rounded-md bg-card px-6 py-12 text-center">
-        <p className="text-lg font-bold">Seu carrinho está vazio</p>
+        <p className="type-heading">Seu carrinho está vazio</p>
         <Button asChild className="mt-4">
           <Link to="/" hash="catalogo">
             Explorar NFTs
@@ -351,7 +351,7 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
           <div className="space-y-7 md:hidden">
             <fieldset disabled={busy} aria-labelledby="carteira-conectada-titulo">
               <div className="flex items-baseline justify-between gap-3">
-                <h2 id="carteira-conectada-titulo" className="text-base font-bold">
+                <h2 id="carteira-conectada-titulo" className="type-title">
                   Carteira conectada
                 </h2>
                 <Link to="/carteiras" className="text-sm font-bold text-highlight">
@@ -412,7 +412,7 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
             </fieldset>
 
             <fieldset disabled={busy}>
-              <legend className="text-base font-bold">Carteira e rede</legend>
+              <legend className="type-title">Carteira e rede</legend>
               <div className="mt-3 space-y-3">
                 {NETWORK_IDS.map((id) => (
                   <label
@@ -466,7 +466,7 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
             id="revisao-titulo"
             ref={reviewHeadingRef}
             tabIndex={-1}
-            className="text-lg font-bold outline-none"
+            className="type-heading outline-none"
           >
             Revise seu pedido
           </h2>
@@ -514,7 +514,7 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
           disabled={busy}
           className={cn('min-w-0 max-md:mt-5', !buyerOpen && 'max-md:hidden')}
         >
-          <legend className="text-lg font-bold max-md:sr-only">Perfil do colecionador</legend>
+          <legend className="type-heading max-md:sr-only">Perfil do colecionador</legend>
           <div className="mt-4 grid gap-x-6 gap-y-5 md:grid-cols-2">
             <FormField
               id="pg-nome"
@@ -640,7 +640,7 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
 
       <aside aria-labelledby="seus-nfts-titulo" className="space-y-6">
         <section className={cn(!reviewing && 'max-md:hidden')}>
-          <h2 id="seus-nfts-titulo" className="text-lg font-bold">
+          <h2 id="seus-nfts-titulo" className="type-heading">
             Seus NFTs
           </h2>
           <ul className="mt-3 space-y-3">
@@ -707,7 +707,7 @@ function CheckoutFlow({ cart, wallets, userId, defaults }: CheckoutFlowProps) {
         )}
 
         <fieldset disabled={busy || reviewing} className="max-md:hidden">
-          <legend className="mx-auto text-base font-bold">Carteira e rede</legend>
+          <legend className="mx-auto type-title">Carteira e rede</legend>
           {wallets.length === 0 ? (
             <p className="mt-3 text-sm">
               Você ainda não tem carteiras.{' '}

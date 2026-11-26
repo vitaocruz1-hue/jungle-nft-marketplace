@@ -93,7 +93,7 @@ export function LoginForm({ onSuccess }: { onSuccess: () => void }) {
       >
         {login.isPending ? 'Entrando…' : 'Entrar'}
       </Button>
-      <p className="text-center text-xs text-muted-foreground">
+      <p className="text-center type-caption text-muted-foreground">
         Demonstração: <span className="text-foreground">ana@kurio.dev</span> ·{' '}
         <span className="text-foreground">Kurio@123</span>
       </p>

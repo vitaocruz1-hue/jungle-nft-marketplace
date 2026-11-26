@@ -87,7 +87,11 @@ function CouponForm({ cart }: { cart: Cart }) {
         </Button>
       </div>
       {error && (
-        <p id="cupom-erro" role="alert" className="mt-2 text-xs font-semibold text-destructive">
+        <p
+          id="cupom-erro"
+          role="alert"
+          className="mt-2 type-caption font-semibold text-destructive"
+        >
           {error}
         </p>
       )}
@@ -116,10 +120,7 @@ export function CartSummary({ cart, blockedReason }: CartSummaryProps) {
       aria-labelledby="resumo-titulo"
       className="max-md:-mx-5 max-md:rounded-t-[28px] max-md:bg-[#221411] max-md:px-6 max-md:pt-6 max-md:pb-8 lg:sticky lg:top-6"
     >
-      <h2
-        id="resumo-titulo"
-        className="border-b border-[#442c1a] pb-3 text-lg font-bold max-md:sr-only"
-      >
+      <h2 id="resumo-titulo" className="border-b border-[#442c1a] pb-3 type-heading max-md:sr-only">
         Resumo da carteira
       </h2>
       <div className="mt-6 max-md:mt-0">
@@ -129,11 +130,13 @@ export function CartSummary({ cart, blockedReason }: CartSummaryProps) {
       <dl className="mt-6 space-y-3" aria-live="polite">
         {rows.map((row) => (
           <div key={row.label}>
-            <div className="flex items-baseline justify-between gap-3 text-sm">
-              <dt>{row.label}</dt>
+            <div className="flex items-baseline justify-between gap-3 type-body">
+              <dt className="text-muted-foreground">{row.label}</dt>
               <dd className="text-base tabular-nums">{row.value}</dd>
             </div>
-            {row.hint && <p className="mt-1 text-right text-xs text-highlight">{row.hint}</p>}
+            {row.hint && (
+              <p className="mt-0.5 text-right type-caption text-highlight">{row.hint}</p>
+            )}
           </div>
         ))}
         <div className="flex items-baseline justify-between gap-3 border-t border-[#442c1a] pt-4">
@@ -145,7 +148,7 @@ export function CartSummary({ cart, blockedReason }: CartSummaryProps) {
       </dl>
 
       {blockedReason && (
-        <p id="checkout-bloqueado" role="status" className="mt-4 text-sm text-destructive">
+        <p id="checkout-bloqueado" role="status" className="mt-4 type-body text-destructive">
           {blockedReason}
         </p>
       )}
@@ -165,7 +168,7 @@ export function CartSummary({ cart, blockedReason }: CartSummaryProps) {
       <Link
         to="/"
         hash="catalogo"
-        className="mt-4 block text-center text-sm text-highlight hover:underline"
+        className="mt-4 block text-center type-body font-bold text-highlight hover:underline"
       >
         Continuar explorando
       </Link>

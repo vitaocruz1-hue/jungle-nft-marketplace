@@ -51,8 +51,8 @@ function PendingOrder({ order }: { order: Order }) {
           aria-hidden="true"
           className="size-12 text-highlight motion-safe:animate-spin"
         />
-        <h1 className="text-xl font-bold">Processando seu pagamento</h1>
-        <p className="max-w-sm text-sm text-muted-foreground">
+        <h1 className="type-heading">Processando seu pagamento</h1>
+        <p className="max-w-sm type-body text-muted-foreground">
           Aguardando a confirmação na rede {NETWORK_LABELS[order.network]}. Você pode atualizar esta
           página: o pedido {order.id} continua sendo acompanhado e não será cobrado duas vezes.
         </p>
@@ -73,8 +73,8 @@ function DeclinedOrder({ order }: { order: Order }) {
     <Panel>
       <div className="flex flex-col items-center gap-4 px-8 py-14 text-center">
         <XCircleIcon aria-hidden="true" className="size-12 text-destructive" />
-        <h1 className="text-xl font-bold">Pagamento recusado</h1>
-        <p className="max-w-sm text-sm text-muted-foreground">
+        <h1 className="type-heading">Pagamento recusado</h1>
+        <p className="max-w-sm type-body text-muted-foreground">
           {order.failureReason ?? 'O pagamento não foi concluído.'} Seus itens continuam no
           carrinho.
         </p>
@@ -123,7 +123,7 @@ function Receipt({ order }: { order: Order }) {
       </dl>
 
       <div className="px-6 pt-6 pb-10 sm:px-11">
-        <h2 className="text-sm font-bold">Detalhes da transação</h2>
+        <h2 className="type-body font-bold">Detalhes da transação</h2>
         <table className="mt-2 w-full text-left text-sm">
           <caption className="sr-only">Itens do pedido {order.id}</caption>
           <thead className="border-b border-[#442c1a]">
@@ -153,7 +153,9 @@ function Receipt({ order }: { order: Order }) {
                     />
                     <div>
                       <p className="font-bold">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">ID do token: {item.tokenId}</p>
+                      <p className="type-caption text-muted-foreground">
+                        ID do token: {item.tokenId}
+                      </p>
                     </div>
                   </div>
                 </td>
@@ -183,7 +185,7 @@ function Receipt({ order }: { order: Order }) {
           </div>
         </dl>
 
-        <p className="mt-4 text-center text-xs leading-5 text-muted-foreground">
+        <p className="mt-4 text-center type-caption text-muted-foreground">
           Transação confirmada na {network}. A propriedade foi transferida para sua carteira
           conectada ({shortAddress(order.wallet.address)}) e registrada na rede. Referência simulada
           para esta demonstração.

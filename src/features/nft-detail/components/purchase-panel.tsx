@@ -133,7 +133,7 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
   return (
     <div className="space-y-5">
       <div>
-        <h2 id="edicao-rotulo" className="text-sm font-bold">
+        <h2 id="edicao-rotulo" className="type-body font-bold">
           Edição:
         </h2>
         <div
@@ -168,7 +168,7 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
           })}
         </div>
         {edition && !soldOut && (
-          <p className="mt-2 text-xs text-muted-foreground">
+          <p className="mt-2 type-caption text-muted-foreground">
             {edition.supply === null
               ? 'Edição aberta'
               : `${edition.available} de ${edition.supply} disponíveis`}{' '}

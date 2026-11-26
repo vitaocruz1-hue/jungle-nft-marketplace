@@ -84,13 +84,13 @@ export function AuthPanel({ mode, description, redirect, children }: AuthPanelPr
           </Link>
         </nav>
 
-        <h1 className="mt-20 text-center text-xl font-bold md:sr-only">
+        <h1 className="mt-20 text-center type-heading md:sr-only">
           <span className="md:hidden">
             {mode === 'login' ? 'Entrar' : 'Criar perfil de colecionador'}
           </span>
           <span className="max-md:hidden">{mode === 'login' ? 'Entrar' : 'Criar conta'}</span>
         </h1>
-        <p className="mt-8 text-center text-sm leading-5 max-md:hidden">{description}</p>
+        <p className="mt-8 text-center type-body max-md:hidden">{description}</p>
 
         <div className="mt-6">{children}</div>
       </div>

@@ -81,7 +81,7 @@ function ProfileForm({ user }: { user: User }) {
 
   return (
     <form ref={formRef} noValidate onSubmit={handleSubmit} aria-labelledby="perfil-titulo">
-      <h1 id="perfil-titulo" className="text-base font-bold">
+      <h1 id="perfil-titulo" className="type-title">
         Perfil do colecionador
       </h1>
       <div className="mt-8 grid gap-x-7 gap-y-6 md:grid-cols-2">
@@ -208,7 +208,7 @@ function AvatarField({ user }: { user: User }) {
           </button>
         )}
       </div>
-      <p id="perfil-avatar-dica" className="mt-1.5 text-xs text-muted-foreground">
+      <p id="perfil-avatar-dica" className="mt-1.5 type-caption text-muted-foreground">
         PNG, JPG, WebP ou GIF de até 1 MB.
       </p>
       {error && (
@@ -264,7 +264,7 @@ function PasswordForm() {
       aria-labelledby="senha-titulo"
       className="mt-12 max-w-[417px]"
     >
-      <h2 id="senha-titulo" className="text-base font-bold">
+      <h2 id="senha-titulo" className="type-title">
         Alterar senha
       </h2>
       <div className="mt-6 space-y-5">

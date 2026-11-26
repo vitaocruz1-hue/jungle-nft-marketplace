@@ -120,7 +120,7 @@ function OrdersPage() {
 
   return (
     <ProfileLayout menuOnMobile={false}>
-      <h1 className="text-2xl font-bold">Meus pedidos</h1>
+      <h1 className="type-display">Meus pedidos</h1>
       <p aria-live="polite" className="sr-only">
         {announcement}
       </p>
@@ -142,8 +142,8 @@ function OrdersPage() {
         ) : query.data.items.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-md bg-card px-6 py-12 text-center">
             <PackageIcon aria-hidden="true" className="size-8 text-highlight" />
-            <p className="text-lg font-bold">Você ainda não fez nenhum pedido</p>
-            <p className="max-w-sm text-sm text-muted-foreground">
+            <p className="type-heading">Você ainda não fez nenhum pedido</p>
+            <p className="max-w-sm type-body text-muted-foreground">
               Os NFTs que você comprar aparecem aqui, com o status de cada pedido.
             </p>
             <Button asChild className="mt-2">

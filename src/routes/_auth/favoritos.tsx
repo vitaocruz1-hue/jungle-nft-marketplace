@@ -38,10 +38,10 @@ function FavoritesPage() {
   return (
     <ProfileLayout menuOnMobile={false}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 ref={headingRef} tabIndex={-1} className="text-2xl font-bold outline-none">
+        <h1 ref={headingRef} tabIndex={-1} className="type-display outline-none">
           Favoritos
         </h1>
-        <p aria-live="polite" className="text-sm text-muted-foreground">
+        <p aria-live="polite" className="type-body text-muted-foreground">
           {count !== undefined && count > 0 ? countLabel(count) : ''}
         </p>
       </div>
@@ -63,8 +63,8 @@ function FavoritesPage() {
         ) : query.data.items.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-md bg-card px-6 py-12 text-center">
             <HeartIcon aria-hidden="true" className="size-8 text-highlight" />
-            <p className="text-lg font-bold">Você ainda não favoritou nenhum NFT</p>
-            <p className="max-w-sm text-sm text-muted-foreground">
+            <p className="type-heading">Você ainda não favoritou nenhum NFT</p>
+            <p className="max-w-sm type-body text-muted-foreground">
               Toque no coração de um NFT para guardá-lo aqui.
             </p>
             <Button asChild className="mt-2">

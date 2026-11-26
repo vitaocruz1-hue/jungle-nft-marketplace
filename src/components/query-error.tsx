@@ -29,8 +29,8 @@ export function QueryError({
       )}
     >
       <AlertTriangleIcon aria-hidden="true" className="size-8 text-destructive" />
-      <p className="text-lg font-bold">{title}</p>
-      <p className="max-w-md text-sm text-muted-foreground">{getErrorMessage(error)}</p>
+      <p className="type-heading">{title}</p>
+      <p className="max-w-md type-body text-muted-foreground">{getErrorMessage(error)}</p>
       <Button onClick={onRetry} disabled={isRetrying} className="mt-2">
         <RotateCwIcon className={cn(isRetrying && 'motion-safe:animate-spin')} />
         {isRetrying ? 'Tentando…' : 'Tentar novamente'}

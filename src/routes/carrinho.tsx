@@ -108,7 +108,7 @@ function CartPage() {
           <div className="flex flex-col items-center gap-4 rounded-md bg-card px-6 py-16 text-center">
             <ShoppingCartIcon aria-hidden="true" className="size-10 text-highlight" />
             <p className="text-lg font-bold">Seu carrinho está vazio</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="type-body text-muted-foreground">
               Explore o mercado e escolha seus próximos NFTs.
             </p>
             <Button asChild>

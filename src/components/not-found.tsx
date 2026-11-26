@@ -14,7 +14,7 @@ export function NotFound({
   return (
     <section className="grid place-items-center gap-4 py-24 text-center">
       <p className="text-sm font-semibold text-muted-foreground">Erro 404</p>
-      <h1 className="text-3xl font-bold">{title}</h1>
+      <h1 className="type-display">{title}</h1>
       <p className="max-w-md text-muted-foreground">{description}</p>
       <Button asChild>
         <Link to="/">Voltar para o início</Link>

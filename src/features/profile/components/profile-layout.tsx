@@ -45,7 +45,7 @@ export function ProfileLayout({ children, menuOnMobile = true }: ProfileLayoutPr
         aria-labelledby="menu-perfil-titulo"
         className={cn('self-start bg-card py-3', !menuOnMobile && 'max-md:hidden')}
       >
-        <h2 id="menu-perfil-titulo" className="px-3 pb-2 text-lg font-bold">
+        <h2 id="menu-perfil-titulo" className="px-3 pb-2 type-heading">
           Meu perfil
         </h2>
         <ul>

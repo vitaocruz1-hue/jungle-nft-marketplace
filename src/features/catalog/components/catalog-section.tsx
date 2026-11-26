@@ -141,7 +141,7 @@ export function CatalogSection() {
           ) : data && data.items.length === 0 ? (
             <div className="rounded-md bg-card px-6 py-12 text-center">
               <p className="text-lg font-bold">Nenhum NFT encontrado</p>
-              <p className="mt-2 text-sm text-muted-foreground">
+              <p className="mt-2 type-body text-muted-foreground">
                 {search.page > data.totalPages
                   ? 'Esta página não existe mais.'
                   : 'Tente outros termos ou remova alguns filtros.'}

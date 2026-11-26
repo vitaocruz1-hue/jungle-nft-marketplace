@@ -66,7 +66,7 @@ export function FormField({
         )}
       </div>
       {hint && (
-        <p id={`${id}-dica`} className="mt-1.5 text-xs text-muted-foreground">
+        <p id={`${id}-dica`} className="mt-1.5 type-caption text-muted-foreground">
           {hint}
         </p>
       )}

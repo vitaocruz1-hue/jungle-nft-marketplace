@@ -25,7 +25,7 @@ function FacetList<T extends CategoryId | NetworkId>({
   const headingId = `filtro-${param}`
   return (
     <section aria-labelledby={headingId}>
-      <h3 id={headingId} className="text-lg font-bold">
+      <h3 id={headingId} className="type-heading">
         {title}
       </h3>
       <ul className="mt-3 lg:mt-1.5">
@@ -68,7 +68,7 @@ function FacetList<T extends CategoryId | NetworkId>({
 function FacetListSkeleton({ title, rows }: { title: string; rows: number }) {
   return (
     <section>
-      <h3 className="text-lg font-bold">{title}</h3>
+      <h3 className="type-heading">{title}</h3>
       <div className="mt-3 space-y-4 pl-3">
         {Array.from({ length: rows }, (_, i) => (
           <Skeleton key={i} className="h-5" />
@@ -99,7 +99,7 @@ export function CatalogFilters({
   if (!facets && unavailable) {
     return (
       <div className={cn('bg-card px-5 py-6', className)}>
-        <p role="status" className="text-sm text-muted-foreground">
+        <p role="status" className="type-body text-muted-foreground">
           Filtros indisponíveis no momento. Eles voltam junto com o catálogo.
         </p>
       </div>
@@ -132,7 +132,7 @@ export function CatalogFilters({
       )}
 
       <section aria-labelledby="filtro-preco">
-        <h3 id="filtro-preco" className="text-lg font-bold">
+        <h3 id="filtro-preco" className="type-heading">
           Faixa de preço
         </h3>
         {facets ? (

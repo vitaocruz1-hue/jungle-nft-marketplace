@@ -22,13 +22,13 @@ export function NftTabs({ nft }: { nft: NftDetail }) {
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="detalhes" className="pt-4 text-sm leading-[22px] text-muted-foreground">
+      <TabsContent value="detalhes" className="pt-6 type-body text-muted-foreground">
         {nft.story.map((paragraph) => (
-          <p key={paragraph.slice(0, 24)} className="mb-5">
+          <p key={paragraph.slice(0, 24)} className="mb-4 measure">
             {paragraph}
           </p>
         ))}
-        <dl className="space-y-3">
+        <dl className="mt-6 space-y-4">
           <div>
             <dt className="font-bold text-foreground">Rede:</dt>
             <dd>Cunhado na {network} com procedência imutável e metadados armazenados no IPFS.</dd>
@@ -50,22 +50,22 @@ export function NftTabs({ nft }: { nft: NftDetail }) {
         </dl>
       </TabsContent>
 
-      <TabsContent value="avaliacoes" className="pt-4">
-        <p className="flex items-center gap-2 text-sm">
+      <TabsContent value="avaliacoes" className="pt-6">
+        <p className="flex items-center gap-2 type-body">
           <RatingStars rating={nft.rating} />
           {nft.reviewCount} avaliações · mostrando as mais recentes
         </p>
         <ul className="mt-4 space-y-4">
           {nft.reviews.map((review) => (
-            <li key={review.id} className="rounded-md bg-card p-4">
-              <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+            <li key={review.id} className="rounded-md bg-card p-5">
+              <p className="flex flex-wrap items-center gap-x-3 gap-y-1 type-body">
                 <strong>{review.author}</strong>
                 <RatingStars rating={review.rating} />
-                <time dateTime={review.createdAt} className="text-xs text-muted-foreground">
+                <time dateTime={review.createdAt} className="type-caption text-muted-foreground">
                   {dateFormat.format(new Date(review.createdAt))}
                 </time>
               </p>
-              <p className="mt-2 text-sm text-muted-foreground">{review.comment}</p>
+              <p className="mt-2 measure type-body text-muted-foreground">{review.comment}</p>
             </li>
           ))}
         </ul>

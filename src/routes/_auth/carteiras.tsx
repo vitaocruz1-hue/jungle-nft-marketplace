@@ -15,7 +15,7 @@ export const Route = createFileRoute('/_auth/carteiras')({
 
 function WalletSummary({ wallet }: { wallet: Wallet }) {
   return (
-    <p className="mt-2 text-sm text-muted-foreground">
+    <p className="mt-2 type-body text-muted-foreground">
       {wallet.nickname} · {WALLET_TYPE_LABELS[wallet.type]} ·{' '}
       <span className="font-mono">{shortAddress(wallet.address)}</span>
     </p>
@@ -62,7 +62,7 @@ function WalletsPage() {
 
       <section aria-labelledby="carteira-principal-titulo">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 id="carteira-principal-titulo" className="text-base font-bold">
+          <h2 id="carteira-principal-titulo" className="type-title">
             Carteira principal
           </h2>
           {primary && !editing.primary && (
@@ -75,7 +75,7 @@ function WalletsPage() {
             </button>
           )}
         </div>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-2 type-body text-muted-foreground">
           Estas carteiras ficam disponíveis no pagamento e para receber NFTs comprados.
         </p>
         {primary && !editing.primary && <WalletSummary wallet={primary} />}
@@ -92,7 +92,7 @@ function WalletsPage() {
 
       <section aria-labelledby="carteira-secundaria-titulo" className="mt-12">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 id="carteira-secundaria-titulo" className="text-base font-bold">
+          <h2 id="carteira-secundaria-titulo" className="type-title">
             Carteira secundária
           </h2>
           <div className="flex items-center gap-4">
@@ -123,7 +123,7 @@ function WalletsPage() {
         </div>
         {secondary && !showSecondaryForm && <WalletSummary wallet={secondary} />}
         {!secondary && !showSecondaryForm && (
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-2 type-body text-muted-foreground">
             Você ainda não adicionou uma carteira secundária.
           </p>
         )}

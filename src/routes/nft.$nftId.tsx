@@ -135,7 +135,7 @@ function NftDetailPage() {
           className="min-w-0 max-md:relative max-md:z-10 max-md:-mx-5 max-md:-mt-8 max-md:rounded-t-[28px] max-md:bg-card max-md:px-6 max-md:pt-7 max-md:pb-6"
         >
           <div className="flex items-start justify-between gap-3">
-            <h1 id="nft-titulo" className="text-2xl font-bold max-md:text-xl sm:text-[28px]">
+            <h1 id="nft-titulo" className="type-display max-md:type-heading">
               {nft.name}
             </h1>
             <p className="flex shrink-0 items-center gap-1 rounded-full border border-primary px-2 py-0.5 text-sm md:hidden">
@@ -165,24 +165,24 @@ function NftDetailPage() {
             </p>
           </div>
 
-          <h2 className="mt-4 text-sm font-bold max-md:sr-only">Sobre este NFT:</h2>
-          <p className="mt-2 text-sm leading-[22px] text-muted-foreground">{nft.description}</p>
+          <h2 className="mt-5 type-body font-bold max-md:sr-only">Sobre este NFT:</h2>
+          <p className="mt-2 measure type-body text-muted-foreground">{nft.description}</p>
 
           <div className="mt-4">
             <PurchasePanel key={nft.id} nft={nft} />
           </div>
 
-          <dl className="mt-6 space-y-3 text-sm text-muted-foreground">
+          <dl className="mt-6 space-y-2 type-body text-muted-foreground">
             <div className="flex gap-1">
-              <dt>ID do token:</dt>
+              <dt className="font-bold text-foreground">ID do token:</dt>
               <dd>{nft.tokenId}</dd>
             </div>
             <div className="flex gap-1">
-              <dt>Coleção:</dt>
+              <dt className="font-bold text-foreground">Coleção:</dt>
               <dd>{nft.collection.name}</dd>
             </div>
             <div className="flex gap-1">
-              <dt>Atributos:</dt>
+              <dt className="font-bold text-foreground">Atributos:</dt>
               <dd>{nft.attributes.join(', ')}</dd>
             </div>
           </dl>
