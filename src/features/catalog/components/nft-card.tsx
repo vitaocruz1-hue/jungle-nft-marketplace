@@ -29,7 +29,7 @@ export function NftCard({ nft, priority = false, favoriteButton = 'mobile' }: Nf
         params={{ nftId: nft.id }}
         className="block rounded-sm focus-visible:outline-offset-4"
       >
-        <div className="nft-card-frame relative flex aspect-[258/300] items-center justify-center bg-card px-1 max-md:aspect-auto max-md:rounded-[20px] max-md:bg-[#2a1a14] max-md:px-1 max-md:pt-1 max-md:pb-4">
+        <div className="nft-card-frame relative flex aspect-[258/300] items-center justify-center bg-card px-1 max-md:aspect-auto max-md:rounded-[20px] max-md:bg-[#2a1a14] max-md:px-1 max-md:pt-1 max-md:pb-4 md:items-start md:pt-[12%]">
           {/* Zoom e reflexo (hover/foco) ficam dentro dos cantos arredondados. */}
           <div className="nft-card-art w-full">
             <img
@@ -56,9 +56,9 @@ export function NftCard({ nft, priority = false, favoriteButton = 'mobile' }: Nf
             </span>
           )}
         </div>
-        <h3 className="mt-3 truncate text-sm sm:text-base">{nft.name}</h3>
+        <h3 className="mt-3 truncate text-sm sm:text-base md:mt-2">{nft.name}</h3>
       </Link>
-      <p className="mt-1 flex flex-wrap items-baseline gap-x-3 text-base sm:text-lg">
+      <p className="mt-1 flex flex-wrap items-baseline gap-x-3 text-base sm:text-lg md:mt-0.5">
         <span
           className={cn(
             'font-bold',
@@ -96,7 +96,7 @@ export function NftCard({ nft, priority = false, favoriteButton = 'mobile' }: Nf
 export function NftCardSkeleton() {
   return (
     <div>
-      <div className="flex aspect-[258/300] items-center justify-center bg-card px-1 max-md:aspect-auto max-md:rounded-[20px] max-md:px-1 max-md:pt-1 max-md:pb-4">
+      <div className="flex aspect-[258/300] items-center justify-center bg-card px-1 max-md:aspect-auto max-md:rounded-[20px] max-md:px-1 max-md:pt-1 max-md:pb-4 md:items-start md:pt-[12%]">
         <Skeleton className="aspect-square w-full rounded-[15px] bg-card" />
       </div>
       <Skeleton className="mt-3 h-5 w-3/4" />

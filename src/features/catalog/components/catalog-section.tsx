@@ -85,7 +85,7 @@ export function CatalogSection() {
     <section
       id="catalogo"
       aria-labelledby="catalogo-titulo"
-      className="mt-6 grid gap-8 md:mt-16 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[310px_minmax(0,1fr)] xl:gap-12"
+      className="mt-6 grid gap-8 md:mt-16 lg:mt-24 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[310px_minmax(0,1fr)] xl:gap-12"
     >
       <h2 id="catalogo-titulo" className="sr-only">
         Catálogo de NFTs
@@ -120,12 +120,12 @@ export function CatalogSection() {
           {data && !query.isPlaceholderData ? resultsLabel(data.totalItems) : ''}
         </p>
 
-        <div className="mt-5 md:mt-8">
+        <div className="mt-5 md:mt-8 lg:mt-5">
           {query.isPending ? (
             <div
               aria-busy="true"
               aria-label="Carregando NFTs"
-              className="grid grid-cols-2 gap-x-4 gap-y-6 sm:gap-x-6 md:grid-cols-3 md:gap-y-8 xl:gap-x-8.5 xl:gap-y-12 max-md:[&>*:nth-child(even)]:mt-8"
+              className="grid grid-cols-2 gap-x-4 gap-y-6 sm:gap-x-6 md:grid-cols-3 md:gap-y-8 xl:gap-x-8.5 xl:gap-y-[58px] max-md:[&>*:nth-child(even)]:mt-8"
             >
               {Array.from({ length: CATALOG_PAGE_SIZE }, (_, i) => (
                 <NftCardSkeleton key={i} />
@@ -175,7 +175,7 @@ export function CatalogSection() {
                 aria-busy={query.isPlaceholderData}
                 className={cn(
                   // Celular: grade desencontrada (coluna da direita mais baixa), como no Figma.
-                  'grid grid-cols-2 gap-x-4 gap-y-6 transition-opacity sm:gap-x-6 md:grid-cols-3 md:gap-y-8 xl:gap-x-8.5 xl:gap-y-12 max-md:[&>*:nth-child(even)]:mt-8',
+                  'grid grid-cols-2 gap-x-4 gap-y-6 transition-opacity sm:gap-x-6 md:grid-cols-3 md:gap-y-8 xl:gap-x-8.5 xl:gap-y-[58px] max-md:[&>*:nth-child(even)]:mt-8',
                   query.isPlaceholderData && 'opacity-60',
                 )}
               >

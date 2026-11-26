@@ -25,22 +25,26 @@ export function Hero() {
       <MobileHero slides={slides} current={current} onSelect={setCurrent} />
       <section
         aria-labelledby="hero-titulo"
-        className="grid items-center gap-x-10 gap-y-8 pt-8 max-md:hidden md:grid-cols-[minmax(0,1fr)_300px] lg:grid-cols-[minmax(0,1fr)_450px] lg:gap-x-12"
+        className="grid items-center gap-x-10 gap-y-8 pt-8 max-md:hidden md:grid-cols-[minmax(0,1fr)_300px] lg:grid-cols-[minmax(0,1fr)_450px] lg:grid-rows-[355px_minmax(0,1fr)] lg:gap-x-12"
       >
         <div className="md:col-start-1 md:row-start-1 md:self-end lg:pl-10">
           <p className="text-sm tracking-[0.12em]">Bem-vindo à Kurio</p>
           <h1
             id="hero-titulo"
-            className="mt-5 text-[28px] leading-[1.35] font-bold uppercase sm:text-4xl md:text-[30px] lg:text-[44px] lg:leading-[70px]"
+            className="mt-5 text-[28px] leading-[1.35] font-bold uppercase sm:text-4xl md:text-[30px] lg:mt-[7px] lg:text-[43px] lg:leading-[70px]"
           >
             Seja dono do futuro <br className="hidden sm:block" />
             da arte digital
           </h1>
-          <p className="mt-4 max-w-[560px] text-sm leading-6 text-muted-foreground">
+          <p className="mt-4 max-w-[560px] text-sm leading-6 text-muted-foreground lg:mt-[3px]">
             Descubra NFTs selecionados de criadores emergentes e consagrados. Colecione arte digital
             rara, apoie artistas e tenha uma parte da cultura da internet.
           </p>
-          <Button asChild size="lg" className="mt-10 h-10 w-[140px] text-base font-bold uppercase">
+          <Button
+            asChild
+            size="lg"
+            className="mt-10 h-10 w-[140px] text-base font-bold uppercase lg:mt-8"
+          >
             <Link to="/" hash="catalogo">
               Explorar
             </Link>
@@ -75,7 +79,7 @@ export function Hero() {
           role="group"
           aria-label="Escolher destaque"
           className={cn(
-            'flex min-h-6 justify-center gap-2 md:col-start-1 md:row-start-2 md:justify-end md:self-start',
+            'flex min-h-6 justify-center gap-2 md:col-start-1 md:row-start-2 md:justify-end md:self-start lg:mt-1 lg:mr-[46px] lg:gap-0',
             slides.length <= 1 && 'invisible',
           )}
         >
@@ -91,8 +95,8 @@ export function Hero() {
               <span
                 aria-hidden="true"
                 className={cn(
-                  'block size-2 rounded-full bg-primary transition-transform',
-                  index === current ? 'scale-125' : 'opacity-50',
+                  'block size-2 rounded-full bg-primary transition-opacity',
+                  index !== current && 'opacity-50',
                 )}
               />
             </button>

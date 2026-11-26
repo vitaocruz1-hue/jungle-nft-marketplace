@@ -28,7 +28,7 @@ function FacetList<T extends CategoryId | NetworkId>({
       <h3 id={headingId} className="text-lg font-bold">
         {title}
       </h3>
-      <ul className="mt-3">
+      <ul className="mt-3 lg:mt-1.5">
         {options.map((option) => {
           const active = option.value === selected
           return (
@@ -44,7 +44,7 @@ function FacetList<T extends CategoryId | NetworkId>({
                 resetScroll={false}
                 aria-current={active ? 'true' : undefined}
                 className={cn(
-                  'flex items-center justify-between rounded-sm py-2.5 pl-3 text-[15px] transition-colors hover:text-highlight',
+                  'flex items-center justify-between rounded-sm py-2.5 pl-3 text-[15px] transition-colors hover:text-highlight lg:pr-3 lg:leading-5',
                   active ? 'font-semibold text-highlight' : 'text-muted-foreground',
                 )}
               >
@@ -107,7 +107,7 @@ export function CatalogFilters({
   }
 
   return (
-    <div className={cn('space-y-8 bg-card px-5 py-6', className)}>
+    <div className={cn('space-y-8 bg-card px-5 py-6 lg:pt-3.5', className)}>
       {hasActiveFilters(search) && (
         <Link
           from="/"

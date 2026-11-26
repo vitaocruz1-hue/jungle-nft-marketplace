@@ -20,7 +20,7 @@ export function CatalogToolbar({
   filtersButton?: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="flex flex-col gap-4 lg:-mt-2 lg:flex-row lg:items-center lg:justify-between">
       <nav aria-label="Seções do catálogo">
         <ul className="flex flex-wrap gap-x-3 gap-y-2 sm:gap-x-6">
           {TABS.map((tab) => {
@@ -34,7 +34,7 @@ export function CatalogToolbar({
                   resetScroll={false}
                   aria-current={active ? 'page' : undefined}
                   className={cn(
-                    'relative inline-block pb-1.5 text-sm transition-colors hover:text-highlight sm:text-base',
+                    'relative inline-block pb-1.5 text-sm transition-colors hover:text-highlight sm:text-base lg:pb-0.5',
                     active &&
                       'text-highlight after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-primary',
                   )}

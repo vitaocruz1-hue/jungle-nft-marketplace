@@ -25,7 +25,7 @@ export function CatalogPagination({ page, totalPages }: { page: number; totalPag
   if (totalPages <= 1) return null
 
   return (
-    <nav aria-label="Paginação do catálogo" className="mt-12 flex justify-end">
+    <nav aria-label="Paginação do catálogo" className="mt-12 flex justify-end lg:mt-[88px]">
       <ul className="flex flex-wrap items-center gap-2">
         {page > 1 && (
           <li>
