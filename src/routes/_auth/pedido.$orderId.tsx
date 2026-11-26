@@ -131,10 +131,10 @@ function Receipt({ order }: { order: Order }) {
               <th scope="col" className="py-2 font-bold">
                 NFTs
               </th>
-              <th scope="col" className="py-2 text-center font-bold">
+              <th scope="col" className="px-2 py-2 text-center font-bold whitespace-nowrap sm:px-3">
                 Edições
               </th>
-              <th scope="col" className="py-2 text-right font-bold">
+              <th scope="col" className="py-2 pl-2 text-right font-bold whitespace-nowrap sm:pl-3">
                 Subtotal
               </th>
             </tr>
@@ -143,13 +143,13 @@ function Receipt({ order }: { order: Order }) {
             {order.items.map((item) => (
               <tr key={item.editionId}>
                 <td className="py-2">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <img
                       src={item.image.src}
                       alt=""
                       width={64}
                       height={64}
-                      className="size-16 rounded-md object-cover"
+                      className="size-10 shrink-0 rounded-md object-cover sm:size-16"
                     />
                     <div>
                       <p className="font-bold">{item.name}</p>
@@ -159,8 +159,10 @@ function Receipt({ order }: { order: Order }) {
                     </div>
                   </div>
                 </td>
-                <td className="py-2 text-center text-xs">(x {item.quantity})</td>
-                <td className="py-2 text-right font-bold text-highlight">
+                <td className="px-2 py-2 text-center text-xs whitespace-nowrap sm:px-3">
+                  (x {item.quantity})
+                </td>
+                <td className="py-2 pl-2 text-right font-bold whitespace-nowrap text-highlight sm:pl-3">
                   {displayEth(item.lineTotal)}
                 </td>
               </tr>
