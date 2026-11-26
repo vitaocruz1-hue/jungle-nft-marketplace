@@ -77,4 +77,9 @@ export interface Order {
   failureReason: string | null
 }
 
+/** GET /api/orders — pedidos do usuário logado, do mais recente ao mais antigo. */
+export interface OrderListResponse {
+  items: Order[]
+}
+
 export const IDEMPOTENCY_HEADER = 'Idempotency-Key'

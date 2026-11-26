@@ -21,7 +21,7 @@ const activeClass = 'before:absolute before:inset-y-0 before:left-0 before:w-1 b
 
 /** Itens do menu do Figma: os que têm tela viram links; os outros mostram "em breve". */
 const MORE_ITEMS = [
-  { label: 'Atividade', icon: ShoppingCartIcon },
+  { label: 'Atividade', icon: ShoppingCartIcon, to: '/pedidos' },
   { label: 'Lista de interesse', icon: HeartIcon, to: '/favoritos' },
   { label: 'Ofertas', icon: TrendingUpIcon },
   { label: 'Arquivos baixados', icon: DownloadIcon },

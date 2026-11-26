@@ -135,13 +135,18 @@ export function SiteFooter({ className }: { className?: string }) {
                     Meu perfil
                   </Link>
                 </li>
-                {['Minha coleção', 'Atividade', 'Estúdio do criador'].map((item) => (
+                {['Minha coleção', 'Atividade'].map((item) => (
                   <li key={item}>
-                    <ComingSoonButton section={item} className={linkClass}>
+                    <Link to="/pedidos" className={linkClass}>
                       {item}
-                    </ComingSoonButton>
+                    </Link>
                   </li>
                 ))}
+                <li>
+                  <ComingSoonButton section="Estúdio do criador" className={linkClass}>
+                    Estúdio do criador
+                  </ComingSoonButton>
+                </li>
                 <li>
                   <Link to="/favoritos" className={linkClass}>
                     Lista de interesse

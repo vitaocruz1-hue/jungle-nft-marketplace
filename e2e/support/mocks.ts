@@ -5,6 +5,8 @@ interface MockControls {
   reset(): void
   expireSession(): void
   ordersCount(): number
+  setSettlementDelay(ms: number): void
+  settlePendingOrders(): void
   changeNftPrice(nftId: string, newPrice: string): boolean
   sellOut(nftId: string, editionId?: string): boolean
   replayLastEvent(): boolean

@@ -1,6 +1,6 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-import type { CreateOrderRequest, Order, Quote } from '@/contracts/orders'
+import type { CreateOrderRequest, Order, OrderListResponse, Quote } from '@/contracts/orders'
 import { IDEMPOTENCY_HEADER } from '@/contracts/orders'
 import type { NetworkId } from '@/contracts/catalog'
 import { privateKeys, useSession } from '@/features/auth/session'
@@ -8,6 +8,8 @@ import { apiClient } from '@/lib/api-client'
 import { ApiError } from '@/lib/api-error'
 
 export const orderKeys = {
+  /** Lista e detalhes ficam sob ['me', userId, 'orders', …]. */
+  list: (userId: string) => [...privateKeys.user(userId), 'orders', 'list'] as const,
   detail: (userId: string, orderId: string) =>
     [...privateKeys.user(userId), 'orders', orderId] as const,
 }
@@ -59,4 +61,24 @@ export function orderQueryOptions(userId: string, orderId: string) {
 export function useOrder(orderId: string) {
   const { user } = useSession()
   return useQuery({ ...orderQueryOptions(user?.id ?? '', orderId), enabled: user !== null })
+}
+
+async function getOrders(signal?: AbortSignal) {
+  const { data } = await apiClient.get<OrderListResponse>('/orders', { signal })
+  return data
+}
+
+export function orderListQueryOptions(userId: string) {
+  return queryOptions({
+    queryKey: orderKeys.list(userId),
+    queryFn: ({ signal }) => getOrders(signal),
+    // Sempre confere ao abrir a tela: um pedido recém-criado aparece na hora.
+    staleTime: 0,
+  })
+}
+
+/** Pedidos do usuário logado (tela /pedidos). */
+export function useOrders() {
+  const { user } = useSession()
+  return useQuery({ ...orderListQueryOptions(user?.id ?? ''), enabled: user !== null })
 }

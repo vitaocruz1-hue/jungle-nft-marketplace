@@ -10,6 +10,7 @@ import {
 } from './realtime'
 import { SCENARIOS, type ScenarioId } from './scenarios'
 import { expireAllSessions } from './utils/auth'
+import { setSettlementDelay, settlePendingOrders } from './utils/orders'
 import { currentPrice } from './utils/nft'
 
 /**
@@ -63,6 +64,11 @@ export const mockControls = {
   ordersCount() {
     return db.state.orders.length
   },
+
+  /** Adia a confirmação dos próximos pedidos (ms). */
+  setSettlementDelay,
+  /** Confirma/recusa agora os pedidos pendentes (emite order.updated). */
+  settlePendingOrders,
 
   replayLastEvent,
   emitStaleNftEvent,

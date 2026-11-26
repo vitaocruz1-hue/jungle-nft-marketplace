@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import type { FeaturedResponse, NftDetail, NftListResponse, NftSummary } from '@/contracts/catalog'
 import type { Cart } from '@/contracts/cart'
 import type { FavoritesResponse } from '@/contracts/favorites'
-import type { Order } from '@/contracts/orders'
+import type { Order, OrderListResponse } from '@/contracts/orders'
 import type { NftUpdatedEvent, OrderUpdatedEvent } from '@/contracts/realtime'
 import { privateKeys } from '@/features/auth/session'
 import { catalogKeys } from '@/features/catalog/queries'
@@ -91,6 +91,23 @@ export function applyOrderUpdated(queryClient: QueryClient, event: OrderUpdatedE
           status: event.data.status,
           failureReason: event.data.failureReason,
           version: event.version,
+        }
+      : old,
+  )
+  // Tela "Meus pedidos": o status muda na hora, sem esperar a API.
+  queryClient.setQueryData<OrderListResponse>(orderKeys.list(event.userId), (old) =>
+    old
+      ? {
+          items: old.items.map((order) =>
+            order.id === event.resource.id && event.version > order.version
+              ? {
+                  ...order,
+                  status: event.data.status,
+                  failureReason: event.data.failureReason,
+                  version: event.version,
+                }
+              : order,
+          ),
         }
       : old,
   )

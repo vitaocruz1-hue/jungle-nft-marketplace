@@ -6,6 +6,17 @@ import { getUserCart } from './cart'
 
 /** Tempo que a "rede" leva para confirmar/recusar um pedido. */
 export const SETTLEMENT_DELAY_MS = 2500
+const SETTLEMENT_DELAY_KEY = 'kurio:mock-settlement-ms'
+
+/** Testes podem adiar a confirmação (e confirmá-la na hora com settlePendingOrders). */
+export function getSettlementDelay() {
+  const saved = Number(sessionStorage.getItem(SETTLEMENT_DELAY_KEY))
+  return Number.isFinite(saved) && saved > 0 ? saved : SETTLEMENT_DELAY_MS
+}
+
+export function setSettlementDelay(ms: number) {
+  sessionStorage.setItem(SETTLEMENT_DELAY_KEY, String(ms))
+}
 
 const EXPLORERS = {
   ethereum: 'https://etherscan.io/tx/',
@@ -88,6 +99,15 @@ export function scheduleSettlement(order: OrderRecord) {
       if (current) settleOrder(current)
     }, wait),
   )
+}
+
+/** Confirma/recusa agora todos os pedidos pendentes (controle de teste). */
+export function settlePendingOrders() {
+  for (const order of db.state.orders) {
+    if (order.status !== 'pending') continue
+    clearTimeout(timers.get(order.id))
+    settleOrder(order)
+  }
 }
 
 /** Após F5 o mock recomeça: retoma os pedidos que estavam pendentes. */

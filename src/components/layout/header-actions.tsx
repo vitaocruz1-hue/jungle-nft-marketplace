@@ -3,6 +3,7 @@ import {
   HeartIcon,
   LogInIcon,
   LogOutIcon,
+  PackageIcon,
   ShoppingCartIcon,
   UserIcon,
   WalletIcon,
@@ -96,6 +97,11 @@ export function AccountButton({ className }: { className?: string }) {
         <DropdownMenuItem asChild>
           <Link to="/favoritos">
             <HeartIcon /> Favoritos
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/pedidos">
+            <PackageIcon /> Meus pedidos
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>

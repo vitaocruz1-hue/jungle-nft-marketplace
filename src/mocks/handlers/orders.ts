@@ -2,7 +2,13 @@ import { delay, http, HttpResponse, type DefaultBodyType, type PathParams } from
 
 import { NETWORK_IDS, type NetworkId } from '@/contracts/catalog'
 import type { ApiErrorBody } from '@/contracts/common'
-import type { CreateOrderRequest, CreateQuoteRequest, Order, Quote } from '@/contracts/orders'
+import type {
+  CreateOrderRequest,
+  CreateQuoteRequest,
+  Order,
+  OrderListResponse,
+  Quote,
+} from '@/contracts/orders'
 import { IDEMPOTENCY_HEADER } from '@/contracts/orders'
 import { EMAIL_PATTERN } from '@/contracts/auth'
 import { compareEth } from '@/lib/eth'
@@ -13,7 +19,7 @@ import { getActiveScenario, simulateNetwork } from '../scenarios'
 import { requireAuth } from '../utils/auth'
 import { getUserCart, toCart } from '../utils/cart'
 import { apiUrl, errorResponse, readJson } from '../utils/http'
-import { hashRequest, scheduleSettlement, SETTLEMENT_DELAY_MS, toOrder } from '../utils/orders'
+import { getSettlementDelay, hashRequest, scheduleSettlement, toOrder } from '../utils/orders'
 import { checkCoupon, computeTotals } from '../utils/pricing'
 
 const QUOTE_TTL_MS = 5 * 60 * 1000
@@ -179,7 +185,7 @@ export const ordersHandlers = [
         userId: auth.user.id,
         idempotencyKey: key,
         requestHash,
-        settleAt: new Date(now.getTime() + SETTLEMENT_DELAY_MS).toISOString(),
+        settleAt: new Date(now.getTime() + getSettlementDelay()).toISOString(),
         outcome: getActiveScenario() === 'pagamento-recusado' ? 'declined' : 'confirmed',
       }
       db.state.orders.push(order)
@@ -193,6 +199,21 @@ export const ordersHandlers = [
         await delay(12_000)
       }
       return HttpResponse.json(toOrder(order), { status: 201 })
+    },
+  ),
+
+  http.get<PathParams, DefaultBodyType, OrderListResponse | ApiErrorBody>(
+    apiUrl('/orders'),
+    async ({ request }) => {
+      await simulateNetwork()
+      const auth = requireAuth(request)
+      if (!auth.ok) return auth.response
+      // Só os pedidos do próprio usuário, do mais recente ao mais antigo.
+      const items = db.state.orders
+        .filter((o) => o.userId === auth.user.id)
+        .toSorted((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .map(toOrder)
+      return HttpResponse.json({ items })
     },
   ),
 
