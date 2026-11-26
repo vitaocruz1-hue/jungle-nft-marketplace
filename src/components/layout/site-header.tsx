@@ -15,7 +15,7 @@ import {
 import { cn } from '@/lib/utils'
 
 import { Container } from './container'
-import { AccountButton, CartLink } from './header-actions'
+import { AccountButton, CartLink, FavoritesLink } from './header-actions'
 import { SearchDialog } from './search-dialog'
 
 const navItemClass =
@@ -98,7 +98,7 @@ export function SiteHeader({ className }: { className?: string }) {
         // A linha clara do vidro é uma sombra de 1 px: não muda a altura do cabeçalho.
         'z-40 transition-[background-color,box-shadow] duration-200 md:sticky md:top-0',
         scrolled &&
-          'md:glass md:shadow-[0_1px_0_rgb(255_255_255/0.09)] md:[--glass-tint:var(--background)]',
+          'md:glass md:shadow-[0_1px_0_rgb(255_255_255/0.16),0_12px_32px_-14px_rgb(0_0_0/0.8)]',
         className,
       )}
     >
@@ -121,9 +121,9 @@ export function SiteHeader({ className }: { className?: string }) {
             <MainNav className="flex h-full items-center gap-8 lg:gap-[41px]" />
           </nav>
 
-          <div className="flex items-center gap-1 sm:gap-3 lg:mt-[14px] lg:ml-[196px]">
+          <div className="flex items-center gap-1 sm:gap-3 lg:mt-[14px] lg:ml-[148px]">
             <SearchDialog />
-
+            <FavoritesLink />
             <CartLink />
             <AccountButton className="ml-1 hidden sm:inline-flex lg:ml-[17px]" />
 

@@ -21,12 +21,63 @@ import {
 import { useLogout } from '@/features/auth/hooks'
 import { useSession } from '@/features/auth/session'
 import { useCart } from '@/features/cart/queries'
+import { useFavoritesList } from '@/features/favorites/queries'
 import { useBumpOnIncrease } from '@/lib/use-bump'
 import { cn } from '@/lib/utils'
 
 /** Página atual, para voltar a ela depois do login. */
 function useCurrentHref() {
   return useRouterState({ select: (state) => state.location.href })
+}
+
+/** Contador sobre o ícone (carrinho e favoritos). Some quando é 0. */
+function CountBadge({ count }: { count: number }) {
+  if (count <= 0) return null
+  return (
+    <span
+      aria-hidden="true"
+      className="absolute top-0.5 right-0 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] leading-none font-bold text-primary-foreground"
+    >
+      {count > 99 ? '99+' : count}
+    </span>
+  )
+}
+
+/**
+ * Atalho para os favoritos (só desktop; no celular fica na barra de abas).
+ * Desvio do Figma: o ícone não existe no frame. Sem login, vai direto ao login
+ * e volta para /favoritos depois.
+ */
+export function FavoritesLink() {
+  const { user } = useSession()
+  const { data } = useFavoritesList()
+  const count = user ? (data?.nftIds.length ?? 0) : 0
+  const label = `Favoritos (${count})`
+  const content = (
+    <>
+      <HeartIcon className="size-5 lg:size-6" />
+      <CountBadge count={count} />
+    </>
+  )
+
+  return (
+    <Button
+      asChild
+      variant="ghost"
+      size="icon"
+      className="relative hidden hover:bg-secondary md:inline-flex"
+    >
+      {user ? (
+        <Link to="/favoritos" aria-label={label}>
+          {content}
+        </Link>
+      ) : (
+        <Link to="/login" search={{ redirect: '/favoritos' }} aria-label={label}>
+          {content}
+        </Link>
+      )}
+    </Button>
+  )
 }
 
 export function CartLink() {
@@ -43,14 +94,7 @@ export function CartLink() {
           key={bumps}
           className={cn('size-5 lg:size-6', bumps > 0 && 'cart-bump')}
         />
-        {count > 0 && (
-          <span
-            aria-hidden="true"
-            className="absolute top-0.5 right-0 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] leading-none font-bold text-primary-foreground"
-          >
-            {count > 99 ? '99+' : count}
-          </span>
-        )}
+        <CountBadge count={count} />
       </Link>
     </Button>
   )
