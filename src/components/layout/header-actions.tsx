@@ -135,7 +135,8 @@ export function AccountButton({ className }: { className?: string }) {
           >
             {user.displayName.charAt(0).toUpperCase()}
           </span>
-          <span className="truncate">{user.username}</span>
+          {/* Entre 768 e 1023 px o menu principal divide a linha: só a inicial cabe. */}
+          <span className="truncate md:max-lg:hidden">{user.username}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
