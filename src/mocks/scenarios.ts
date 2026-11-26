@@ -17,6 +17,8 @@ export const SCENARIOS = {
   'pagamento-recusado': 'A carteira recusa o pagamento (pedido recusado)',
   'timeout-pedido': 'O pedido é criado, mas a resposta demora além do limite (timeout)',
   'carteira-recusa': 'O usuário recusa a conexão da carteira',
+  'api-html': 'A API responde HTML em vez de JSON (como um rewrite errado da hospedagem)',
+  'formato-invalido': 'A API responde JSON fora do contrato (campos faltando)',
 } as const
 
 export type ScenarioId = keyof typeof SCENARIOS
