@@ -356,7 +356,7 @@ receber os dados simulados. O TBT vem da avaliação do React e do MSW e das ren
 (skeleton → dados).
 
 **O que foi feito:** carregamento do app em paralelo com o MSW, com a rede aguardando o mock;
-`socket.io-client` sob demanda; code splitting por rota; imagens WebP com dimensões declaradas e
+`socket.io-client` sob demanda; code splitting por rota; imagens WebP com dimensões declaradas (iguais às do arquivo, conferidas em `e2e/images.spec.ts`) e
 `fetchpriority` no LCP; fonte local; altura mínima do conteúdo (CLS 0,197 → abaixo de 0,05).
 
 **Tentativas descartadas (medidas):** carregamento sequencial (MSW → app) e preload da fonte e

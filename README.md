@@ -118,7 +118,7 @@ mesmos controles estão em `window.__kurioMocks`.
 
 ## Testes
 
-- **E2E** (`npm run test:e2e`): 71 cenários × desktop e mobile, cobrindo os 12 itens do enunciado
+- **E2E** (`npm run test:e2e`): 74 cenários × desktop e mobile, cobrindo os 12 itens do enunciado
   (catálogo, detalhe, conta, favoritos, carrinho, compra, falhas, perfil/carteiras, tempo real,
   eventos duplicados/desconexão, teclado/foco e skeletons/recuperação), além das telas de
   favoritos e pedidos (estados, isolamento entre usuários, status ao vivo), dos avisos de tempo
@@ -127,6 +127,9 @@ mesmos controles estão em `window.__kurioMocks`.
   handlers MSW.
 - **Sem rolagem horizontal** (`e2e/overflow.spec.ts`): todas as rotas, públicas e logadas (inclusive o
   recibo de um pedido), em 390, 768 e 1440 px, conferindo `scrollWidth <= clientWidth`.
+- **Imagens com dimensões reais** (`e2e/images.spec.ts`): na Início, Detalhe e Carrinho, toda imagem
+  declara `width`/`height` iguais ao arquivo e a aba Problemas do DevTools (lida via CDP,
+  `Audits.issueAdded`) não recebe o aviso "Lazy-loaded images should have explicit dimensions".
 - **Relógio controlado** (`page.clock` do Playwright): os cenários que dependem de tempo avançam o
   relógio em vez de esperar. A API simulada roda na própria página e usa o mesmo relógio, então o
   "servidor" e a tela concordam sobre a hora.
