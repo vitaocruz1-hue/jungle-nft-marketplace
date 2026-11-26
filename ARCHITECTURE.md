@@ -173,6 +173,38 @@ protocolo. Limitações e ajustes:
   opções de filtro vêm na resposta do catálogo: com erro, o painel de filtros mostra
   "Filtros indisponíveis" e volta junto no "Tentar novamente".
 
+### Resiliência: o app nunca recebe HTML como dado
+
+Com recarregamento forçado (Ctrl+Shift+R), "Bypass for network" no DevTools ou atualização do
+service worker, a página pode não passar pelo MSW. Antes, as chamadas `/api/*` iam para a Vercel,
+que devolvia o `index.html` com status 200, e a lista do catálogo quebrava ao ler `items`. A correção
+tem camadas independentes:
+
+1. **Início do MSW** (`src/mocks/browser.ts`): depois de `worker.start()`, o app confirma que o
+   service worker controla a aba e faz uma "prova de vida" (`GET /api/__mock-health`, que só o MSW
+   responde com JSON). Se falhar, recarrega **uma vez** (trava em `sessionStorage`). Se ainda assim
+   falhar, `whenNetworkReady()` rejeita: nenhuma chamada sai e o topo mostra o aviso "A API de
+   demonstração não está ativa nesta aba" com "Recarregar página". O recarregamento automático do
+   próprio MSW (sem trava) é antecipado pelo nosso, com trava.
+2. **Hospedagem** (`vercel.json`): o rewrite da SPA não cobre `/api/*` (`/((?!api/).*)`). Sem o
+   MSW, a Vercel responde 404, não HTML.
+3. **Axios** (`src/lib/api-client.ts`): resposta com corpo que não é JSON (pelo `content-type`)
+   vira `ApiError` de rede. As rotas principais (catálogo, destaques, detalhe, recomendações,
+   carrinho, sessão, login e cadastro) passam por esquemas zod (`src/contracts/schemas.ts`, presos
+   aos contratos com `satisfies`): formato inesperado vira `INVALID_RESPONSE`, tratado na tela.
+4. **Página de erro** (`src/components/route-error.tsx`): `errorComponent` da raiz e padrão de
+   todas as rotas, em português, com "Tentar novamente" e "Restaurar dados de demonstração" (limpa
+   os dados `kurio:*`, o cenário da URL e recarrega).
+5. **Teste** (`e2e/resilience.spec.ts`): recarrega com o service worker ignorado
+   (`Network.setBypassServiceWorker` via CDP) e HTML em `/api`, e usa os cenários `api-html` e
+   `formato-invalido`; em nenhum caso aparece a tela genérica "Something went wrong".
+
+**React duplicado no build do Windows.** Ao investigar, o build local tinha duas cópias do React: o
+mesmo arquivo entrava como `C:/...` (caminho real usado pelo Vite para o `index.html`) e `c:/...`
+(caminho do terminal, usado pelo atalho `@`). Um componente novo caiu na cópia "errada" e os hooks
+quebraram. O atalho `@` agora usa o caminho real do disco (`realpathSync.native`): uma cópia do
+React e a mesma divisão de código por rota do build da Vercel (Linux), que nunca teve o problema.
+
 ## Interface, acessibilidade e desvios do Figma
 
 - **Assets:** o conector do Figma não tinha acesso ao arquivo. As artes dos NFTs foram recortadas

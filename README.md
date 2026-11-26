@@ -79,6 +79,8 @@ esquerdo da tela. A escolha vale para a aba atual até ser trocada (`?cenario=pa
 | `carteira-recusa`    | O usuário recusa a conexão da carteira no pagamento                         |
 | `pagamento-recusado` | O pedido é criado e depois recusado pela "rede"                             |
 | `timeout-pedido`     | O pedido é criado, mas a resposta chega após o timeout do cliente           |
+| `api-html`           | Catálogo, detalhe, carrinho e sessão respondem HTML (rewrite errado)        |
+| `formato-invalido`   | Catálogo, detalhe, carrinho e sessão respondem JSON fora do contrato        |
 
 **Reset:** painel → "Restaurar dados iniciais" (restaura catálogo, usuários, carrinhos, carteiras e
 pedidos, e encerra a sessão). Os dados simulados ficam no `localStorage` para sobreviver ao F5.
@@ -89,33 +91,35 @@ mesmos controles estão em `window.__kurioMocks`.
 
 ## Como reproduzir os fluxos de falha
 
-| Fluxo                                             | Passos                                                                                                                                                            |
-| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Resultado vazio                                   | Busque por `xyz` (lupa no cabeçalho)                                                                                                                              |
-| Respostas fora de ordem                           | `?cenario=variavel` e troque filtros rapidamente: a lista sempre corresponde ao último filtro                                                                     |
-| Falha HTTP 5xx e recuperação                      | `?cenario=erro-servidor` → catálogo, filtros, `/favoritos` e `/pedidos` mostram o erro; volte para `padrao` no painel e use "Tentar novamente"                    |
-| Sem conexão                                       | `?cenario=offline`                                                                                                                                                |
-| Sessão expirada                                   | Entre como Ana → painel "Expirar sessão atual" → qualquer ação: aviso e volta ao login guardando a página                                                         |
-| Acesso não autorizado                             | Sem login, abra `/perfil`, `/carteiras` ou `/pagamento`                                                                                                           |
-| Conflito de cadastro                              | Crie conta com `ana@kurio.dev`                                                                                                                                    |
-| Validação de formulário                           | Envie cadastro, perfil, senha ou carteira com campos vazios/inválidos                                                                                             |
-| Cupom inválido/expirado                           | No carrinho, aplique `NAOEXISTE` ou `EXPIRADO`                                                                                                                    |
-| Preço alterado / edição esgotada durante a compra | Entre como Ana, adicione `Emerald Ape #042`, vá até "Revise seu pedido" e, no painel, altere o preço ou esgote o NFT: a confirmação trava até "Atualizar cotação" |
-| Timeout com recuperação                           | `?cenario=timeout-pedido` → confirme a compra: após ~10 s a nova tentativa usa a mesma chave e recupera o mesmo pedido                                            |
-| Clique repetido                                   | Clique duas vezes em "Confirmar compra": um único pedido                                                                                                          |
-| Pagamento recusado                                | `?cenario=pagamento-recusado` → itens continuam no carrinho                                                                                                       |
-| Pedido pendente + F5/reconexão                    | Confirme a compra e recarregue durante "Processando": o mesmo pedido é retomado e confirmado                                                                      |
-| Eventos duplicados/antigos                        | Painel → "Reenviar último evento" / "Enviar versão antiga": nada regride                                                                                          |
-| Mudança em tempo real visível                     | Com um NFT na tela ou no carrinho, painel → alterar preço ou esgotar: aviso "Preço do … mudou de X para Y ETH" / "… esgotou" e o preço acende                     |
-| Status do pedido ao vivo                          | Confirme uma compra e abra "Meus pedidos" (menu do usuário ou "Minha coleção" no rodapé): "Pendente" vira "Confirmado" sem recarregar                             |
+| Fluxo                                             | Passos                                                                                                                                                                             |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Resultado vazio                                   | Busque por `xyz` (lupa no cabeçalho)                                                                                                                                               |
+| Respostas fora de ordem                           | `?cenario=variavel` e troque filtros rapidamente: a lista sempre corresponde ao último filtro                                                                                      |
+| Falha HTTP 5xx e recuperação                      | `?cenario=erro-servidor` → catálogo, filtros, `/favoritos` e `/pedidos` mostram o erro; volte para `padrao` no painel e use "Tentar novamente"                                     |
+| Sem conexão                                       | `?cenario=offline`                                                                                                                                                                 |
+| Sessão expirada                                   | Entre como Ana → painel "Expirar sessão atual" → qualquer ação: aviso e volta ao login guardando a página                                                                          |
+| Acesso não autorizado                             | Sem login, abra `/perfil`, `/carteiras` ou `/pagamento`                                                                                                                            |
+| Conflito de cadastro                              | Crie conta com `ana@kurio.dev`                                                                                                                                                     |
+| Validação de formulário                           | Envie cadastro, perfil, senha ou carteira com campos vazios/inválidos                                                                                                              |
+| Cupom inválido/expirado                           | No carrinho, aplique `NAOEXISTE` ou `EXPIRADO`                                                                                                                                     |
+| Preço alterado / edição esgotada durante a compra | Entre como Ana, adicione `Emerald Ape #042`, vá até "Revise seu pedido" e, no painel, altere o preço ou esgote o NFT: a confirmação trava até "Atualizar cotação"                  |
+| Timeout com recuperação                           | `?cenario=timeout-pedido` → confirme a compra: após ~10 s a nova tentativa usa a mesma chave e recupera o mesmo pedido                                                             |
+| Clique repetido                                   | Clique duas vezes em "Confirmar compra": um único pedido                                                                                                                           |
+| Pagamento recusado                                | `?cenario=pagamento-recusado` → itens continuam no carrinho                                                                                                                        |
+| Pedido pendente + F5/reconexão                    | Confirme a compra e recarregue durante "Processando": o mesmo pedido é retomado e confirmado                                                                                       |
+| Eventos duplicados/antigos                        | Painel → "Reenviar último evento" / "Enviar versão antiga": nada regride                                                                                                           |
+| Mudança em tempo real visível                     | Com um NFT na tela ou no carrinho, painel → alterar preço ou esgotar: aviso "Preço do … mudou de X para Y ETH" / "… esgotou" e o preço acende                                      |
+| Recarregamento forçado (Ctrl+Shift+R)             | Na Início, Detalhe ou Carrinho: o app recarrega uma vez para o MSW assumir a aba; com o service worker ignorado no DevTools, mostra o aviso "A API de demonstração não está ativa" |
+| Resposta inválida da API                          | `?cenario=api-html` ou `?cenario=formato-invalido` → erro tratado com "Tentar novamente"; no detalhe, página de erro com "Restaurar dados de demonstração"                         |
+| Status do pedido ao vivo                          | Confirme uma compra e abra "Meus pedidos" (menu do usuário ou "Minha coleção" no rodapé): "Pendente" vira "Confirmado" sem recarregar                                              |
 
 ## Testes
 
-- **E2E** (`npm run test:e2e`): 58 cenários × desktop e mobile, cobrindo os 12 itens do enunciado
+- **E2E** (`npm run test:e2e`): 62 cenários × desktop e mobile, cobrindo os 12 itens do enunciado
   (catálogo, detalhe, conta, favoritos, carrinho, compra, falhas, perfil/carteiras, tempo real,
   eventos duplicados/desconexão, teclado/foco e skeletons/recuperação), além das telas de
-  favoritos e pedidos (estados, isolamento entre usuários, status ao vivo) e dos avisos de tempo
-  real. Cada teste roda em um
+  favoritos e pedidos (estados, isolamento entre usuários, status ao vivo), dos avisos de tempo
+  real e da resiliência (service worker ignorado via CDP, HTML e JSON inválido em `/api`). Cada teste roda em um
   contexto isolado (armazenamento limpo); tempo real passa pelo `socket.io-client` e REST pelos
   handlers MSW.
 - **Regressão visual** (`npm run test:visual`): baselines em `e2e/visual.spec.ts-snapshots/`. Como a
