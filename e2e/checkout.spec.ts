@@ -21,6 +21,27 @@ async function reachReview(page: Page, nftId = 'emerald-ape-042') {
 }
 
 test.describe('Pagamento e confirmação', () => {
+  test('cotação vencida (5 min, relógio controlado) trava a compra até atualizar', async ({
+    page,
+  }) => {
+    await page.clock.install()
+    await reachReview(page)
+
+    // A cotação vale 5 minutos: o relógio avança em vez de o teste esperar.
+    const confirm = page.getByRole('button', { name: 'Confirmar compra' })
+    await expect(confirm).toBeEnabled()
+    await page.clock.fastForward('05:01')
+    await expect(page.getByRole('alert').filter({ hasText: 'A cotação expirou.' })).toBeVisible()
+    await expect(confirm).toBeDisabled()
+    expect(await mocks(page, (m) => m.ordersCount())).toBe(0)
+
+    // Cotação nova (pela API) libera a compra.
+    await page.getByRole('button', { name: 'Atualizar cotação' }).click()
+    await expect(confirm).toBeEnabled()
+    await confirm.click()
+    await expect(page).toHaveURL(/\/pedido\/ord-\d+$/)
+  })
+
   test('compra completa: do catálogo ao recibo confirmado', async ({ page }) => {
     await page.goto('/')
     await login(page, 'ana@kurio.dev', 'Kurio@123')

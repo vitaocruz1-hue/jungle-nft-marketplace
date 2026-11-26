@@ -14,6 +14,8 @@ test.describe('Tempo real visível', () => {
   test('preço de um NFT na tela: aviso com valor antigo e novo e destaque breve no preço', async ({
     page,
   }) => {
+    // Relógio controlado: o destaque dura 1,6 s e o teste avança o tempo em vez de esperar.
+    await page.clock.install()
     await page.goto('/')
     const card = results(page).locator('article', { hasText: 'Emerald Ape #042' })
     const price = card.locator('p > span').first()
@@ -27,8 +29,9 @@ test.describe('Tempo real visível', () => {
     await expect(
       toasts(page).filter({ hasText: 'Preço do Emerald Ape #042 mudou de 1.19 para 2.50 ETH.' }),
     ).toBeVisible()
-    // O destaque é breve: some sozinho.
-    await expect(price).not.toHaveClass(/price-flash/, { timeout: 5_000 })
+    // O destaque é breve: 1,6 s depois, some sozinho.
+    await page.clock.runFor(1_600)
+    await expect(price).not.toHaveClass(/price-flash/, { timeout: 1_000 })
   })
 
   test('NFT esgotado na tela avisa "esgotou"', async ({ page }) => {

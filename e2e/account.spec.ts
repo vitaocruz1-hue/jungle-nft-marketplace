@@ -31,6 +31,21 @@ test.describe('Sessão', () => {
     await expect(page).toHaveURL(/\/login\?redirect=%2Fnft%2Fsage-nomad-009&motivo=expirada/)
   })
 
+  test('sessão vence pelo tempo (30 min) com relógio controlado', async ({ page }) => {
+    // O "servidor" simulado roda na página e usa o mesmo relógio: avançar 30 min
+    // vence a sessão sem esperar e sem atalho de teste.
+    await page.clock.install()
+    await page.goto('/')
+    await login(page, 'ana@kurio.dev', 'Kurio@123')
+    await page.goto('/nft/sage-nomad-009')
+    await expect(page.getByRole('button', { name: 'Favoritado' })).toBeVisible()
+
+    await page.clock.fastForward('30:01')
+    await page.getByRole('button', { name: 'Favoritado' }).click()
+    await expect(page.getByText('Sua sessão expirou', { exact: true })).toBeVisible()
+    await expect(page).toHaveURL(/\/login\?redirect=%2Fnft%2Fsage-nomad-009&motivo=expirada/)
+  })
+
   test('logout e troca de usuário não vazam dados privados', async ({ page }) => {
     await page.goto('/')
     await login(page, 'ana@kurio.dev', 'Kurio@123')
