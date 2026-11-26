@@ -38,7 +38,7 @@ export function SearchDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="icon" aria-label="Buscar NFTs" className="hover:bg-secondary">
-          <SearchIcon className="size-5" />
+          <SearchIcon className="size-5 lg:size-6" />
         </Button>
       </DialogTrigger>
       <DialogContent className="top-24 translate-y-0 sm:max-w-lg">

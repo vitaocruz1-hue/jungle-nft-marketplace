@@ -282,10 +282,10 @@
     }
   }
 
-  /* A partir de 768 px o cabeçalho (68 px) fica preso no topo: âncoras e foco param abaixo dele. */
+  /* A partir de 768 px o cabeçalho (69 px) fica preso no topo: âncoras e foco param abaixo dele. */
   @media (width >= 48rem) {
     html {
-      scroll-padding-top: 68px;
+      scroll-padding-top: 69px;
     }
   }
 }

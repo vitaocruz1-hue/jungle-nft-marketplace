@@ -39,7 +39,10 @@ export function CartLink() {
   return (
     <Button asChild variant="ghost" size="icon" className="relative hover:bg-secondary">
       <Link to="/carrinho" aria-label={label}>
-        <ShoppingCartIcon key={bumps} className={cn('size-5', bumps > 0 && 'cart-bump')} />
+        <ShoppingCartIcon
+          key={bumps}
+          className={cn('size-5 lg:size-6', bumps > 0 && 'cart-bump')}
+        />
         {count > 0 && (
           <span
             aria-hidden="true"
@@ -62,7 +65,10 @@ export function AccountButton({ className }: { className?: string }) {
 
   if (!user) {
     return (
-      <Button asChild className={cn('h-9 px-3 text-base', className)}>
+      <Button
+        asChild
+        className={cn('h-9 px-3 text-base lg:h-[35px] lg:has-[>svg]:px-[7px]', className)}
+      >
         <Link to="/login" search={{ redirect: href.startsWith('/login') ? undefined : href }}>
           <LogInIcon className="size-5" />
           Entrar

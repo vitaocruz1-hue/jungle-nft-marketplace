@@ -19,7 +19,7 @@ import { AccountButton, CartLink } from './header-actions'
 import { SearchDialog } from './search-dialog'
 
 const navItemClass =
-  'relative flex h-full items-center px-1 text-base transition-colors hover:text-highlight'
+  'relative flex h-full items-center text-base transition-colors hover:text-highlight'
 const activeNavItemClass =
   'font-bold text-highlight after:absolute after:inset-x-0 after:bottom-[-1px] after:h-[3px] after:bg-primary'
 
@@ -105,27 +105,27 @@ export function SiteHeader({ className }: { className?: string }) {
       <Container>
         <div
           className={cn(
-            'flex h-[68px] items-center justify-between gap-4 border-b border-[#8b5b33]/70 transition-colors duration-200',
+            'flex h-[69px] items-center justify-between gap-4 border-b border-[#8b5b33]/70 transition-colors duration-200',
             scrolled && 'md:border-transparent',
           )}
         >
           <Link
             to="/"
-            className="text-base font-bold tracking-wide"
+            className="text-base font-bold tracking-wide lg:mt-[14px] lg:text-sm lg:tracking-wider"
             aria-label="Kurio, página inicial"
           >
             KURIO
           </Link>
 
-          <nav aria-label="Principal" className="hidden h-full md:block">
-            <MainNav className="flex h-full items-center gap-8 lg:gap-14" />
+          <nav aria-label="Principal" className="hidden h-full md:block lg:ml-auto">
+            <MainNav className="flex h-full items-center gap-8 lg:gap-[41px]" />
           </nav>
 
-          <div className="flex items-center gap-1 sm:gap-3">
+          <div className="flex items-center gap-1 sm:gap-3 lg:mt-[14px] lg:ml-[196px]">
             <SearchDialog />
 
             <CartLink />
-            <AccountButton className="ml-1 hidden sm:inline-flex" />
+            <AccountButton className="ml-1 hidden sm:inline-flex lg:ml-[17px]" />
 
             <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
               <SheetTrigger asChild>
