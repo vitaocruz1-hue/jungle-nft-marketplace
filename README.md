@@ -111,7 +111,7 @@ mesmos controles estão em `window.__kurioMocks`.
 
 ## Testes
 
-- **E2E** (`npm run test:e2e`): 57 cenários × desktop e mobile, cobrindo os 12 itens do enunciado
+- **E2E** (`npm run test:e2e`): 58 cenários × desktop e mobile, cobrindo os 12 itens do enunciado
   (catálogo, detalhe, conta, favoritos, carrinho, compra, falhas, perfil/carteiras, tempo real,
   eventos duplicados/desconexão, teclado/foco e skeletons/recuperação), além das telas de
   favoritos e pedidos (estados, isolamento entre usuários, status ao vivo) e dos avisos de tempo
@@ -130,12 +130,12 @@ relatórios e ambiente em [lighthouse/reports/](lighthouse/reports/summary.md).
 
 | Página  | Perfil  | Performance | Acessibilidade | Boas práticas | SEO |    LCP |   CLS |    TBT |
 | ------- | ------- | ----------: | -------------: | ------------: | --: | -----: | ----: | -----: |
-| Início  | mobile  |          66 |            100 |            96 | 100 | 5,65 s | 0,032 | 528 ms |
-| Início  | desktop |          97 |            100 |            96 | 100 | 1,22 s | 0,002 |  14 ms |
-| Detalhe | mobile  |          68 |            100 |            96 | 100 | 5,37 s | 0,000 | 386 ms |
-| Detalhe | desktop |          98 |            100 |            96 | 100 | 1,19 s | 0,001 |   5 ms |
+| Início  | mobile  |          62 |            100 |            96 | 100 | 5,84 s | 0,016 | 658 ms |
+| Início  | desktop |          97 |            100 |            96 | 100 | 1,27 s | 0,002 |  16 ms |
+| Detalhe | mobile  |          67 |            100 |            96 | 100 | 5,36 s | 0,000 | 410 ms |
+| Detalhe | desktop |          97 |            100 |            96 | 100 | 1,23 s | 0,001 |   6 ms |
 
-Performance mobile fica abaixo de 90; causas e tentativas em
+Performance mobile fica abaixo de 90 e varia com a carga da máquina (±4); causas e tentativas em
 [ARCHITECTURE.md → Performance](ARCHITECTURE.md#performance).
 
 ## Deploy

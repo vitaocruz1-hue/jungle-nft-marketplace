@@ -230,19 +230,29 @@ Segue os 6 frames mobile do Figma (414 px de largura), adaptados para 390 px.
 Regra: com a página parada, tudo segue o Figma. Os efeitos aparecem só em interação, ao rolar ou em
 elementos que flutuam sobre o conteúdo. Sem bibliotecas novas (Tailwind + `tw-animate-css`).
 
-- **Vidro:** utilitário `glass` (`src/index.css`): fundo translúcido, `backdrop-filter: blur` e
-  borda clara. Sem suporte a `backdrop-filter` (ou `color-mix`), o fundo é sólido. Usado na barra
-  de abas, gavetas, diálogos (busca, zoom), avisos e painel de cenários.
+- **Vidro:** utilitário `glass` (`src/index.css`): fundo com 60% de opacidade, `blur(18px)` com
+  saturação e borda clara (16% de branco). Sem suporte a `backdrop-filter` (ou `color-mix`), o fundo
+  é sólido. Usado na barra de abas, gavetas, diálogos (busca, zoom), avisos e painel de cenários;
+  o escurecimento atrás de gavetas e diálogos caiu para 40% para o desfoque aparecer.
 - **Cabeçalho:** a partir de 768 px fica preso no topo. No topo é igual ao Figma; ao rolar vira
-  vidro, com uma linha clara feita por sombra (não muda a altura). `scroll-padding-top: 69px`
-  mantém âncoras e foco abaixo dele.
-- **Cards:** em hover (só em dispositivos com mouse) ou foco do teclado, a moldura sobe 4 px e
-  ganha sombra e borda com brilho laranja; a arte dá zoom lento e um reflexo passa por ela. O foco
-  usa `.nft-card-link:focus-visible` (sem `:has()`, mais barato no recálculo de estilos).
-- **Movimento:** "aperto" de 2% ao clicar em links e botões; gavetas em 250/200 ms, diálogos em
+  vidro (cor dos painéis a 60%), com linha clara e sombra suave feitas por `box-shadow` (não muda
+  a altura). `scroll-padding-top: 69px` mantém âncoras e foco abaixo dele.
+- **Cards:** em hover (só em dispositivos com mouse) ou foco do teclado, a moldura sobe 8 px em
+  300 ms e ganha brilho laranja (borda + halo); a arte dá zoom de 1,08 e uma faixa diagonal de luz
+  atravessa a imagem. Com mouse, o card inclina até 6° seguindo o ponteiro (`card-tilt.ts` só
+  grava `--tilt-x`/`--tilt-y`; o CSS só usa com `hover: hover`, `pointer: fine` e sem
+  `prefers-reduced-motion`). O foco usa `.nft-card-link:focus-visible` (sem `:has()`).
+- **Botões:** hover com brilho (`brightness` + halo laranja) nos botões principais e de contorno;
+  clique com "aperto" de 0,96 (links: 0,98); gavetas em 250/200 ms, diálogos em
   200 ms, avisos em 250 ms; fade de 200 ms ao trocar de página (só navegação interna, nunca na
   1ª carga, e só opacidade, para não mover elementos fixos); "pulinho" no ícone do carrinho quando
   um item entra; destaque do preço que mudou em tempo real.
+- **Desvio do Figma — coração no cabeçalho:** no desktop há um ícone de Favoritos entre a busca e
+  o carrinho (mesmo estilo e tamanho), com contador igual ao do carrinho (some com 0 ou sem login)
+  e `aria-label` "Favoritos (N)". Leva a `/favoritos` (sem login, a
+  `/login?redirect=/favoritos`). Foi adicionado para dar acesso direto aos favoritos; o item no
+  menu do usuário continua. O menu principal continua na posição do Figma; só os ícones da direita
+  se deslocam 48 px para a esquerda.
 - **`prefers-reduced-motion`:** deslocamentos e zoom ficam desligados (`motion-safe`/media
   query) e as animações duram 0,01 ms; o destaque de preço vira um contorno parado.
 - **Fidelidade ao Figma (desktop):** medido nas exportações (posição de cada linha de texto e
@@ -253,15 +263,18 @@ elementos que flutuam sobre o conteúdo. Sem bibliotecas novas (Tailwind + `tw-a
   com rolagem lateral (o Figma mostra 5 cards maiores com bolinhas); no 1º banner o título quebra
   em outro ponto; os demais frames desktop (detalhe, carrinho, pagamento, perfil) não tiveram
   ajuste fino além de cabeçalho e rodapé.
-- **Lighthouse:** um A/B com execuções intercaladas (mobile, Início) não mostrou diferença além do
-  ruído entre antes e depois do polimento (medianas 66 × 65; as execuções
-  individuais variaram de 63 a 72).
-  Retirar o vidro da barra de abas não melhorou a nota.
+- **Lighthouse:** A/Bs com execuções intercaladas (mobile, Início) não mostraram diferença além do
+  ruído: antes × depois do 1º polimento, 66 × 65 (execuções de 63 a 72); antes × depois dos efeitos
+  fortes, 62 × 64. Retirar o vidro da barra de abas não melhorou a nota.
 
 ## Performance
 
-Medianas de 3 execuções (detalhes em `lighthouse/reports/summary.md`): desktop 97/98;
-mobile 66 (Início) e 68 (Detalhe). Acessibilidade 100, Boas práticas 96 e SEO 100 em todos.
+Medianas de 3 execuções (detalhes em `lighthouse/reports/summary.md`): desktop 97/97;
+mobile 62 (Início) e 67 (Detalhe). Acessibilidade 100, Boas práticas 96 e SEO 100 em todos.
+
+A nota mobile depende da carga da máquina: a última medição foi feita com outros servidores de
+desenvolvimento abertos (CPU em ~60%). Nas mesmas condições, a versão anterior também marcou 62;
+com a máquina livre, a Início ficou entre 64 e 67 nas medições anteriores.
 
 **Causas do mobile abaixo de 90.** O perfil mobile simula CPU 4× mais lenta. O LCP (arte
 principal) depende de JavaScript: iniciar o MSW (exigido no cenário auditado), executar o React e
