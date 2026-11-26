@@ -34,6 +34,8 @@ export function CatalogSection() {
   const query = useQuery(nftListQueryOptions(toListParams(search)))
   const filtersOpen = useFiltersSheetOpen()
   const { data } = query
+  // Durante o "Tentar novamente" os filtros voltam ao skeleton e chegam junto com o catálogo.
+  const filtersUnavailable = query.isError && !data && !query.isFetching
 
   // Fecha a gaveta ao sair da Início.
   useEffect(() => () => setFiltersSheetOpen(false), [])
@@ -64,7 +66,7 @@ export function CatalogSection() {
           className="px-5 pb-4 md:hidden"
           triggerClassName="flex-1 justify-between border border-border bg-card"
         />
-        <CatalogFilters facets={data?.facets} search={search} />
+        <CatalogFilters facets={data?.facets} search={search} unavailable={filtersUnavailable} />
         <SheetFooter className="sticky bottom-0 bg-background">
           <Button onClick={() => setFiltersSheetOpen(false)} className="h-10">
             Ver {data ? resultsLabel(data.totalItems) : 'resultados'}
@@ -85,7 +87,7 @@ export function CatalogSection() {
       </h2>
 
       <aside aria-label="Filtros do catálogo" className="hidden space-y-8 lg:block">
-        <CatalogFilters facets={data?.facets} search={search} />
+        <CatalogFilters facets={data?.facets} search={search} unavailable={filtersUnavailable} />
         <SpotlightCard />
       </aside>
 

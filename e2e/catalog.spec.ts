@@ -11,6 +11,7 @@ import {
   sortCombobox,
   waitForResults,
 } from './support/catalog'
+import { useScenario } from './support/mocks'
 
 test.describe('Catálogo da Início', () => {
   test('primeira página reproduz o Figma', async ({ page }) => {
@@ -133,5 +134,29 @@ test.describe('Catálogo da Início', () => {
     await expect(page.getByLabel('Carregando NFTs')).toBeVisible()
     await expect(results(page)).toBeVisible({ timeout: 10_000 })
     await expect(page.getByLabel('Carregando NFTs')).toBeHidden()
+  })
+
+  test('erro no catálogo tira os filtros do "carregando" e eles voltam no "Tentar novamente"', async ({
+    page,
+  }) => {
+    await useScenario(page, 'erro-servidor')
+    await page.goto('/')
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'Não foi possível carregar o catálogo' }),
+    ).toBeVisible({ timeout: 15_000 })
+
+    let filters = await openFilters(page)
+    await expect(filters.getByRole('status')).toHaveText(/Filtros indisponíveis/)
+    await expect(filters.getByRole('heading', { name: 'Coleções' })).toHaveCount(0)
+    if (page.viewportSize()!.width < 1024) await page.keyboard.press('Escape')
+
+    await page.evaluate(() => sessionStorage.setItem('kurio:mock-scenario', 'padrao'))
+    await page.getByRole('button', { name: 'Tentar novamente' }).click()
+    await expect(results(page)).toBeVisible()
+
+    filters = await openFilters(page)
+    await expect(filters.getByRole('heading', { name: 'Coleções' })).toBeVisible()
+    await expect(filters.getByRole('heading', { name: 'Rede' })).toBeVisible()
+    await expect(filters.getByText(/Filtros indisponíveis/)).toHaveCount(0)
   })
 })

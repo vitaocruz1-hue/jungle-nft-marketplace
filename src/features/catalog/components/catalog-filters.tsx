@@ -81,10 +81,25 @@ function FacetListSkeleton({ title, rows }: { title: string; rows: number }) {
 interface CatalogFiltersProps {
   facets: Facets | undefined
   search: CatalogSearch
+  /**
+   * As opções de filtro vêm na mesma resposta do catálogo. Se ela falhou (e não
+   * está sendo repetida), não há o que carregar: mostra um aviso em vez do skeleton.
+   */
+  unavailable?: boolean
 }
 
 /** Painel de filtros (coluna lateral no desktop, gaveta no celular). */
-export function CatalogFilters({ facets, search }: CatalogFiltersProps) {
+export function CatalogFilters({ facets, search, unavailable = false }: CatalogFiltersProps) {
+  if (!facets && unavailable) {
+    return (
+      <div className="bg-card px-5 py-6">
+        <p role="status" className="text-sm text-muted-foreground">
+          Filtros indisponíveis no momento. Eles voltam junto com o catálogo.
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-8 bg-card px-5 py-6">
       {hasActiveFilters(search) && (
