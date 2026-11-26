@@ -67,7 +67,7 @@ Cupons: `KURIO10` (10%), `GENESIS5` (5%), `EXPIRADO` (vencido). Qualquer outro c
 ## Cenários da simulação
 
 Escolha um cenário pela URL (`?cenario=<id>`) ou pelo **painel "Cenários"** no canto inferior
-esquerdo da tela. A escolha vale para a aba atual até ser trocada (`?cenario=padrao` volta ao normal).
+esquerdo da tela (no celular, logo acima da barra de abas ou da barra de compra, sem cobrir os ícones). A escolha vale para a aba atual até ser trocada (`?cenario=padrao` volta ao normal).
 
 | Cenário              | O que acontece                                                              |
 | -------------------- | --------------------------------------------------------------------------- |
@@ -118,7 +118,7 @@ mesmos controles estão em `window.__kurioMocks`.
 
 ## Testes
 
-- **E2E** (`npm run test:e2e`): 68 cenários × desktop e mobile, cobrindo os 12 itens do enunciado
+- **E2E** (`npm run test:e2e`): 71 cenários × desktop e mobile, cobrindo os 12 itens do enunciado
   (catálogo, detalhe, conta, favoritos, carrinho, compra, falhas, perfil/carteiras, tempo real,
   eventos duplicados/desconexão, teclado/foco e skeletons/recuperação), além das telas de
   favoritos e pedidos (estados, isolamento entre usuários, status ao vivo), dos avisos de tempo
