@@ -1,5 +1,11 @@
 import { ComingSoonButton } from '@/components/coming-soon'
 
+/** Dimensões reais dos arquivos (o navegador reserva o espaço antes de carregar). */
+const NEON_VESSEL = { src: '/images/nfts/neon-vessel.webp', width: 496, height: 496 }
+const EMERALD_APE = { src: '/images/nfts/emerald-ape.webp', width: 512, height: 512 }
+const SAGE_NOMAD = { src: '/images/nfts/sage-nomad.webp', width: 496, height: 496 }
+const GOLDEN_BEAT = { src: '/images/nfts/golden-beat.webp', width: 496, height: 496 }
+
 /** Conteúdo editorial (fora do escopo do desafio): textos fixos, sem API. */
 const POSTS = [
   {
@@ -7,28 +13,28 @@ const POSTS = [
     readTime: 6,
     title: 'Como funciona a propriedade de NFTs',
     text: 'Aprenda a colecionar, negociar e verificar ativos digitais.',
-    image: '/images/nfts/neon-vessel.webp',
+    image: NEON_VESSEL,
   },
   {
     date: '13 de setembro',
     readTime: 2,
     title: '10 artistas digitais para acompanhar',
     text: 'Conheça criadores que moldam a cultura digital.',
-    image: '/images/nfts/emerald-ape.webp',
+    image: EMERALD_APE,
   },
   {
     date: '15 de setembro',
     readTime: 3,
     title: 'Raridade, atributos e procedência',
     text: 'Entenda raridade, procedência, direitos autorais e utilidade.',
-    image: '/images/nfts/sage-nomad.webp',
+    image: SAGE_NOMAD,
   },
   {
     date: '15 de setembro',
     readTime: 2,
     title: 'Como proteger sua carteira',
     text: 'Proteja sua carteira, seus ativos e sua identidade.',
-    image: '/images/nfts/golden-beat.webp',
+    image: GOLDEN_BEAT,
   },
 ]
 
@@ -47,10 +53,10 @@ export function Journal() {
           <li key={post.title}>
             <article className="flex h-full flex-col overflow-hidden rounded-md bg-card">
               <img
-                src={post.image}
+                src={post.image.src}
                 alt=""
-                width={496}
-                height={496}
+                width={post.image.width}
+                height={post.image.height}
                 loading="lazy"
                 decoding="async"
                 className="aspect-[268/195] w-full rounded-t-md object-cover"

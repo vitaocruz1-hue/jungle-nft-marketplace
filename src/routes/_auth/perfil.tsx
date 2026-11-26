@@ -168,6 +168,9 @@ function AvatarField({ user }: { user: User }) {
             <img
               src={user.avatarUrl}
               alt={`Avatar de ${user.displayName}`}
+              // Tamanho exibido (a foto enviada pode ter qualquer tamanho; o object-cover recorta).
+              width={50}
+              height={50}
               className="size-full object-cover"
             />
           ) : (

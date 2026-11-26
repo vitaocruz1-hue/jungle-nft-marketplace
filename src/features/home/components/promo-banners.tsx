@@ -7,7 +7,8 @@ import type { CatalogSearch } from '@/features/catalog/search-params'
 interface Banner {
   title: string
   text: string
-  image: { src: string; alt: string }
+  /** Dimensões reais do arquivo (o navegador reserva o espaço antes de carregar). */
+  image: { src: string; alt: string; width: number; height: number }
   search: Partial<CatalogSearch>
 }
 
@@ -15,13 +16,13 @@ const BANNERS: Banner[] = [
   {
     title: 'Lançamentos gênesis de edição limitada',
     text: 'Colecione edições escassas diretamente dos criadores antes da revelação pública.',
-    image: { src: '/images/nfts/emerald-ape.webp', alt: '' },
+    image: { src: '/images/nfts/emerald-ape.webp', alt: '', width: 512, height: 512 },
     search: { tab: 'new' },
   },
   {
     title: 'Arte digital selecionada e muito mais',
     text: 'Explore novos artistas, coleções verificadas e obras digitais que definem a cultura.',
-    image: { src: '/images/nfts/neon-vessel.webp', alt: '' },
+    image: { src: '/images/nfts/neon-vessel.webp', alt: '', width: 496, height: 496 },
     search: { category: 'digital-art' },
   },
 ]
@@ -41,8 +42,8 @@ export function PromoBanners() {
           <img
             src={banner.image.src}
             alt={banner.image.alt}
-            width={496}
-            height={496}
+            width={banner.image.width}
+            height={banner.image.height}
             loading="lazy"
             decoding="async"
             className="h-full min-h-[180px] w-full rounded-[15px] object-cover"
