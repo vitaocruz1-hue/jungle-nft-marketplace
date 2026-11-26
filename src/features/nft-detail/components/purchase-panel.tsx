@@ -214,7 +214,10 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
       )}
 
       {/* Celular (Figma mobile): barra de compra fixa no rodapé da tela. */}
-      <div className="fixed inset-x-0 bottom-0 z-40 rounded-t-[28px] border-t border-[#3d2a1f] bg-card px-6 pt-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgb(0_0_0/0.35)] md:hidden">
+      <div
+        data-bottom-bar
+        className="fixed inset-x-0 bottom-0 z-40 rounded-t-[28px] border-t border-[#3d2a1f] bg-card px-6 pt-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgb(0_0_0/0.35)] md:hidden"
+      >
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span aria-hidden="true" className="text-sm font-bold text-muted-foreground">

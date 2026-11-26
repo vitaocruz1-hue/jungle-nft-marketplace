@@ -1,11 +1,12 @@
 import { FlaskConicalIcon, XIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { cn } from '@/lib/utils'
 
 import { mockControls } from '../controls'
 import { getActiveScenario, SCENARIOS, type ScenarioId } from '../scenarios'
 import { parsePriceInput } from './price-input'
+import { useBottomBarOffset } from './use-bottom-bar-offset'
 
 /**
  * Painel de cenários da demonstração (camada de mocks, fora do app).
@@ -18,6 +19,9 @@ const button =
 
 const field =
   'mt-1 w-full rounded-sm border border-[#5c4030] bg-[#241612] px-2 py-1 text-xs focus-visible:outline-2 focus-visible:outline-[#e89b55]'
+
+/** Espaço do botão "Cenários" (altura + margem) reservado no fim da página no celular. */
+const FAB_SPACE_PX = 56
 
 interface Feedback {
   ok: boolean
@@ -35,6 +39,19 @@ export function ScenarioPanel() {
   const nfts = mockControls.listNfts()
   const selected = nfts.find((nft) => nft.id === nftId)
   const priceCheck = parsePriceInput(price)
+  // No celular, fica acima da barra de abas (ou da barra de compra), sem cobrir nenhum ícone.
+  const barOffset = useBottomBarOffset()
+  const hasBottomBar = barOffset > 0
+
+  // Com o botão acima da barra, o fim da página ganha espaço para nenhum conteúdo ficar por baixo dele.
+  useEffect(() => {
+    if (!hasBottomBar) return
+    const previous = document.body.style.paddingBottom
+    document.body.style.paddingBottom = `${FAB_SPACE_PX}px`
+    return () => {
+      document.body.style.paddingBottom = previous
+    }
+  }, [hasBottomBar])
 
   function changeScenario(id: ScenarioId) {
     mockControls.setScenario(id)
@@ -59,11 +76,18 @@ export function ScenarioPanel() {
   }
 
   return (
-    <div className="fixed bottom-3 left-3 z-[60] font-sans text-[#f5f1eb]">
+    <div
+      className="fixed left-3 z-[60] font-sans text-[#f5f1eb]"
+      style={{
+        // Sem barra no rodapé (desktop e telas sem barra): 12 px acima da safe-area.
+        bottom: hasBottomBar ? `${barOffset + 12}px` : 'calc(env(safe-area-inset-bottom) + 12px)',
+      }}
+    >
       {open ? (
         <section
           aria-labelledby="painel-cenarios-titulo"
-          className="max-h-[80vh] w-72 overflow-y-auto rounded-md border glass p-3 shadow-2xl [--glass-tint:#140d0a]"
+          style={{ maxHeight: `min(80vh, calc(100dvh - ${barOffset + 24}px))` }}
+          className="w-72 overflow-y-auto rounded-md border glass p-3 shadow-2xl [--glass-tint:#140d0a]"
         >
           <div className="flex items-center justify-between">
             <h2 id="painel-cenarios-titulo" className="text-sm font-bold">
