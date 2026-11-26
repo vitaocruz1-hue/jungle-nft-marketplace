@@ -1,9 +1,15 @@
 import type { AddCartItemRequest, Cart } from '@/contracts/cart'
+import { cartSchema } from '@/contracts/schemas'
 import { apiClient } from '@/lib/api-client'
+import { parseResponse } from '@/lib/parse-response'
 import { sessionStore } from '@/lib/session-store'
 
-/** Visitante: guarda o id do carrinho criado pela API para as próximas chamadas. */
-function remember(cart: Cart) {
+/**
+ * Confere o formato (zod) e, para o visitante, guarda o id do carrinho criado
+ * pela API para as próximas chamadas.
+ */
+function remember(data: Cart) {
+  const cart = parseResponse(cartSchema, data, 'carrinho')
   if (!sessionStore.getToken()) sessionStore.setGuestCartId(cart.id)
   return cart
 }

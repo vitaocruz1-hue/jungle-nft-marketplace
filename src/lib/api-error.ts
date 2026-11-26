@@ -1,8 +1,17 @@
-import { isAxiosError } from 'axios'
+import { AxiosHeaders, isAxiosError } from 'axios'
 
 import type { ApiErrorBody, ApiErrorCode } from '@/contracts/common'
 
-export type ClientErrorCode = ApiErrorCode | 'NETWORK_ERROR' | 'TIMEOUT' | 'CANCELED' | 'UNKNOWN'
+export type ClientErrorCode =
+  | ApiErrorCode
+  | 'NETWORK_ERROR'
+  | 'TIMEOUT'
+  | 'CANCELED'
+  | 'UNKNOWN'
+  /** A resposta chegou, mas não tem o formato do contrato (validação com zod). */
+  | 'INVALID_RESPONSE'
+  /** A API simulada (MSW) não conseguiu controlar esta aba. */
+  | 'MOCKS_UNAVAILABLE'
 
 /**
  * Erro único que o app recebe de qualquer chamada à API.
@@ -39,6 +48,37 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * A API sempre responde JSON. Outro tipo de conteúdo (ex.: o index.html que a
+ * hospedagem devolve quando a API simulada não está ativa) não é resposta da API.
+ */
+export function hasJsonContentType(headers: unknown): boolean {
+  let value: unknown
+  if (headers instanceof AxiosHeaders) value = headers.get('content-type')
+  else if (headers && typeof headers === 'object') {
+    value = (headers as Record<string, unknown>)['content-type']
+  }
+  return typeof value === 'string' && /\bapplication\/(?:[\w.+-]+\+)?json\b/i.test(value)
+}
+
+export function notJsonError() {
+  return new ApiError({
+    message: 'Não foi possível falar com a API (resposta inesperada). Tente novamente.',
+    status: null,
+    code: 'NETWORK_ERROR',
+  })
+}
+
+/** A API simulada não está ativa nesta aba (ver `startMockWorker`). */
+export function mocksUnavailableError() {
+  return new ApiError({
+    message:
+      'A API de demonstração não está ativa nesta aba. Recarregue a página para voltar a usar o site.',
+    status: null,
+    code: 'MOCKS_UNAVAILABLE',
+  })
+}
+
 function isApiErrorBody(data: unknown): data is ApiErrorBody {
   return (
     typeof data === 'object' &&
@@ -70,7 +110,9 @@ export function toApiError(error: unknown): ApiError {
         code: 'NETWORK_ERROR',
       })
     }
-    const { status, data } = error.response
+    const { status, data, headers } = error.response
+    // Erro sem JSON (ex.: página 404 da hospedagem): a API nem foi alcançada.
+    if (!hasJsonContentType(headers)) return notJsonError()
     if (isApiErrorBody(data)) {
       return new ApiError({
         message: data.error.message,

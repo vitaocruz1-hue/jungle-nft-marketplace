@@ -2,7 +2,12 @@ import axios from 'axios'
 
 import { env } from '@/config/env'
 import { CART_ID_HEADER } from '@/contracts/cart'
-import { toApiError } from '@/lib/api-error'
+import {
+  hasJsonContentType,
+  mocksUnavailableError,
+  notJsonError,
+  toApiError,
+} from '@/lib/api-error'
 import { whenNetworkReady } from '@/lib/network-ready'
 import { notifySessionEnded, sessionStore } from '@/lib/session-store'
 
@@ -19,7 +24,10 @@ export const apiClient = axios.create({
 // Na ida: espera a rede (mocks) ficar pronta e identifica o usuário (token)
 // ou o carrinho do visitante.
 apiClient.interceptors.request.use(async (config) => {
-  await whenNetworkReady()
+  // Sem a API simulada ativa, falha na hora com um erro claro (nada vai para a hospedagem).
+  await whenNetworkReady().catch(() => {
+    throw mocksUnavailableError()
+  })
   const token = sessionStore.getToken()
   if (token) config.headers.set('Authorization', `Bearer ${token}`)
   const guestCartId = sessionStore.getGuestCartId()
@@ -27,10 +35,16 @@ apiClient.interceptors.request.use(async (config) => {
   return config
 })
 
-// Na volta: qualquer falha vira ApiError. Se uma chamada autenticada recebe
-// 401, a sessão acabou: o app limpa os dados privados e pede novo login.
+// Na volta: resposta com corpo que não é JSON não é da API (ex.: o index.html da
+// hospedagem) e vira erro de rede, nunca "dado". Qualquer falha vira ApiError.
+// Se uma chamada autenticada recebe 401, a sessão acabou: o app limpa os dados
+// privados e pede novo login.
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const emptyBody = response.status === 204 || response.data === '' || response.data == null
+    if (!emptyBody && !hasJsonContentType(response.headers)) return Promise.reject(notJsonError())
+    return response
+  },
   (error: unknown) => {
     const apiError = toApiError(error)
     const sentToken = axios.isAxiosError(error) && error.config?.headers?.has('Authorization')
