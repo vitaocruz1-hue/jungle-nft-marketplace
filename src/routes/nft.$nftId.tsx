@@ -16,8 +16,10 @@ import { NftGallery } from '@/features/nft-detail/components/nft-gallery'
 import { NftTabs } from '@/features/nft-detail/components/nft-tabs'
 import { PurchasePanel } from '@/features/nft-detail/components/purchase-panel'
 import { RelatedNfts } from '@/features/nft-detail/components/related-nfts'
+import { useLiveNft } from '@/features/realtime/realtime-store'
 import { ApiError } from '@/lib/api-error'
 import { displayEth } from '@/lib/eth'
+import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/nft/$nftId')({
   loader: async ({ context: { queryClient }, params }) => {
@@ -106,6 +108,7 @@ function ShareLinks({ name }: { name: string }) {
 function NftDetailPage() {
   const { nftId } = Route.useParams()
   const { data: nft } = useSuspenseQuery(nftDetailQueryOptions(nftId))
+  const priceFlash = useLiveNft(nft.id)
 
   return (
     <Container className="max-md:pb-48 md:pt-8">
@@ -148,7 +151,7 @@ function NftDetailPage() {
           <div className="mt-2 flex flex-wrap items-center justify-between gap-3 border-b border-[#442c1a] pb-3 max-md:hidden">
             <p className="text-xl font-bold text-highlight">
               <span className="sr-only">A partir de </span>
-              {displayEth(nft.price)}
+              <span className={cn(priceFlash && 'price-flash')}>{displayEth(nft.price)}</span>
               {nft.compareAtPrice && (
                 <span className="ml-3 text-base font-normal text-muted-foreground line-through">
                   <span className="sr-only">Preço anterior: </span>

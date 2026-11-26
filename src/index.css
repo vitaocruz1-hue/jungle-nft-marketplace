@@ -65,6 +65,33 @@
   --animate-shimmer: shimmer 1.6s linear infinite;
 }
 
+/* Preço que acabou de mudar em tempo real: brilho laranja que se apaga (~1,6 s). */
+@keyframes price-flash {
+  0%,
+  35% {
+    background-color: color-mix(in srgb, var(--highlight) 28%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--highlight) 28%, transparent);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 3px transparent;
+  }
+}
+
+.price-flash {
+  border-radius: 4px;
+  animation: price-flash 1.6s ease-out;
+}
+
+/* Sem movimento: destaque parado enquanto durar o aviso. */
+@media (prefers-reduced-motion: reduce) {
+  .price-flash {
+    animation: none;
+    outline: 1px solid var(--highlight);
+    outline-offset: 2px;
+  }
+}
+
 @keyframes shimmer {
   from {
     background-position: 200% 0;

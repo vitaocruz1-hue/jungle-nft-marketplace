@@ -2,7 +2,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { FeaturedResponse, NftDetail, NftListResponse, NftSummary } from '@/contracts/catalog'
-import type { Cart } from '@/contracts/cart'
+import type { Cart, CartItem } from '@/contracts/cart'
 import type { FavoritesResponse } from '@/contracts/favorites'
 import type { Order, OrderListResponse } from '@/contracts/orders'
 import type { NftUpdatedEvent, OrderUpdatedEvent } from '@/contracts/realtime'
@@ -10,9 +10,9 @@ import { privateKeys } from '@/features/auth/session'
 import { catalogKeys } from '@/features/catalog/queries'
 import { cartKeys } from '@/features/cart/queries'
 import { orderKeys } from '@/features/orders/queries'
-import { displayEth } from '@/lib/eth'
+import { compareEth, displayEth, normalizeEth } from '@/lib/eth'
 
-import { notifyNftChanged } from './realtime-store'
+import { flashPrice, isNftOnScreen, notifyNftChanged } from './realtime-store'
 
 /** Aplica preço/estoque novos num NFT do cache, só se a versão for mais nova. */
 function patchSummary<T extends NftSummary>(nft: T, event: NftUpdatedEvent): T {
@@ -38,9 +38,82 @@ function patchDetail(nft: NftDetail, event: NftUpdatedEvent): NftDetail {
   }
 }
 
+/** Último retrato conhecido do NFT em qualquer cache (detalhe, listas, favoritos…). */
+function findCachedSummary(queryClient: QueryClient, nftId: string): NftSummary | undefined {
+  const detail = queryClient.getQueryData<NftDetail>(catalogKeys.detail(nftId))
+  if (detail) return detail
+  const lists = queryClient.getQueriesData<NftListResponse>({ queryKey: catalogKeys.lists() })
+  const related = queryClient.getQueriesData<NftSummary[]>({
+    queryKey: [...catalogKeys.all, 'related'],
+  })
+  const favorites = queryClient.getQueriesData<FavoritesResponse>({
+    queryKey: privateKeys.all,
+    predicate: (query) => query.queryKey[2] === 'favorites',
+  })
+  const candidates = [
+    ...lists.flatMap(([, data]) => data?.items ?? []),
+    ...related.flatMap(([, data]) => data ?? []),
+    ...favorites.flatMap(([, data]) => data?.items ?? []),
+  ]
+  return candidates
+    .filter((nft) => nft.id === nftId)
+    .reduce<NftSummary | undefined>(
+      (best, nft) => (!best || nft.version > best.version ? nft : best),
+      undefined,
+    )
+}
+
+function findCartItem(queryClient: QueryClient, nftId: string): CartItem | undefined {
+  return queryClient
+    .getQueriesData<Cart>({ queryKey: cartKeys.all })
+    .flatMap(([, cart]) => cart?.items ?? [])
+    .find((item) => item.nftId === nftId)
+}
+
+type Change = { kind: 'price' | 'sold-out'; message: string }
+
+/**
+ * Texto do aviso. No carrinho vale a edição escolhida; fora dele, o preço do
+ * card/detalhe. Sem mudança visível (ex.: a API já tinha trazido o valor novo),
+ * não há aviso.
+ */
+function describeChange(
+  event: NftUpdatedEvent,
+  before: NftSummary | undefined,
+  cartItem: CartItem | undefined,
+): Change | null {
+  if (cartItem) {
+    const edition = event.data.editions.find((e) => e.id === cartItem.editionId)
+    const label = `${cartItem.name} (edição ${cartItem.editionLabel})`
+    if (edition && edition.available === 0 && cartItem.available > 0) {
+      return { kind: 'sold-out', message: `${label} esgotou.` }
+    }
+    if (edition && compareEth(edition.price, cartItem.unitPrice) !== 0) {
+      return {
+        kind: 'price',
+        message: `Preço do ${label} mudou de ${normalizeEth(cartItem.unitPrice)} para ${displayEth(edition.price)}.`,
+      }
+    }
+  }
+  if (!before || event.version <= before.version) return null
+  if (event.data.soldOut && !before.soldOut) {
+    return { kind: 'sold-out', message: `${before.name} esgotou.` }
+  }
+  if (compareEth(event.data.price, before.price) !== 0) {
+    return {
+      kind: 'price',
+      message: `Preço do ${before.name} mudou de ${normalizeEth(before.price)} para ${displayEth(event.data.price)}.`,
+    }
+  }
+  return null
+}
+
 /** nft.updated: atualiza catálogo, destaques, detalhe e carrinho. */
 export function applyNftUpdated(queryClient: QueryClient, event: NftUpdatedEvent) {
   const nftId = event.resource.id
+  // Lido ANTES de atualizar o cache: é o "de" do aviso ("mudou de 1.19 para 2.50 ETH").
+  const before = findCachedSummary(queryClient, nftId)
+  const cartItem = findCartItem(queryClient, nftId)
 
   queryClient.setQueriesData<NftListResponse>({ queryKey: catalogKeys.lists() }, (old) =>
     old ? { ...old, items: old.items.map((nft) => patchSummary(nft, event)) } : old,
@@ -66,16 +139,15 @@ export function applyNftUpdated(queryClient: QueryClient, event: NftUpdatedEvent
   )
 
   // Carrinho: a API recalcula preços, avisos e totais; buscamos de novo.
-  const carts = queryClient.getQueriesData<Cart>({ queryKey: cartKeys.all })
-  const inCart = carts.flatMap(([, cart]) => cart?.items ?? []).find((i) => i.nftId === nftId)
-  if (inCart) {
-    void queryClient.invalidateQueries({ queryKey: cartKeys.all })
-    const edition = event.data.editions.find((e) => e.id === inCart.editionId)
-    if (edition && edition.available === 0) {
-      toast.warning(`${inCart.name} (edição ${inCart.editionLabel}) esgotou.`)
-    } else if (edition && edition.price !== inCart.unitPrice) {
-      toast.info(`O preço de ${inCart.name} mudou para ${displayEth(edition.price)}.`)
-    }
+  if (cartItem) void queryClient.invalidateQueries({ queryKey: cartKeys.all })
+
+  // Aviso só para o que o usuário está vendo (na tela ou no carrinho).
+  const change = describeChange(event, before, cartItem)
+  if (change && (cartItem || isNftOnScreen(nftId))) {
+    const show = change.kind === 'sold-out' ? toast.warning : toast.info
+    // Um aviso por NFT: uma mudança nova substitui a anterior em vez de empilhar.
+    show(change.message, { id: `nft-${nftId}` })
+    flashPrice(nftId)
   }
 
   notifyNftChanged(event)

@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import type { CartItem } from '@/contracts/cart'
 import { getErrorMessage } from '@/lib/api-error'
+import { useLiveNft } from '@/features/realtime/realtime-store'
 import { displayEth } from '@/lib/eth'
 import { cn } from '@/lib/utils'
 
@@ -73,6 +74,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
   const remove = useRemoveCartItem()
   const busy = update.isPending || remove.isPending
   const limit = Math.min(item.available, item.maxPerOrder)
+  const priceFlash = useLiveNft(item.nftId)
 
   function changeQuantity(quantity: number) {
     update.mutate(
@@ -147,7 +149,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
         </div>
         <p className="text-base font-bold text-muted-foreground">
           <span className="sr-only">Preço unitário: </span>
-          {displayEth(item.unitPrice)}
+          <span className={cn(priceFlash && 'price-flash')}>{displayEth(item.unitPrice)}</span>
         </p>
         <Stepper
           item={item}
@@ -158,7 +160,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
         />
         <p className="text-base font-bold text-highlight">
           <span className="sr-only">Total do item: </span>
-          {displayEth(item.lineTotal)}
+          <span className={cn(priceFlash && 'price-flash')}>{displayEth(item.lineTotal)}</span>
         </p>
         {removeButton()}
       </div>
@@ -171,7 +173,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
           <p className="truncate text-[13px] text-muted-foreground">Edição: {item.editionLabel}</p>
           <p className="mt-1.5 text-base font-bold text-highlight">
             <span className="sr-only">Total do item: </span>
-            {displayEth(item.lineTotal)}
+            <span className={cn(priceFlash && 'price-flash')}>{displayEth(item.lineTotal)}</span>
           </p>
         </div>
         <div className="flex flex-col items-end justify-between py-1.5 pr-3 pl-2">

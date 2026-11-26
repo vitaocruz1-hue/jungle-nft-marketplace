@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import type { NftDetail, NftEdition } from '@/contracts/catalog'
 import { useAddToCart } from '@/features/cart/queries'
 import { useFavoriteAction } from '@/features/favorites/use-favorite-action'
+import { useLiveNft } from '@/features/realtime/realtime-store'
 import { getErrorMessage } from '@/lib/api-error'
 import { displayEth, multiplyEth } from '@/lib/eth'
 import { cn } from '@/lib/utils'
@@ -82,6 +83,7 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
   const [quantity, setQuantity] = useState(1)
   const addToCart = useAddToCart()
   const { favorite, toggleFavorite, isAuthenticated } = useFavoriteAction(nft.id)
+  const priceFlash = useLiveNft(nft.id)
 
   // Se o estoque mudar (ex.: evento em tempo real), a seleção se ajusta.
   const edition = nft.editions.find((e) => e.id === editionId) ?? defaultEdition(nft.editions)
@@ -220,7 +222,7 @@ export function PurchasePanel({ nft }: { nft: NftDetail }) {
             </span>
             <QuantityStepper {...stepper} size="mobile" describedBy="limite-quantidade" />
           </div>
-          <p className="text-xl font-bold text-highlight">
+          <p className={cn('text-xl font-bold text-highlight', priceFlash && 'price-flash')}>
             <span className="sr-only">Total: </span>
             {edition ? displayEth(multiplyEth(edition.price, soldOut ? 1 : safeQuantity)) : ''}
           </p>

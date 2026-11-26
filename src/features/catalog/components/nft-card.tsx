@@ -3,13 +3,10 @@ import { Link } from '@tanstack/react-router'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { NftSummary } from '@/contracts/catalog'
 import { FavoriteButton } from '@/features/favorites/components/favorite-button'
+import { useLiveNft } from '@/features/realtime/realtime-store'
 import { displayEth } from '@/lib/eth'
 import { cn } from '@/lib/utils'
 
-/**
- * Card do catálogo. Desktop: moldura 258×300 com a arte 250×250 ao centro.
- * Celular (Figma mobile): moldura arredondada, ♥ sobre a arte.
- */
 interface NftCardProps {
   nft: NftSummary
   priority?: boolean
@@ -17,8 +14,13 @@ interface NftCardProps {
   favoriteButton?: 'mobile' | 'always'
 }
 
+/**
+ * Card do catálogo. Desktop: moldura 258×300 com a arte 250×250 ao centro.
+ * Celular (Figma mobile): moldura arredondada, ♥ sobre a arte.
+ */
 export function NftCard({ nft, priority = false, favoriteButton = 'mobile' }: NftCardProps) {
   const rare = nft.rarity === 'Raro' || nft.rarity === 'Épico'
+  const priceFlash = useLiveNft(nft.id)
 
   return (
     <article className="group relative">
@@ -54,7 +56,13 @@ export function NftCard({ nft, priority = false, favoriteButton = 'mobile' }: Nf
         <h3 className="mt-3 truncate text-sm sm:text-base">{nft.name}</h3>
       </Link>
       <p className="mt-1 flex flex-wrap items-baseline gap-x-3 text-base sm:text-lg">
-        <span className={cn('font-bold', nft.soldOut ? 'text-muted-foreground' : 'text-highlight')}>
+        <span
+          className={cn(
+            'font-bold',
+            nft.soldOut ? 'text-muted-foreground' : 'text-highlight',
+            priceFlash && 'price-flash',
+          )}
+        >
           <span className="sr-only">Preço: </span>
           {displayEth(nft.price)}
         </span>
