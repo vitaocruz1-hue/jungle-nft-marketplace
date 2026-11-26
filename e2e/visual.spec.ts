@@ -11,6 +11,8 @@ import { login } from './support/auth'
 // Esconde avisos (toasts), que dependem do tempo, e espera imagens/fontes.
 async function stable(page: Page) {
   await page.addStyleTag({ content: '[data-sonner-toaster]{display:none !important}' })
+  // Página parada: o mouse fica fora de qualquer elemento (sem efeitos de hover na foto).
+  await page.mouse.move(0, 0)
   // Nada ainda carregando (skeletons) em nenhuma parte da página.
   await expect(page.locator('[data-slot="skeleton"]:visible')).toHaveCount(0)
   await page.evaluate(() => document.fonts.ready)

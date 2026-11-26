@@ -83,6 +83,27 @@ test.describe('Favoritos', () => {
     await expect(favoritesList(page).getByRole('article')).toHaveText([/Sage Nomad #009/])
   })
 
+  test('cabeçalho (desktop): coração com contador leva aos favoritos; sem login, ao login', async ({
+    page,
+  }) => {
+    test.skip(isMobile(page), 'no celular o atalho é o coração da barra de abas')
+    await page.goto('/')
+    const heart = page.getByRole('banner').getByRole('link', { name: /^Favoritos \(\d+\)$/ })
+    await expect(heart).toHaveAccessibleName('Favoritos (0)')
+    await expect(heart).not.toContainText(/\d/)
+
+    await heart.click()
+    await loginFromRedirect(page, USERS.ana)
+    await expect(heart).toHaveAccessibleName('Favoritos (1)')
+    await expect(heart).toContainText('1')
+
+    await favoritesList(page)
+      .getByRole('button', { name: 'Remover Sage Nomad #009 dos favoritos' })
+      .click()
+    await expect(heart).toHaveAccessibleName('Favoritos (0)')
+    await expect(heart).not.toContainText(/\d/)
+  })
+
   test('mostra skeleton enquanto carrega', async ({ page }) => {
     await useScenario(page, 'lento')
     await page.goto('/favoritos')
