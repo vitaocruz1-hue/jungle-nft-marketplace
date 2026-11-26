@@ -58,7 +58,7 @@ function NewsletterForm() {
       }}
       aria-labelledby="newsletter-titulo"
     >
-      <h2 id="newsletter-titulo" className="text-lg leading-tight font-bold">
+      <h2 id="newsletter-titulo" className="text-lg leading-tight font-bold xl:leading-[18px]">
         Antecipe-se ao próximo lançamento
       </h2>
       <div className="mt-4 flex">
@@ -74,11 +74,14 @@ function NewsletterForm() {
           aria-describedby="newsletter-ajuda"
           className="h-10 rounded-r-none border-0 bg-secondary placeholder:text-muted-foreground/80"
         />
-        <Button type="submit" className="h-10 rounded-l-none px-4 text-lg font-bold">
+        <Button type="submit" className="h-10 rounded-l-none px-4 text-lg font-bold xl:px-2.5">
           Enviar
         </Button>
       </div>
-      <p id="newsletter-ajuda" className="mt-4 text-sm leading-6 text-muted-foreground">
+      <p
+        id="newsletter-ajuda"
+        className="mt-4 text-sm leading-6 text-muted-foreground xl:mt-3 xl:text-[13px] xl:leading-[22px]"
+      >
         Receba lançamentos selecionados, histórias de criadores e novidades do mercado.
       </p>
     </form>
@@ -90,30 +93,32 @@ export function SiteFooter({ className }: { className?: string }) {
     <footer className={cn('mt-24', className)}>
       <Container>
         <div className="bg-card">
-          <div className="grid gap-10 px-6 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0 lg:px-10">
+          <div className="grid gap-10 px-6 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0 lg:px-10 xl:grid-cols-[249px_266px_266px_minmax(0,1fr)] xl:pt-8 xl:pr-[31px] xl:pb-4 xl:pl-12">
             {FEATURES.map((feature) => (
               <section
                 key={feature.title}
-                className="lg:border-r lg:border-primary/80 lg:px-6 lg:first:pl-0"
+                className="lg:border-r lg:border-primary/80 lg:px-6 lg:first:pl-0 xl:px-[18px]"
               >
                 <span
                   aria-hidden="true"
-                  className="grid size-17.5 place-items-center rounded-full bg-primary text-xl font-bold text-primary-foreground"
+                  className="grid size-17.5 place-items-center rounded-full bg-primary text-xl font-bold text-primary-foreground xl:size-[74px]"
                 >
                   {feature.letter}
                 </span>
-                <h2 className="mt-4 text-[17px] font-bold">{feature.title}</h2>
-                <p className="mt-3 text-sm leading-[22px] text-muted-foreground">{feature.text}</p>
+                <h2 className="mt-4 text-[17px] font-bold xl:mt-2">{feature.title}</h2>
+                <p className="mt-3 text-sm leading-[22px] text-muted-foreground xl:mt-1.5 xl:max-w-[190px]">
+                  {feature.text}
+                </p>
               </section>
             ))}
-            <div className="lg:pl-6">
+            <div className="lg:pl-6 xl:pl-[18px]">
               <NewsletterForm />
             </div>
           </div>
 
-          <div className="grid gap-4 bg-secondary px-6 py-8 sm:grid-cols-2 lg:grid-cols-4 lg:items-center lg:px-10">
-            <p className="font-bold tracking-wide">KURIO</p>
-            <p className="text-sm leading-6 sm:text-base">
+          <div className="grid gap-4 bg-secondary px-6 py-8 sm:grid-cols-2 lg:grid-cols-4 lg:items-center lg:px-10 xl:gap-x-[76px] xl:px-[33px] xl:py-[22px]">
+            <p className="font-bold tracking-wide xl:text-sm xl:tracking-wider">KURIO</p>
+            <p className="text-sm leading-6 sm:text-base xl:text-sm xl:leading-[22px]">
               Feito para colecionadores, criadores e cultura
             </p>
             <a href="mailto:contato@email.com" className={linkClass}>
@@ -124,12 +129,12 @@ export function SiteFooter({ className }: { className?: string }) {
             </a>
           </div>
 
-          <div className="grid gap-10 px-6 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:px-10">
+          <div className="grid gap-10 px-6 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:px-10 xl:gap-x-[76px] xl:px-[33px] xl:pt-7 xl:pb-[35px]">
             <nav aria-labelledby="rodape-perfil">
               <h2 id="rodape-perfil" className={headingClass}>
                 Meu perfil
               </h2>
-              <ul className="mt-4 space-y-3">
+              <ul className="mt-4 space-y-3 xl:mt-1 xl:space-y-1.5">
                 <li>
                   <Link to="/perfil" className={linkClass}>
                     Meu perfil
@@ -159,7 +164,7 @@ export function SiteFooter({ className }: { className?: string }) {
               <h2 id="rodape-ajuda" className={headingClass}>
                 Central de ajuda
               </h2>
-              <ul className="mt-4 space-y-3">
+              <ul className="mt-4 space-y-3 xl:mt-1 xl:space-y-1.5">
                 {[
                   'Central de ajuda',
                   'Como comprar NFTs',
@@ -180,7 +185,7 @@ export function SiteFooter({ className }: { className?: string }) {
               <h2 id="rodape-colecoes" className={headingClass}>
                 Coleções
               </h2>
-              <ul className="mt-4 space-y-3">
+              <ul className="mt-4 space-y-3 xl:mt-1 xl:space-y-1.5">
                 {FOOTER_CATEGORIES.map((category) => (
                   <li key={category}>
                     <Link to="/" search={{ category }} hash="catalogo" className={linkClass}>
@@ -208,8 +213,10 @@ export function SiteFooter({ className }: { className?: string }) {
                   </li>
                 ))}
               </ul>
-              <h2 className={`${headingClass} mt-8`}>Carteiras compatíveis</h2>
-              <p className="mt-3 inline-flex flex-wrap items-center gap-2 rounded-md border border-[#8b5b33] bg-secondary/60 px-2 py-1.5 text-[10px] font-bold tracking-wide text-highlight uppercase">
+              <h2 className={`${headingClass} mt-8 xl:mt-[25px] xl:whitespace-nowrap`}>
+                Carteiras compatíveis
+              </h2>
+              <p className="mt-3 inline-flex flex-wrap items-center gap-2 rounded-md border border-[#8b5b33] bg-secondary/60 px-2 py-1.5 text-[10px] font-bold tracking-wide text-highlight uppercase xl:mt-1.5 xl:flex-nowrap xl:gap-1.5 xl:py-1 xl:tracking-normal xl:whitespace-nowrap">
                 <span>MetaMask</span>
                 <span aria-hidden="true">•</span>
                 <span>WalletConnect</span>
@@ -220,7 +227,9 @@ export function SiteFooter({ className }: { className?: string }) {
           </div>
         </div>
 
-        <p className="py-6 text-center text-sm">© 2026 Kurio. Propriedade digital para todos.</p>
+        <p className="py-6 text-center text-sm xl:pt-[11px]">
+          © 2026 Kurio. Propriedade digital para todos.
+        </p>
       </Container>
     </footer>
   )
