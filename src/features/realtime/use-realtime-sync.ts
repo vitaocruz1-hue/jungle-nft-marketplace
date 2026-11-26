@@ -46,6 +46,8 @@ export function useRealtimeSync() {
         })
         listen(socket)
       })
+      // Sem a API simulada ativa nesta aba não há com quem conectar (o aviso já aparece na tela).
+      .catch(() => undefined)
 
     function listen(socket: Socket) {
       socket.on('connect', () => {

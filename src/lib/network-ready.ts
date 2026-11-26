@@ -1,14 +1,46 @@
 /**
- * Promessa resolvida quando a rede do app está pronta para uso.
- * Com a API simulada ligada, só resolve depois de o MSW interceptar fetch e
- * WebSocket: a interface aparece na hora, mas nenhuma chamada escapa do mock.
+ * Estado da rede do app (sem dependências: é carregado antes de tudo).
+ * Com a API simulada ligada, as chamadas só saem depois de o MSW interceptar
+ * fetch e WebSocket: a interface aparece na hora, mas nada escapa do mock.
+ * Se o MSW não conseguir controlar a aba (ex.: recarregamento forçado que
+ * ignora o service worker), o estado vira "unavailable" e `whenNetworkReady()`
+ * rejeita: as chamadas falham na hora, em vez de irem para a hospedagem e
+ * voltarem HTML.
  */
+export type NetworkStatus = 'starting' | 'ready' | 'unavailable'
+
+let status: NetworkStatus = 'starting'
 let ready: Promise<void> = Promise.resolve()
+const listeners = new Set<() => void>()
+
+function setStatus(next: NetworkStatus) {
+  status = next
+  for (const listener of listeners) listener()
+}
 
 export function setNetworkReady(promise: Promise<void>) {
-  ready = promise
+  ready = promise.then(
+    () => setStatus('ready'),
+    (cause: unknown) => {
+      setStatus('unavailable')
+      throw cause
+    },
+  )
+  // Quem precisa da rede trata a falha; aqui só evita o aviso de "rejeição sem tratamento".
+  ready.catch(() => undefined)
 }
 
 export function whenNetworkReady() {
   return ready
+}
+
+export function getNetworkStatus() {
+  return status
+}
+
+export function subscribeNetworkStatus(listener: () => void) {
+  listeners.add(listener)
+  return () => {
+    listeners.delete(listener)
+  }
 }
