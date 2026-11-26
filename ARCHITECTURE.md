@@ -33,27 +33,28 @@ Base `/api`. Corpo de erro único (`ApiErrorBody`): `{ error: { code, message, f
 O interceptor do Axios converte qualquer falha em `ApiError` (`code`, `status`, `fieldErrors`,
 `isTransient`). Tipos completos em `src/contracts/*.ts`.
 
-| Recurso   | Método e rota                                                                                                               | Notas / erros                                                                                                                                                                   |
-| --------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Sessão    | `POST /auth/register` `{username,email,password}` → `AuthResponse`                                                          | 422 validação · 409 e-mail/usuário em uso                                                                                                                                       |
-|           | `POST /auth/login` `{email,password}` → `AuthResponse` `{token,user,expiresAt}`                                             | 401 credenciais                                                                                                                                                                 |
-|           | `GET /auth/session` → `{user,expiresAt}`                                                                                    | 401 `UNAUTHENTICATED` / `SESSION_EXPIRED`                                                                                                                                       |
-|           | `POST /auth/logout` → 204                                                                                                   |                                                                                                                                                                                 |
-| NFTs      | `GET /nfts?search&category&network&minPrice&maxPrice&tab&sort&page&pageSize` → `NftListResponse`                            | itens + paginação + contadores por filtro + faixa de preço · 400 parâmetros inválidos                                                                                           |
-|           | `GET /featured` → destaques (carrossel e "NFT em destaque")                                                                 |                                                                                                                                                                                 |
-|           | `GET /nfts/:id` → `NftDetail` (edições, galeria, avaliações)                                                                | 404                                                                                                                                                                             |
-|           | `GET /nfts/:id/related?exclude=id1,id2` → `NftSummary[]` (até 8, alternando personagens)                                    | 404                                                                                                                                                                             |
-| Favoritos | `GET /favorites` · `PUT /favorites/:nftId` · `DELETE /favorites/:nftId` → `{nftIds}`                                        | 401 · 404 · 503 (cenário)                                                                                                                                                       |
-| Carrinho  | `GET /cart` → `Cart` (itens com preço/estoque **atuais**, avisos, cupom e totais)                                           | visitante: `X-Cart-Id`; logado: token                                                                                                                                           |
-|           | `POST /cart/items` `{nftId,editionId,quantity}` · `PATCH /cart/items/:id` `{quantity}` · `DELETE /cart/items/:id`           | 404 · 409 `OUT_OF_STOCK` · 422 limite por pedido/estoque                                                                                                                        |
-|           | `PUT /cart/coupon` `{code}` · `DELETE /cart/coupon`                                                                         | 422 `COUPON_INVALID` / `COUPON_EXPIRED`                                                                                                                                         |
-|           | `POST /cart/acknowledge` (aceitar novos preços)                                                                             |                                                                                                                                                                                 |
-| Cotação   | `POST /quote` `{network}` → `Quote` (itens, cupom, subtotal, desconto, taxa da rede, total, `expiresAt`)                    | 401 · 409 sem estoque · 422 carrinho vazio/rede                                                                                                                                 |
-| Pedidos   | `POST /orders` + cabeçalho `Idempotency-Key`, `{quoteId,walletId,buyer}` → `Order`                                          | mesma chave + mesmo corpo → mesmo pedido (200) · corpo diferente → 409 `IDEMPOTENCY_CONFLICT` · 409 `QUOTE_EXPIRED` / `PRICE_CHANGED` / `OUT_OF_STOCK` / `COUPON_EXPIRED` · 422 |
-|           | `GET /orders/:id` → `Order`                                                                                                 | 404 também para pedido de outro usuário                                                                                                                                         |
-| Perfil    | `GET /profile` · `PATCH /profile` · `PUT /profile/avatar` `{dataUrl}` · `DELETE /profile/avatar` · `POST /profile/password` | 422 · 409 conflito                                                                                                                                                              |
-| Carteiras | `GET /wallets` → `{primary,secondary}` · `PUT /wallets/:slot`                                                               | 422 (mesma `validateWallet` do app)                                                                                                                                             |
-|           | `POST /wallets/:id/connect` (conexão simulada)                                                                              | 403 recusada (cenário)                                                                                                                                                          |
+| Recurso   | Método e rota                                                                                                                       | Notas / erros                                                                                                                                                                   |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sessão    | `POST /auth/register` `{username,email,password}` → `AuthResponse`                                                                  | 422 validação · 409 e-mail/usuário em uso                                                                                                                                       |
+|           | `POST /auth/login` `{email,password}` → `AuthResponse` `{token,user,expiresAt}`                                                     | 401 credenciais                                                                                                                                                                 |
+|           | `GET /auth/session` → `{user,expiresAt}`                                                                                            | 401 `UNAUTHENTICATED` / `SESSION_EXPIRED`                                                                                                                                       |
+|           | `POST /auth/logout` → 204                                                                                                           |                                                                                                                                                                                 |
+| NFTs      | `GET /nfts?search&category&network&minPrice&maxPrice&tab&sort&page&pageSize` → `NftListResponse`                                    | itens + paginação + contadores por filtro + faixa de preço · 400 parâmetros inválidos                                                                                           |
+|           | `GET /featured` → destaques (carrossel e "NFT em destaque")                                                                         |                                                                                                                                                                                 |
+|           | `GET /nfts/:id` → `NftDetail` (edições, galeria, avaliações)                                                                        | 404                                                                                                                                                                             |
+|           | `GET /nfts/:id/related?exclude=id1,id2` → `NftSummary[]` (até 8, alternando personagens)                                            | 404                                                                                                                                                                             |
+| Favoritos | `GET /favorites` · `PUT /favorites/:nftId` · `DELETE /favorites/:nftId` → `{nftIds, items}` (`items`: cards, mais recente primeiro) | 401 · 404 · 503 (cenário)                                                                                                                                                       |
+| Carrinho  | `GET /cart` → `Cart` (itens com preço/estoque **atuais**, avisos, cupom e totais)                                                   | visitante: `X-Cart-Id`; logado: token                                                                                                                                           |
+|           | `POST /cart/items` `{nftId,editionId,quantity}` · `PATCH /cart/items/:id` `{quantity}` · `DELETE /cart/items/:id`                   | 404 · 409 `OUT_OF_STOCK` · 422 limite por pedido/estoque                                                                                                                        |
+|           | `PUT /cart/coupon` `{code}` · `DELETE /cart/coupon`                                                                                 | 422 `COUPON_INVALID` / `COUPON_EXPIRED`                                                                                                                                         |
+|           | `POST /cart/acknowledge` (aceitar novos preços)                                                                                     |                                                                                                                                                                                 |
+| Cotação   | `POST /quote` `{network}` → `Quote` (itens, cupom, subtotal, desconto, taxa da rede, total, `expiresAt`)                            | 401 · 409 sem estoque · 422 carrinho vazio/rede                                                                                                                                 |
+| Pedidos   | `POST /orders` + cabeçalho `Idempotency-Key`, `{quoteId,walletId,buyer}` → `Order`                                                  | mesma chave + mesmo corpo → mesmo pedido (200) · corpo diferente → 409 `IDEMPOTENCY_CONFLICT` · 409 `QUOTE_EXPIRED` / `PRICE_CHANGED` / `OUT_OF_STOCK` / `COUPON_EXPIRED` · 422 |
+|           | `GET /orders` → `{items: Order[]}` (só do usuário logado, mais recente primeiro)                                                    | 401                                                                                                                                                                             |
+|           | `GET /orders/:id` → `Order`                                                                                                         | 404 também para pedido de outro usuário                                                                                                                                         |
+| Perfil    | `GET /profile` · `PATCH /profile` · `PUT /profile/avatar` `{dataUrl}` · `DELETE /profile/avatar` · `POST /profile/password`         | 422 · 409 conflito                                                                                                                                                              |
+| Carteiras | `GET /wallets` → `{primary,secondary}` · `PUT /wallets/:slot`                                                                       | 422 (mesma `validateWallet` do app)                                                                                                                                             |
+|           | `POST /wallets/:id/connect` (conexão simulada)                                                                                      | 403 recusada (cenário)                                                                                                                                                          |
 
 Erros de rede e timeout (Axios, 10 s) viram `NETWORK_ERROR` / `TIMEOUT`.
 
@@ -63,14 +64,22 @@ Cliente: `socket.io-client`, transporte WebSocket, caminho `/realtime`, token no
 pacote CONNECT. Todo evento tem `eventId` (identidade estável), `resource` (`{type,id}`) e
 `version` (versão do recurso após a mudança).
 
-| Evento          | Destino                       | Payload (`src/contracts/realtime.ts`)                                 | Efeito no app                                                                                                                                                             |
-| --------------- | ----------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nft.updated`   | todos os clientes             | preço, preço anterior, esgotado, edições (`id`, `price`, `available`) | atualiza catálogo, destaques, relacionados e detalhe (só se `version` for maior); se o NFT está no carrinho, rebusca o carrinho e avisa; no pagamento, invalida a cotação |
-| `order.updated` | só conexões do dono do pedido | `status`, `failureReason`, `userId`                                   | atualiza o pedido e rebusca pela API; confirmado → rebusca o carrinho                                                                                                     |
+| Evento          | Destino                       | Payload (`src/contracts/realtime.ts`)                                 | Efeito no app                                                                                                                                                                                                                         |
+| --------------- | ----------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nft.updated`   | todos os clientes             | preço, preço anterior, esgotado, edições (`id`, `price`, `available`) | atualiza catálogo, destaques, relacionados, favoritos e detalhe (só se `version` for maior); se o NFT está no carrinho, rebusca o carrinho; se está na tela ou no carrinho, avisa e destaca o preço; no pagamento, invalida a cotação |
+| `order.updated` | só conexões do dono do pedido | `status`, `failureReason`, `userId`                                   | atualiza o pedido e a lista "Meus pedidos" e rebusca o pedido pela API; confirmado → rebusca o carrinho                                                                                                                               |
 
 **Tolerância:** um filtro por conexão descarta `eventId` já visto e `version` ≤ última aplicada
 do mesmo recurso; os patches no cache também comparam com a `version` do dado em cache.
 Eventos de pedido com `userId` diferente do usuário atual são descartados.
+
+**Aviso visível:** cada componente que mostra um preço (card, detalhe, linha do carrinho) marca o
+NFT como "na tela" enquanto está montado (`useLiveNft`). Ao chegar `nft.updated` de um NFT na
+tela ou no carrinho, o app compara com o valor que estava no cache **antes** do patch e mostra um
+único aviso: "Preço do Emerald Ape #042 mudou de 1.19 para 2.50 ETH." ou "… esgotou." (no carrinho,
+com a edição). O aviso tem id por NFT (uma mudança nova substitui a anterior) e o preço ganha um
+destaque de ~1,6 s (`.price-flash`; com `prefers-reduced-motion`, contorno parado). Mudanças de
+NFTs fora da tela atualizam o cache em silêncio; evento repetido ou antigo não gera aviso.
 
 **Ciclo de vida:** uma conexão por sessão (efeito dependente do token). Login, logout ou troca de
 usuário encerram a conexão anterior e removem todos os listeners.
@@ -100,8 +109,8 @@ protocolo. Limitações e ajustes:
 - Login/cadastro devolvem um token opaco (`localStorage`), enviado pelo interceptor do Axios em
   `Authorization: Bearer`. Senhas nunca são guardadas: o banco simulado tem só hash SHA-256 com sal
   (sal novo a cada troca de senha). Sessão de 30 minutos.
-- `GET /auth/session` valida o token ao abrir o app; a rota `_auth` (perfil, carteiras, pagamento,
-  pedido) redireciona para `/login?redirect=<página>`.
+- `GET /auth/session` valida o token ao abrir o app; a rota `_auth` (perfil, carteiras,
+  favoritos, pedidos, pagamento, pedido) redireciona para `/login?redirect=<página>`.
 - 401 em qualquer chamada **autenticada** encerra a sessão uma única vez: limpa o token e os dados
   privados do cache, avisa e leva ao login com `redirect` + `motivo=expirada`. Após entrar, a
   pessoa volta à mesma página; o formulário de pagamento é restaurado do rascunho (`sessionStorage`).
@@ -139,12 +148,12 @@ protocolo. Limitações e ajustes:
 
 | Política             | Valor                                                                                                                                                       |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `staleTime`          | 30 s (sessão: 5 min)                                                                                                                                        |
+| `staleTime`          | 30 s (sessão: 5 min; lista de pedidos: 0, confere ao abrir)                                                                                                 |
 | Retries de queries   | Até 2, só para falhas passageiras (rede, timeout, 5xx); 4xx não repete                                                                                      |
 | Retries de mutations | Nunca automáticos (evita compra duplicada); o pedido repete explicitamente com a mesma chave                                                                |
 | Chaves               | Catálogo: `['nfts','list',params]`, `['nfts','detail',id]`… · privados: `['me',userId,…]` · carrinho: `['cart',token\|'guest']`                             |
 | Respostas obsoletas  | Cada combinação de filtros tem sua chave; o `AbortSignal` do Query cancela a requisição antiga; a lista anterior fica visível (esmaecida) até a nova chegar |
-| Atualização otimista | Favoritos: aplica na hora, rollback em falha e ressincroniza com a API ao final                                                                             |
+| Atualização otimista | Favoritos: aplica na hora (desfavoritar tira o card de `/favoritos`), rollback em falha e ressincroniza com a API ao final                                  |
 | Invalidação          | Mutations de carrinho gravam a resposta da API no cache; eventos e reconexões invalidam o que mudou                                                         |
 | Prefetch             | Loaders das rotas iniciam as consultas; links pré-carregam ao passar o mouse (`defaultPreload: 'intent'`)                                                   |
 
@@ -157,7 +166,12 @@ protocolo. Limitações e ajustes:
   Ana; o gerador pseudoaleatório usa semente fixa. Os NFTs gerados alternam 12 artes (4 personagens
   × inteira/rosto/roupa) e as recomendações fazem rodízio por personagem, para a mesma imagem não
   se repetir lado a lado.
-- Cenários escolhidos por `?cenario=` ou pelo painel; controles em `window.__kurioMocks` para testes.
+- Cenários escolhidos por `?cenario=` ou pelo painel; controles em `window.__kurioMocks` para testes
+  (inclui `setSettlementDelay`/`settlePendingOrders`, que seguram e liberam a confirmação dos
+  pedidos para testar o status ao vivo sem depender de tempo).
+- `erro-servidor` derruba as consultas do catálogo e as listas da conta (favoritos e pedidos). As
+  opções de filtro vêm na resposta do catálogo: com erro, o painel de filtros mostra
+  "Filtros indisponíveis" e volta junto no "Tentar novamente".
 
 ## Interface, acessibilidade e desvios do Figma
 
@@ -175,8 +189,13 @@ protocolo. Limitações e ajustes:
 - **Pagamento:** endereço, ENS e tipo de carteira vêm da carteira selecionada (somente leitura); a
   rede escolhida define a taxa da cotação. "Nome ENS" usa campo + sufixo `.eth` fixo.
 - **Perfil:** troca de senha tem botão próprio (o Figma tem um único "Salvar").
+- **Telas além do Figma:** `/favoritos` e `/pedidos` (rotas privadas) usam o layout "Meu perfil" e
+  os cards do catálogo. No menu do Perfil e no rodapé, "Lista de interesse" abre os favoritos e
+  "Atividade"/"Minha coleção" abrem os pedidos; no celular, o coração da barra de abas abre os
+  favoritos. Na tela de favoritos o coração do card aparece também no desktop.
 - **Fora do escopo:** Criadores, Aprenda, Diário da Cunhagem, Central de ajuda, newsletter, login
-  social e itens do menu do perfil (Atividade, Ofertas…) mostram "em breve" sem simular sucesso.
+  social e os demais itens do menu do perfil (Ofertas, Arquivos baixados…) mostram "em breve" sem
+  simular sucesso.
   "Ver no Etherscan" abre o explorador da rede com a referência simulada.
 - **Responsivo:** 390/768/1440 px; filtros em gaveta e menu lateral abaixo de 1024/768 px.
 
@@ -188,8 +207,8 @@ Segue os 6 frames mobile do Figma (414 px de largura), adaptados para 390 px.
   barra de abas inferior. Detalhe, Carrinho, Pagamento, Login e Cadastro são telas "focadas", sem
   cabeçalho, rodapé ou barra de abas, com botão Voltar. As telas sem frame mobile (Perfil,
   Pedidos, 404…) têm cabeçalho, rodapé e barra de abas.
-- **Barra de abas:** o coração não tem tela no Figma e mostra "em breve". O botão central é a
-  busca: leva ao campo "Explorar coleções" da Início e o foca.
+- **Barra de abas:** o coração abre os favoritos. O botão central é a busca: leva ao campo
+  "Explorar coleções" da Início e o foca.
 - **Catálogo:** a ordenação fica dentro da gaveta de filtros (o Figma mobile só tem o botão de
   filtros). O selo RARO/ÉPICO vem do campo `rarity` da API.
 - **Pagamento:** "Carteira e rede" escolhe a rede (Ethereum/Polygon/Solana), que define a taxa da

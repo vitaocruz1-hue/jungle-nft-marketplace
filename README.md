@@ -73,7 +73,7 @@ esquerdo da tela. A escolha vale para a aba atual até ser trocada (`?cenario=pa
 | `lento`              | 3 s por resposta (skeletons)                                                |
 | `variavel`           | Latências fixas e diferentes por requisição (respostas fora de ordem)       |
 | `instavel`           | As 2 primeiras consultas falham (503) e as repetições automáticas recuperam |
-| `erro-servidor`      | O catálogo responde 500 (feedback de erro e "Tentar novamente")             |
+| `erro-servidor`      | Catálogo, favoritos e lista de pedidos respondem 500 ("Tentar novamente")   |
 | `offline`            | Toda chamada falha por rede e o socket é recusado                           |
 | `falha-favoritos`    | Favoritar/desfavoritar responde 503 (rollback da atualização otimista)      |
 | `carteira-recusa`    | O usuário recusa a conexão da carteira no pagamento                         |
@@ -93,7 +93,7 @@ mesmos controles estão em `window.__kurioMocks`.
 | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Resultado vazio                                   | Busque por `xyz` (lupa no cabeçalho)                                                                                                                              |
 | Respostas fora de ordem                           | `?cenario=variavel` e troque filtros rapidamente: a lista sempre corresponde ao último filtro                                                                     |
-| Falha HTTP 5xx e recuperação                      | `?cenario=erro-servidor` → "Tentar novamente" após voltar para `padrao` no painel                                                                                 |
+| Falha HTTP 5xx e recuperação                      | `?cenario=erro-servidor` → catálogo, filtros, `/favoritos` e `/pedidos` mostram o erro; volte para `padrao` no painel e use "Tentar novamente"                    |
 | Sem conexão                                       | `?cenario=offline`                                                                                                                                                |
 | Sessão expirada                                   | Entre como Ana → painel "Expirar sessão atual" → qualquer ação: aviso e volta ao login guardando a página                                                         |
 | Acesso não autorizado                             | Sem login, abra `/perfil`, `/carteiras` ou `/pagamento`                                                                                                           |
@@ -106,12 +106,16 @@ mesmos controles estão em `window.__kurioMocks`.
 | Pagamento recusado                                | `?cenario=pagamento-recusado` → itens continuam no carrinho                                                                                                       |
 | Pedido pendente + F5/reconexão                    | Confirme a compra e recarregue durante "Processando": o mesmo pedido é retomado e confirmado                                                                      |
 | Eventos duplicados/antigos                        | Painel → "Reenviar último evento" / "Enviar versão antiga": nada regride                                                                                          |
+| Mudança em tempo real visível                     | Com um NFT na tela ou no carrinho, painel → alterar preço ou esgotar: aviso "Preço do … mudou de X para Y ETH" / "… esgotou" e o preço acende                     |
+| Status do pedido ao vivo                          | Confirme uma compra e abra "Meus pedidos" (menu do usuário ou "Minha coleção" no rodapé): "Pendente" vira "Confirmado" sem recarregar                             |
 
 ## Testes
 
-- **E2E** (`npm run test:e2e`): 42 cenários × desktop e mobile, cobrindo os 12 itens do enunciado
+- **E2E** (`npm run test:e2e`): 57 cenários × desktop e mobile, cobrindo os 12 itens do enunciado
   (catálogo, detalhe, conta, favoritos, carrinho, compra, falhas, perfil/carteiras, tempo real,
-  eventos duplicados/desconexão, teclado/foco e skeletons/recuperação). Cada teste roda em um
+  eventos duplicados/desconexão, teclado/foco e skeletons/recuperação), além das telas de
+  favoritos e pedidos (estados, isolamento entre usuários, status ao vivo) e dos avisos de tempo
+  real. Cada teste roda em um
   contexto isolado (armazenamento limpo); tempo real passa pelo `socket.io-client` e REST pelos
   handlers MSW.
 - **Regressão visual** (`npm run test:visual`): baselines em `e2e/visual.spec.ts-snapshots/`. Como a
