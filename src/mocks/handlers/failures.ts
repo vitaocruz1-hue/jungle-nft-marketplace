@@ -1,5 +1,7 @@
 import { http, HttpResponse } from 'msw'
 
+import { MOCK_RESPONSE_HEADER } from '@/contracts/common'
+
 import { getActiveScenario } from '../scenarios'
 import { apiUrl, errorResponse } from '../utils/http'
 
@@ -42,7 +44,10 @@ export const failureHandlers = [
     }
 
     if (scenario === 'api-html' && isMainRead(request.method, pathname)) {
-      return new HttpResponse(SPA_HTML, { status: 200, headers: { 'Content-Type': 'text/html' } })
+      return new HttpResponse(SPA_HTML, {
+        status: 200,
+        headers: { 'Content-Type': 'text/html', [MOCK_RESPONSE_HEADER]: '1' },
+      })
     }
 
     // JSON válido, mas sem os campos do contrato (ex.: `items` nulo na lista).

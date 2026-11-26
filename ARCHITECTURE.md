@@ -186,6 +186,13 @@ tem camadas independentes:
    falhar, `whenNetworkReady()` rejeita: nenhuma chamada sai e o topo mostra o aviso "A API de
    demonstração não está ativa nesta aba" com "Recarregar página". O recarregamento automático do
    próprio MSW (sem trava) é antecipado pelo nosso, com trava.
+   **Recuperação sem recarregar:** o service worker guarda na memória quais abas atende. Se ele
+   reiniciar, for atualizado ou se desregistrar (o MSW faz isso quando acha que a última aba fechou,
+   o que pode acontecer num F5), as chamadas passam direto para a hospedagem. Uma resposta sem JSON
+   (e sem a marca `x-kurio-mock` dos cenários de teste) dispara a reativação do MSW (stop/start +
+   prova de vida) e a chamada é repetida uma vez; ela não chegou ao "servidor", então não duplica
+   nada. Se a reativação falhar, o app passa para o aviso.
+
 2. **Hospedagem** (`vercel.json`): o rewrite da SPA não cobre `/api/*` (`/((?!api/).*)`). Sem o
    MSW, a Vercel responde 404, não HTML.
 3. **Axios** (`src/lib/api-client.ts`): resposta com corpo que não é JSON (pelo `content-type`)
@@ -355,5 +362,6 @@ MSW do primeiro render; reduzir a renderização abaixo da dobra.
 
 - A API, o tempo real e a "rede" são simulados no navegador; dados ficam no `localStorage` do
   visitante (cada navegador tem seu próprio "servidor").
-- Baselines visuais dependem do sistema operacional (sufixo `-win32`).
+- Baselines visuais dependem do sistema operacional: `-darwin` e `-linux` vêm do CI
+  (`macos-latest`/`ubuntu-latest`), `-win32` do Windows de desenvolvimento.
 - Referências de transação e links de exploração são simulados.

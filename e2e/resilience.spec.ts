@@ -33,9 +33,13 @@ test.describe('Resiliência: API simulada fora do ar ou respostas inválidas', (
     await expect(results(page)).toContainText('Emerald Ape #042')
 
     // Como a hospedagem responderia /api com o rewrite da SPA: index.html, status 200.
-    let apiCallsToHost = 0
+    // Chamadas /api feitas pelo documento atual (a lista recomeça a cada recarregamento).
+    let hostCalls: string[] = []
+    page.on('framenavigated', (frame) => {
+      if (frame === page.mainFrame()) hostCalls = []
+    })
     await page.route('**/api/**', (route) => {
-      apiCallsToHost += 1
+      hostCalls.push(new URL(route.request().url()).pathname)
       return route.fulfill({ status: 200, contentType: 'text/html', body: SPA_HTML })
     })
     const cdp = await bypassServiceWorker(page, true)
@@ -48,8 +52,9 @@ test.describe('Resiliência: API simulada fora do ar ou respostas inválidas', (
     await expect(notice).toBeVisible()
     await expect(page.getByRole('button', { name: 'Recarregar página' }).first()).toBeVisible()
     await expectNoGenericCrash(page)
-    // Só a prova de vida do MSW foi para a "hospedagem": nenhuma chamada da API real.
-    expect(apiCallsToHost).toBeLessThanOrEqual(2)
+    // Na página final, só a prova de vida do MSW foi para a "hospedagem": nenhuma
+    // chamada da API (catálogo, carrinho, sessão…) saiu sem o mock.
+    expect(hostCalls.every((path) => path.endsWith('/__mock-health'))).toBe(true)
 
     // O DevTools volta ao normal: recarregar devolve o site funcionando.
     await cdp.send('Network.setBypassServiceWorker', { bypass: false })
@@ -57,6 +62,25 @@ test.describe('Resiliência: API simulada fora do ar ou respostas inválidas', (
     await notice.getByRole('button', { name: 'Recarregar página' }).click()
     await expect(results(page)).toContainText('Emerald Ape #042')
     await expect(notice).toHaveCount(0)
+    await expectNoGenericCrash(page)
+  })
+
+  test('service worker "esquece" a aba no meio do uso: o app reativa a API simulada e segue', async ({
+    page,
+  }) => {
+    await page.goto('/')
+    await expect(results(page)).toContainText('Emerald Ape #042')
+
+    // Como num F5 com o service worker se desregistrando ou numa atualização dele:
+    // a aba deixa de ser atendida e as chamadas iriam direto para a hospedagem.
+    await page.evaluate(() => navigator.serviceWorker.controller?.postMessage('CLIENT_CLOSED'))
+
+    await results(page)
+      .getByRole('link', { name: /Emerald Ape #042/ })
+      .first()
+      .click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Emerald Ape #042' })).toBeVisible()
+    await expect(page.getByText('A API de demonstração não está ativa nesta aba')).toHaveCount(0)
     await expectNoGenericCrash(page)
   })
 

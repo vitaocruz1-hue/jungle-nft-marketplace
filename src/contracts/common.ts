@@ -10,6 +10,13 @@
  */
 export type EthAmount = string
 
+/**
+ * Marca respostas fora do padrão que a API simulada envia de propósito (ex.: o
+ * cenário `api-html`). Sem ela, uma resposta sem JSON significa que a chamada
+ * nem passou pela API simulada.
+ */
+export const MOCK_RESPONSE_HEADER = 'x-kurio-mock'
+
 /** Data/hora em ISO 8601 (UTC). */
 export type IsoDateTime = string
 

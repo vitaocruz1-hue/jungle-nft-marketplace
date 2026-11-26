@@ -34,6 +34,25 @@ export function whenNetworkReady() {
   return ready
 }
 
+/** A rede caiu de vez (ex.: a recuperação do MSW falhou): as próximas chamadas falham na hora. */
+export function markNetworkUnavailable() {
+  setNetworkReady(Promise.reject(new Error('API simulada indisponível')))
+}
+
+let recovery: (() => Promise<boolean>) | null = null
+
+/**
+ * Registra como recuperar a rede quando uma resposta não veio da API simulada
+ * (ex.: o service worker foi reiniciado ou atualizado e "esqueceu" a aba).
+ */
+export function setNetworkRecovery(recover: () => Promise<boolean>) {
+  recovery = recover
+}
+
+export function getNetworkRecovery() {
+  return recovery
+}
+
 export function getNetworkStatus() {
   return status
 }

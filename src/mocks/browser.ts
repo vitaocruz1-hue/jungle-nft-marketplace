@@ -1,5 +1,7 @@
 import { setupWorker } from 'msw/browser'
 
+import { markNetworkUnavailable, setNetworkRecovery } from '@/lib/network-ready'
+
 import { apiUrl } from './utils/http'
 import { mockControls, type MockControls } from './controls'
 import { handlers } from './handlers'
@@ -89,6 +91,40 @@ async function mocksAnswer() {
   }
 }
 
+const START_OPTIONS = {
+  // Chamada para /api sem handler é erro de desenvolvimento: avisa alto.
+  // Imagens, fontes e arquivos do Vite passam direto, sem aviso.
+  onUnhandledRequest(request: Request, print: { error(): void }) {
+    if (new URL(request.url).pathname.startsWith('/api/')) print.error()
+  },
+}
+
+let recovering: Promise<boolean> | null = null
+
+/**
+ * Reativa o MSW nesta aba sem recarregar. O service worker guarda na memória
+ * quais abas ele atende: se for reiniciado, atualizado ou se desregistrar (o MSW
+ * faz isso quando acha que a última aba fechou, o que pode acontecer num F5), as
+ * chamadas passam direto para a hospedagem. Parar e iniciar de novo refaz o
+ * registro; a prova de vida confirma. Chamadas simultâneas esperam a mesma tentativa.
+ */
+function recoverMocks(): Promise<boolean> {
+  recovering ??= (async () => {
+    try {
+      worker.stop()
+      await worker.start(START_OPTIONS)
+      if ((await waitForController()) && (await mocksAnswer())) return true
+    } catch {
+      // Cai no aviso abaixo.
+    }
+    markNetworkUnavailable()
+    return false
+  })().finally(() => {
+    recovering = null
+  })
+  return recovering
+}
+
 export async function startMockWorker() {
   if (!('serviceWorker' in navigator)) throw new MockWorkerUnavailableError()
 
@@ -99,13 +135,7 @@ export async function startMockWorker() {
     return reloadOnceOrGiveUp()
   }
 
-  await worker.start({
-    // Chamada para /api sem handler é erro de desenvolvimento: avisa alto.
-    // Imagens, fontes e arquivos do Vite passam direto, sem aviso.
-    onUnhandledRequest(request, print) {
-      if (new URL(request.url).pathname.startsWith('/api/')) print.error()
-    },
-  })
+  await worker.start(START_OPTIONS)
 
   if (!(await waitForController()) || !(await mocksAnswer())) {
     worker.stop()
@@ -114,6 +144,7 @@ export async function startMockWorker() {
 
   // Deu certo: libera um novo recarregamento automático no futuro.
   sessionStorage.removeItem(RELOAD_GUARD_KEY)
+  setNetworkRecovery(recoverMocks)
   window.__kurioMocks = mockControls
   // Pedidos que estavam pendentes antes do F5 voltam a ser processados.
   resumePendingOrders()
