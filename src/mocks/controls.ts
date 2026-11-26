@@ -1,4 +1,4 @@
-import { formatWei, parseEth } from '@/lib/eth'
+import { formatWei, isEthAmount, parseEth } from '@/lib/eth'
 
 import { db, resetDb } from './db'
 import {
@@ -36,10 +36,23 @@ export const mockControls = {
     expireAllSessions()
   },
 
+  /** NFTs do catálogo para o painel: nome, id, preço atual e se está esgotado. */
+  listNfts() {
+    return db.state.nfts
+      .map((nft) => ({
+        id: nft.id,
+        name: nft.name,
+        price: currentPrice(nft),
+        soldOut: nft.editions.every((edition) => edition.available === 0),
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
+  },
+
   /** Muda o preço de um NFT (todas as edições, na mesma proporção). */
   changeNftPrice(nftId: string, newPrice: string) {
     const nft = db.findNft(nftId)
-    if (!nft) return false
+    // Preço em string decimal ("4.00"), maior que zero.
+    if (!nft || !isEthAmount(newPrice) || parseEth(newPrice) <= 0n) return false
     const ratioFrom = parseEth(currentPrice(nft))
     const ratioTo = parseEth(newPrice)
     for (const edition of nft.editions) {
