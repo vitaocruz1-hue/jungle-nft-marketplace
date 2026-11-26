@@ -256,9 +256,9 @@ elementos que flutuam sobre o conteúdo. Sem bibliotecas novas (Tailwind + `tw-a
 - **`prefers-reduced-motion`:** deslocamentos e zoom ficam desligados (`motion-safe`/media
   query) e as animações duram 0,01 ms; o destaque de preço vira um contorno parado.
 - **Fidelidade ao Figma (desktop):** medido nas exportações (posição de cada linha de texto e
-  bloco) e corrigido no cabeçalho, no rodapé (todas as páginas) e na Início inteira. A Início
-  passou de 3843 px para 3666 px de altura (Figma: 3668), com as seções nas mesmas alturas. As
-  medidas exatas valem a partir de 1024/1280 px; abaixo disso, o layout fluido anterior continua.
+  bloco) e corrigido no cabeçalho, no rodapé (todas as páginas) e na Início inteira (que chegou a
+  3666 px de altura, contra 3668 no Figma). Larguras, colunas e posições dessas medidas continuam;
+  os espaços entre textos foram depois revistos pela decisão de legibilidade abaixo.
 - **Diferenças que ficaram:** "Mais desta coleção"/"Colecionadores também viram" são uma faixa
   com rolagem lateral (o Figma mostra 5 cards maiores com bolinhas); no 1º banner o título quebra
   em outro ponto; os demais frames desktop (detalhe, carrinho, pagamento, perfil) não tiveram
@@ -267,14 +267,41 @@ elementos que flutuam sobre o conteúdo. Sem bibliotecas novas (Tailwind + `tw-a
   ruído: antes × depois do 1º polimento, 66 × 65 (execuções de 63 a 72); antes × depois dos efeitos
   fortes, 62 × 64. Retirar o vidro da barra de abas não melhorou a nota.
 
+### Legibilidade (decisão consciente de desvio do Figma)
+
+Com as medidas exatas do Figma, alguns textos ficavam amontoados: descrição dos cards do blog em
+12 px com linhas de 16 px, título, descrição e "Ler mais" colados, títulos de duas linhas
+espremidos, benefícios do rodapé em 190 px de largura e parágrafos do detalhe com ~140 caracteres
+por linha. Para um marketplace isso prejudica a leitura, então a legibilidade passou a ter
+prioridade sobre essas medidas. Fonte (Roboto Mono), paleta e organização das seções (ordem,
+colunas, posições) não mudaram.
+
+- **Escala tipográfica** (`src/index.css`): `type-caption` 12 px, `type-body` 14 px,
+  `type-body-lg` 16 px (altura de linha 1.6, texto corrido); `type-title` 16 px,
+  `type-heading` 20 px e `type-display` 28 px (negrito, altura de linha 1.25, títulos).
+  Títulos de página usam 28 px; de seção/legenda, 20 px; de card/coluna, 16 px.
+- **Hierarquia:** títulos em negrito no tom claro; descrições, rótulos secundários e datas no
+  bege da paleta (`text-muted-foreground`); links de ação ("Ler mais", "Continuar explorando")
+  em negrito na cor de destaque; no detalhe, rótulos (ID do token, Coleção…) em negrito e valores
+  em bege.
+- **Respiro:** 8–12 px entre título e descrição e 16 px antes de links/botões (blog, banners,
+  destaque, benefícios); listas do rodapé com 12 px entre itens; cards do blog com 20 px de
+  preenchimento.
+- **Largura de leitura:** utilitário `measure` (`max-width: 65ch`) nos parágrafos longos (descrição
+  e aba "Detalhes do NFT", avaliações).
+- **Efeito no layout:** as páginas ficaram mais altas (Início desktop 3666 → 3826 px; Detalhe
+  2233 → 2456 px) e as referências visuais foram regeneradas por isso. O título do destaque
+  passou de 70 px para 1.25 de altura de linha. Os títulos do cabeçalho mobile de Carrinho e
+  Pagamento e o tamanho do título do hero continuam os do Figma.
+
 ## Performance
 
-Medianas de 3 execuções (detalhes em `lighthouse/reports/summary.md`): desktop 97/97;
-mobile 62 (Início) e 67 (Detalhe). Acessibilidade 100, Boas práticas 96 e SEO 100 em todos.
+Medianas de 3 execuções (detalhes em `lighthouse/reports/summary.md`): desktop 98/98;
+mobile 71 (Início) e 74 (Detalhe). Acessibilidade 100, Boas práticas 96 e SEO 100 em todos.
 
-A nota mobile depende da carga da máquina: a última medição foi feita com outros servidores de
-desenvolvimento abertos (CPU em ~60%). Nas mesmas condições, a versão anterior também marcou 62;
-com a máquina livre, a Início ficou entre 64 e 67 nas medições anteriores.
+A nota mobile depende muito da carga da máquina: com outros servidores de desenvolvimento abertos
+(CPU em ~60%) a Início chegou a 62; com a máquina mais livre (CPU em ~25%), 71. Para comparar
+versões, os A/Bs deste documento intercalam as execuções nas mesmas condições.
 
 **Causas do mobile abaixo de 90.** O perfil mobile simula CPU 4× mais lenta. O LCP (arte
 principal) depende de JavaScript: iniciar o MSW (exigido no cenário auditado), executar o React e

@@ -1,6 +1,6 @@
 # Auditoria Lighthouse
 
-Gerado em 2026-11-26T17:39:30.507Z por `npm run audit` (configuração: `lighthouse/audit.config.mjs`).
+Gerado em 2026-11-26T18:43:08.712Z por `npm run audit` (configuração: `lighthouse/audit.config.mjs`).
 
 ## Ambiente
 
@@ -16,18 +16,18 @@ Gerado em 2026-11-26T17:39:30.507Z por `npm run audit` (configuração: `lightho
 
 | Página | Perfil | Performance | Acessibilidade | Boas práticas | SEO | LCP | CLS | TBT |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| inicio | mobile | **62** ⚠️ | 100 | 96 | 100 | 5.84 s | 0.016 | 658 ms |
-| inicio | desktop | 97 | 100 | 96 | 100 | 1.27 s | 0.002 | 16 ms |
-| detalhe | mobile | **67** ⚠️ | 100 | 96 | 100 | 5.36 s | 0.000 | 410 ms |
-| detalhe | desktop | 97 | 100 | 96 | 100 | 1.23 s | 0.001 | 6 ms |
+| inicio | mobile | **71** ⚠️ | 100 | 96 | 100 | 5.48 s | 0.017 | 358 ms |
+| inicio | desktop | 98 | 100 | 96 | 100 | 1.19 s | 0.002 | 0 ms |
+| detalhe | mobile | **74** ⚠️ | 100 | 96 | 100 | 5.29 s | 0.000 | 229 ms |
+| detalhe | desktop | 98 | 100 | 96 | 100 | 1.17 s | 0.001 | 0 ms |
 
 Metas: Performance ≥ 90, Acessibilidade ≥ 95, Boas práticas ≥ 95, SEO ≥ 90. ⚠️ = abaixo da meta.
 
 ## Todas as execuções
 
-- inicio · mobile: [61 / 100 / 96 / 100] [62 / 100 / 96 / 100] [62 / 100 / 96 / 100]
-- inicio · desktop: [97 / 100 / 96 / 100] [97 / 100 / 96 / 100] [97 / 100 / 96 / 100]
-- detalhe · mobile: [67 / 100 / 96 / 100] [69 / 100 / 96 / 100] [63 / 100 / 96 / 100]
-- detalhe · desktop: [97 / 100 / 96 / 100] [97 / 100 / 96 / 100] [97 / 100 / 96 / 100]
+- inicio · mobile: [71 / 100 / 96 / 100] [73 / 100 / 96 / 100] [71 / 100 / 96 / 100]
+- inicio · desktop: [97 / 100 / 96 / 100] [98 / 100 / 96 / 100] [98 / 100 / 96 / 100]
+- detalhe · mobile: [74 / 100 / 96 / 100] [74 / 100 / 96 / 100] [74 / 100 / 96 / 100]
+- detalhe · desktop: [98 / 100 / 96 / 100] [98 / 100 / 96 / 100] [97 / 100 / 96 / 100]
 
 Relatórios HTML/JSON (execução de performance mediana) nesta pasta: `<página>-<perfil>.report.html|json`.

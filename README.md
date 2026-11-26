@@ -130,10 +130,10 @@ relatórios e ambiente em [lighthouse/reports/](lighthouse/reports/summary.md).
 
 | Página  | Perfil  | Performance | Acessibilidade | Boas práticas | SEO |    LCP |   CLS |    TBT |
 | ------- | ------- | ----------: | -------------: | ------------: | --: | -----: | ----: | -----: |
-| Início  | mobile  |          62 |            100 |            96 | 100 | 5,84 s | 0,016 | 658 ms |
-| Início  | desktop |          97 |            100 |            96 | 100 | 1,27 s | 0,002 |  16 ms |
-| Detalhe | mobile  |          67 |            100 |            96 | 100 | 5,36 s | 0,000 | 410 ms |
-| Detalhe | desktop |          97 |            100 |            96 | 100 | 1,23 s | 0,001 |   6 ms |
+| Início  | mobile  |          71 |            100 |            96 | 100 | 5,48 s | 0,017 | 358 ms |
+| Início  | desktop |          98 |            100 |            96 | 100 | 1,19 s | 0,002 |   0 ms |
+| Detalhe | mobile  |          74 |            100 |            96 | 100 | 5,29 s | 0,000 | 229 ms |
+| Detalhe | desktop |          98 |            100 |            96 | 100 | 1,17 s | 0,001 |   0 ms |
 
 Performance mobile fica abaixo de 90 e varia com a carga da máquina (±4); causas e tentativas em
 [ARCHITECTURE.md → Performance](ARCHITECTURE.md#performance).
