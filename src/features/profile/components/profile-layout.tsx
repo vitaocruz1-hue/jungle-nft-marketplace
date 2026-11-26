@@ -19,22 +19,32 @@ const itemClass =
   'relative flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-sm text-highlight transition-colors hover:bg-secondary'
 const activeClass = 'before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-primary'
 
-const COMING_SOON = [
+/** Itens do menu do Figma: os que têm tela viram links; os outros mostram "em breve". */
+const MORE_ITEMS = [
   { label: 'Atividade', icon: ShoppingCartIcon },
-  { label: 'Lista de interesse', icon: HeartIcon },
+  { label: 'Lista de interesse', icon: HeartIcon, to: '/favoritos' },
   { label: 'Ofertas', icon: TrendingUpIcon },
   { label: 'Arquivos baixados', icon: DownloadIcon },
   { label: 'Suporte', icon: LifeBuoyIcon },
-]
+] as const
 
-/** Layout "Meu perfil": menu lateral + conteúdo (Perfil e Carteiras). */
-export function ProfileLayout({ children }: { children: React.ReactNode }) {
+interface ProfileLayoutProps {
+  children: React.ReactNode
+  /** Favoritos e pedidos abrem direto no conteúdo no celular (o menu fica no Perfil). */
+  menuOnMobile?: boolean
+}
+
+/** Layout "Meu perfil": menu lateral + conteúdo (Perfil, Carteiras, Favoritos, Pedidos). */
+export function ProfileLayout({ children, menuOnMobile = true }: ProfileLayoutProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const logout = useLogout()
 
   return (
     <Container className="grid gap-8 pt-8 lg:grid-cols-[310px_minmax(0,1fr)]">
-      <nav aria-labelledby="menu-perfil-titulo" className="self-start bg-card py-3">
+      <nav
+        aria-labelledby="menu-perfil-titulo"
+        className={cn('self-start bg-card py-3', !menuOnMobile && 'max-md:hidden')}
+      >
         <h2 id="menu-perfil-titulo" className="px-3 pb-2 text-lg font-bold">
           Meu perfil
         </h2>
@@ -57,13 +67,34 @@ export function ProfileLayout({ children }: { children: React.ReactNode }) {
               <MapPinIcon aria-hidden="true" className="size-4" /> Carteiras
             </Link>
           </li>
-          {COMING_SOON.map(({ label, icon: Icon }) => (
-            <li key={label}>
-              <button type="button" className={itemClass} onClick={() => notifyComingSoon(label)}>
-                <Icon aria-hidden="true" className="size-4" /> {label}
-              </button>
-            </li>
-          ))}
+          {MORE_ITEMS.map((item) => {
+            const Icon = item.icon
+            if ('to' in item) {
+              const active = pathname === item.to
+              return (
+                <li key={item.label}>
+                  <Link
+                    to={item.to}
+                    aria-current={active ? 'page' : undefined}
+                    className={cn(itemClass, active && activeClass)}
+                  >
+                    <Icon aria-hidden="true" className="size-4" /> {item.label}
+                  </Link>
+                </li>
+              )
+            }
+            return (
+              <li key={item.label}>
+                <button
+                  type="button"
+                  className={itemClass}
+                  onClick={() => notifyComingSoon(item.label)}
+                >
+                  <Icon aria-hidden="true" className="size-4" /> {item.label}
+                </button>
+              </li>
+            )
+          })}
           <li className="border-t border-[#3d2a1f]">
             <button
               type="button"

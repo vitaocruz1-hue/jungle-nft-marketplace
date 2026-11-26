@@ -11,7 +11,7 @@ export const SCENARIOS = {
   lento: 'Rede lenta (3 s por resposta)',
   variavel: 'Latência variável: respostas chegam fora de ordem',
   'falha-favoritos': 'Salvar/remover favorito falha (HTTP 503)',
-  'erro-servidor': 'Catálogo responde HTTP 500',
+  'erro-servidor': 'Catálogo, favoritos e lista de pedidos respondem HTTP 500',
   instavel: 'As 2 primeiras consultas falham (503) e depois funcionam',
   offline: 'Sem conexão: toda chamada falha e o socket é recusado',
   'pagamento-recusado': 'A carteira recusa o pagamento (pedido recusado)',

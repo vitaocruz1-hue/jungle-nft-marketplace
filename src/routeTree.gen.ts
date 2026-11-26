@@ -15,6 +15,7 @@ import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthCarteirasRouteImport } from './routes/_auth/carteiras'
+import { Route as AuthFavoritosRouteImport } from './routes/_auth/favoritos'
 import { Route as AuthPagamentoRouteImport } from './routes/_auth/pagamento'
 import { Route as AuthPerfilRouteImport } from './routes/_auth/perfil'
 import { Route as NftNftIdRouteImport } from './routes/nft.$nftId'
@@ -49,6 +50,11 @@ const AuthCarteirasRoute = AuthCarteirasRouteImport.update({
   path: '/carteiras',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthFavoritosRoute = AuthFavoritosRouteImport.update({
+  id: '/favoritos',
+  path: '/favoritos',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthPagamentoRoute = AuthPagamentoRouteImport.update({
   id: '/pagamento',
   path: '/pagamento',
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/carrinho': typeof CarrinhoRoute
   '/login': typeof LoginRoute
   '/carteiras': typeof AuthCarteirasRoute
+  '/favoritos': typeof AuthFavoritosRoute
   '/pagamento': typeof AuthPagamentoRoute
   '/perfil': typeof AuthPerfilRoute
   '/nft/$nftId': typeof NftNftIdRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/carrinho': typeof CarrinhoRoute
   '/login': typeof LoginRoute
   '/carteiras': typeof AuthCarteirasRoute
+  '/favoritos': typeof AuthFavoritosRoute
   '/pagamento': typeof AuthPagamentoRoute
   '/perfil': typeof AuthPerfilRoute
   '/nft/$nftId': typeof NftNftIdRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/carrinho': typeof CarrinhoRoute
   '/login': typeof LoginRoute
   '/_auth/carteiras': typeof AuthCarteirasRoute
+  '/_auth/favoritos': typeof AuthFavoritosRoute
   '/_auth/pagamento': typeof AuthPagamentoRoute
   '/_auth/perfil': typeof AuthPerfilRoute
   '/nft/$nftId': typeof NftNftIdRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
     | '/carrinho'
     | '/login'
     | '/carteiras'
+    | '/favoritos'
     | '/pagamento'
     | '/perfil'
     | '/nft/$nftId'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
     | '/carrinho'
     | '/login'
     | '/carteiras'
+    | '/favoritos'
     | '/pagamento'
     | '/perfil'
     | '/nft/$nftId'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/carrinho'
     | '/login'
     | '/_auth/carteiras'
+    | '/_auth/favoritos'
     | '/_auth/pagamento'
     | '/_auth/perfil'
     | '/nft/$nftId'
@@ -195,6 +207,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCarteirasRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/favoritos': {
+      id: '/_auth/favoritos'
+      path: '/favoritos'
+      fullPath: '/favoritos'
+      preLoaderRoute: typeof AuthFavoritosRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/pagamento': {
       id: '/_auth/pagamento'
       path: '/pagamento'
@@ -228,6 +247,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteChildren {
   AuthCarteirasRoute: typeof AuthCarteirasRoute
+  AuthFavoritosRoute: typeof AuthFavoritosRoute
   AuthPagamentoRoute: typeof AuthPagamentoRoute
   AuthPerfilRoute: typeof AuthPerfilRoute
   AuthPedidoOrderIdRoute: typeof AuthPedidoOrderIdRoute
@@ -235,6 +255,7 @@ interface AuthRouteChildren {
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthCarteirasRoute: AuthCarteirasRoute,
+  AuthFavoritosRoute: AuthFavoritosRoute,
   AuthPagamentoRoute: AuthPagamentoRoute,
   AuthPerfilRoute: AuthPerfilRoute,
   AuthPedidoOrderIdRoute: AuthPedidoOrderIdRoute,

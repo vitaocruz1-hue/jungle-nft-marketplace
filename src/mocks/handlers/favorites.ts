@@ -7,10 +7,21 @@ import { db } from '../db'
 import { getActiveScenario, simulateNetwork } from '../scenarios'
 import { requireAuth } from '../utils/auth'
 import { apiUrl, errorResponse } from '../utils/http'
+import { toSummary } from '../utils/nft'
 
 function favoritesOf(userId: string) {
   db.state.favorites[userId] ??= []
   return db.state.favorites[userId]
+}
+
+/** IDs na ordem em que foram favoritados + cards do mais recente ao mais antigo. */
+function favoritesResponse(userId: string): FavoritesResponse {
+  const nftIds = [...favoritesOf(userId)]
+  const items = nftIds.toReversed().flatMap((id) => {
+    const nft = db.findNft(id)
+    return nft ? [toSummary(nft)] : []
+  })
+  return { nftIds, items }
 }
 
 export const favoritesHandlers = [
@@ -20,7 +31,7 @@ export const favoritesHandlers = [
       await simulateNetwork()
       const auth = requireAuth(request)
       if (!auth.ok) return auth.response
-      return HttpResponse.json({ nftIds: [...favoritesOf(auth.user.id)] })
+      return HttpResponse.json(favoritesResponse(auth.user.id))
     },
   ),
 
@@ -37,7 +48,7 @@ export const favoritesHandlers = [
       const list = favoritesOf(auth.user.id)
       if (!list.includes(params.nftId)) list.push(params.nftId)
       db.persist()
-      return HttpResponse.json({ nftIds: [...list] })
+      return HttpResponse.json(favoritesResponse(auth.user.id))
     },
   ),
 
@@ -54,7 +65,7 @@ export const favoritesHandlers = [
         (id) => id !== params.nftId,
       )
       db.persist()
-      return HttpResponse.json({ nftIds: [...favoritesOf(auth.user.id)] })
+      return HttpResponse.json(favoritesResponse(auth.user.id))
     },
   ),
 ]

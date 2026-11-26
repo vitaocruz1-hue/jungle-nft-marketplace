@@ -16,8 +16,14 @@ export const failureHandlers = [
 
     if (scenario === 'offline') return HttpResponse.error()
 
-    if (scenario === 'erro-servidor' && request.method === 'GET' && pathname.includes('/nfts')) {
-      return errorResponse(500, 'INTERNAL_ERROR', 'Erro interno no servidor do catálogo.')
+    if (scenario === 'erro-servidor' && request.method === 'GET') {
+      if (pathname.includes('/nfts')) {
+        return errorResponse(500, 'INTERNAL_ERROR', 'Erro interno no servidor do catálogo.')
+      }
+      // Listas da conta (a sessão e o detalhe de um pedido continuam funcionando).
+      if (pathname.endsWith('/favorites') || pathname.endsWith('/orders')) {
+        return errorResponse(500, 'INTERNAL_ERROR', 'Erro interno no servidor.')
+      }
     }
 
     if (scenario === 'instavel' && request.method === 'GET' && unstableFailures < 2) {

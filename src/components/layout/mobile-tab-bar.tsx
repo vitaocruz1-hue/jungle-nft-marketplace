@@ -3,7 +3,6 @@ import { HeartIcon, HomeIcon, ScanSearchIcon, ShoppingCartIcon, UserIcon } from 
 
 import { useSession } from '@/features/auth/session'
 import { useCart } from '@/features/cart/queries'
-import { notifyComingSoon } from '@/lib/coming-soon'
 import { cn } from '@/lib/utils'
 
 const itemClass =
@@ -40,14 +39,14 @@ export function MobileTabBar() {
           </Link>
         </li>
         <li>
-          <button
-            type="button"
-            aria-label="Lista de interesse"
-            className={cn(itemClass, 'cursor-pointer')}
-            onClick={() => notifyComingSoon('Lista de interesse')}
+          <Link
+            to="/favoritos"
+            aria-label="Favoritos"
+            aria-current={pathname === '/favoritos' ? 'page' : undefined}
+            className={cn(itemClass, pathname === '/favoritos' && 'text-highlight')}
           >
             <HeartIcon aria-hidden="true" className="size-6 fill-current" />
-          </button>
+          </Link>
         </li>
         <li className="-mt-12">
           {pathname === '/' ? (

@@ -10,7 +10,14 @@ import { cn } from '@/lib/utils'
  * Card do catálogo. Desktop: moldura 258×300 com a arte 250×250 ao centro.
  * Celular (Figma mobile): moldura arredondada, ♥ sobre a arte.
  */
-export function NftCard({ nft, priority = false }: { nft: NftSummary; priority?: boolean }) {
+interface NftCardProps {
+  nft: NftSummary
+  priority?: boolean
+  /** No Figma o ♥ do card só existe no celular; na tela de favoritos aparece sempre. */
+  favoriteButton?: 'mobile' | 'always'
+}
+
+export function NftCard({ nft, priority = false, favoriteButton = 'mobile' }: NftCardProps) {
   const rare = nft.rarity === 'Raro' || nft.rarity === 'Épico'
 
   return (
@@ -64,7 +71,11 @@ export function NftCard({ nft, priority = false }: { nft: NftSummary; priority?:
           add: `Adicionar ${nft.name} aos favoritos`,
           remove: `Remover ${nft.name} dos favoritos`,
         }}
-        className="absolute top-2.5 right-2.5 md:hidden"
+        className={cn(
+          'absolute top-2.5 right-2.5',
+          favoriteButton === 'mobile' && 'md:hidden',
+          favoriteButton === 'always' && 'md:top-3 md:right-3',
+        )}
       />
     </article>
   )

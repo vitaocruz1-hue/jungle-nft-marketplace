@@ -1,5 +1,12 @@
 import { Link, useRouterState } from '@tanstack/react-router'
-import { LogInIcon, LogOutIcon, ShoppingCartIcon, UserIcon, WalletIcon } from 'lucide-react'
+import {
+  HeartIcon,
+  LogInIcon,
+  LogOutIcon,
+  ShoppingCartIcon,
+  UserIcon,
+  WalletIcon,
+} from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -84,6 +91,11 @@ export function AccountButton({ className }: { className?: string }) {
         <DropdownMenuItem asChild>
           <Link to="/perfil">
             <UserIcon /> Meu perfil
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/favoritos">
+            <HeartIcon /> Favoritos
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>

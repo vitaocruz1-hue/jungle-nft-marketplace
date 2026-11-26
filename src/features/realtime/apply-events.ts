@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import type { FeaturedResponse, NftDetail, NftListResponse, NftSummary } from '@/contracts/catalog'
 import type { Cart } from '@/contracts/cart'
+import type { FavoritesResponse } from '@/contracts/favorites'
 import type { Order } from '@/contracts/orders'
 import type { NftUpdatedEvent, OrderUpdatedEvent } from '@/contracts/realtime'
 import { privateKeys } from '@/features/auth/session'
@@ -57,6 +58,11 @@ export function applyNftUpdated(queryClient: QueryClient, event: NftUpdatedEvent
   )
   queryClient.setQueriesData<NftSummary[]>({ queryKey: [...catalogKeys.all, 'related'] }, (old) =>
     old?.map((nft) => patchSummary(nft, event)),
+  )
+  // Tela de favoritos (cache por usuário: ['me', userId, 'favorites']).
+  queryClient.setQueriesData<FavoritesResponse>(
+    { queryKey: privateKeys.all, predicate: (query) => query.queryKey[2] === 'favorites' },
+    (old) => (old ? { ...old, items: old.items.map((nft) => patchSummary(nft, event)) } : old),
   )
 
   // Carrinho: a API recalcula preços, avisos e totais; buscamos de novo.

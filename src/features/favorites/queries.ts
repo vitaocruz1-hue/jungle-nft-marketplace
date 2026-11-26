@@ -36,6 +36,12 @@ export function useFavorites() {
   return { isFavorite: (nftId: string) => ids.has(nftId), isLoading: query.isPending && !!user }
 }
 
+/** Lista completa (tela /favoritos). Mesma chave de cache dos corações. */
+export function useFavoritesList() {
+  const { user } = useSession()
+  return useQuery({ ...favoritesQueryOptions(user?.id ?? ''), enabled: user !== null })
+}
+
 /**
  * Favoritar/desfavoritar com ATUALIZAÇÃO OTIMISTA: o coração muda na hora;
  * se a API falhar, volta ao estado anterior (rollback) e avisa o usuário.
@@ -56,7 +62,9 @@ export function useToggleFavorite() {
         const current = new Set(old?.nftIds ?? [])
         if (favorite) current.add(nftId)
         else current.delete(nftId)
-        return { nftIds: [...current] }
+        // Desfavoritar tira o card na hora; ao favoritar, o card chega com a resposta da API.
+        const items = (old?.items ?? []).filter((item) => favorite || item.id !== nftId)
+        return { nftIds: [...current], items }
       })
       return { previous }
     },
