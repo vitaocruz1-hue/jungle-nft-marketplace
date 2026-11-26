@@ -1,0 +1,115 @@
+# Gera as referências (baselines) da regressão visual em macOS e Linux e faz
+# commit delas. As imagens dependem do sistema (renderização de fontes), por
+# isso cada sistema tem as suas: sufixos -darwin, -linux e -win32.
+# Rodar manualmente: aba Actions → "Atualizar baselines visuais" → Run workflow.
+# Também roda sozinho quando este arquivo muda (ex.: na primeira vez que é enviado).
+name: Atualizar baselines visuais
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/visual-baselines.yml']
+  workflow_dispatch:
+    inputs:
+      incluir_windows:
+        description: 'Gerar também as baselines do Windows (-win32)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: visual-baselines
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    name: Gerar (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - name: Pular o Windows quando não foi pedido
+        id: skip
+        shell: bash
+        run: echo "skip=${{ matrix.os == 'windows-latest' && !inputs.incluir_windows }}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        if: steps.skip.outputs.skip != 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.skip.outputs.skip != 'true'
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependências
+        if: steps.skip.outputs.skip != 'true'
+        run: npm ci
+
+      - name: Instalar o Chromium do Playwright
+        if: steps.skip.outputs.skip != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Gerar baselines
+        if: steps.skip.outputs.skip != 'true'
+        run: npm run test:visual:update
+
+      - name: Guardar as imagens geradas
+        if: steps.skip.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: baselines-${{ matrix.os }}
+          path: e2e/visual.spec.ts-snapshots/
+          retention-days: 14
+
+  commit:
+    name: Commit das baselines
+    needs: generate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Baixar as imagens geradas
+        uses: actions/download-artifact@v4
+        with:
+          pattern: baselines-*
+          path: baselines
+
+      - name: Copiar só as imagens de cada sistema
+        shell: bash
+        run: |
+          dest=e2e/visual.spec.ts-snapshots
+          cp baselines/baselines-macos-latest/*-darwin.png "$dest"/
+          cp baselines/baselines-ubuntu-latest/*-linux.png "$dest"/
+          if [ -d baselines/baselines-windows-latest ]; then
+            cp baselines/baselines-windows-latest/*-win32.png "$dest"/
+          fi
+          rm -rf baselines
+          git status --short
+
+      - name: Commit e push
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add e2e/visual.spec.ts-snapshots
+          if git diff --cached --quiet; then
+            echo "Baselines já estavam atualizadas."
+            exit 0
+          fi
+          git commit -m "test(visual): baselines geradas no CI (macOS e Linux)"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Rodar o CI com as novas baselines
+        # Commits feitos pelo GITHUB_TOKEN não disparam outros workflows;
+        # o disparo manual (workflow_dispatch) é a exceção permitida.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run ci.yml --ref "${GITHUB_REF_NAME}"

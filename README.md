@@ -1,5 +1,7 @@
 # Kurio — Marketplace de NFTs
 
+[![CI](https://github.com/vitaocruz1-hue/jungle-nft-marketplace/actions/workflows/ci.yml/badge.svg)](https://github.com/vitaocruz1-hue/jungle-nft-marketplace/actions/workflows/ci.yml)
+
 Solução do [desafio de frontend da Jungle Gaming](https://github.com/junglegaming/frontend-challenge):
 marketplace de NFTs em React + TypeScript, fiel ao Figma, com API REST e eventos em tempo real
 **simulados no navegador** (MSW + Socket.IO). Não há backend: tudo roda a partir de um checkout limpo.
@@ -85,7 +87,8 @@ esquerdo da tela. A escolha vale para a aba atual até ser trocada (`?cenario=pa
 **Reset:** painel → "Restaurar dados iniciais" (restaura catálogo, usuários, carrinhos, carteiras e
 pedidos, e encerra a sessão). Os dados simulados ficam no `localStorage` para sobreviver ao F5.
 
-O painel também dispara eventos Socket.IO pelo "servidor" simulado: alterar preço, esgotar edições,
+O painel também dispara eventos Socket.IO pelo "servidor" simulado (NFT escolhido pelo nome; preço
+com vírgula ou ponto, maior que zero, até 18 casas): alterar preço, esgotar edições,
 reenviar o último evento (duplicata), enviar uma versão antiga e derrubar a conexão. Em testes, os
 mesmos controles estão em `window.__kurioMocks`.
 
@@ -115,16 +118,30 @@ mesmos controles estão em `window.__kurioMocks`.
 
 ## Testes
 
-- **E2E** (`npm run test:e2e`): 62 cenários × desktop e mobile, cobrindo os 12 itens do enunciado
+- **E2E** (`npm run test:e2e`): 63 cenários × desktop e mobile, cobrindo os 12 itens do enunciado
   (catálogo, detalhe, conta, favoritos, carrinho, compra, falhas, perfil/carteiras, tempo real,
   eventos duplicados/desconexão, teclado/foco e skeletons/recuperação), além das telas de
   favoritos e pedidos (estados, isolamento entre usuários, status ao vivo), dos avisos de tempo
   real e da resiliência (service worker ignorado via CDP, HTML e JSON inválido em `/api`). Cada teste roda em um
   contexto isolado (armazenamento limpo); tempo real passa pelo `socket.io-client` e REST pelos
   handlers MSW.
-- **Regressão visual** (`npm run test:visual`): baselines em `e2e/visual.spec.ts-snapshots/`. Como a
-  renderização de fontes muda por sistema operacional, as baselines têm sufixo de plataforma
-  (`-win32`, geradas no Windows). Em outro sistema, gere as suas com `npm run test:visual:update`.
+- **Regressão visual** (`npm run test:visual`): baselines em `e2e/visual.spec.ts-snapshots/`. A
+  renderização de fontes muda por sistema operacional, então cada sistema tem as suas, pelo sufixo:
+  `-darwin` (macOS), `-linux` e `-win32` (Windows). As de macOS e Linux são geradas no GitHub
+  Actions pelo workflow manual **"Atualizar baselines visuais"**; as de Windows, localmente.
+
+  | Sistema | Rodar                 | Observação                                                   |
+  | ------- | --------------------- | ------------------------------------------------------------ |
+  | macOS   | `npm run test:visual` | Usa as baselines `-darwin` (geradas no `macos-latest` do CI) |
+  | Linux   | `npm run test:visual` | Usa as baselines `-linux` (geradas no `ubuntu-latest` do CI) |
+  | Windows | `npm run test:visual` | Usa as baselines `-win32`                                    |
+
+  Diferenças de fonte entre versões do sistema podem passar do limite (1% dos pixels). Nesse caso,
+  `npm run test:visual:update` gera referências locais; confira as imagens antes de usá-las.
+
+- **CI** (`.github/workflows/ci.yml`): a cada push e pull request, roda tipos, lint, testes de
+  fluxo e regressão visual em Ubuntu, macOS e Windows. Em falha, o relatório HTML do Playwright fica
+  como artefato da execução (aba Actions → execução → "Artifacts").
 - Relatório HTML em `playwright-report/` e traces das falhas em `test-results/`.
 
 ## Auditoria Lighthouse
