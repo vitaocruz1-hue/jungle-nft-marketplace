@@ -23,25 +23,28 @@ export function NftCard({ nft, priority = false, favoriteButton = 'mobile' }: Nf
   const priceFlash = useLiveNft(nft.id)
 
   return (
-    <article className="group relative">
+    <article className="nft-card group relative">
       <Link
         to="/nft/$nftId"
         params={{ nftId: nft.id }}
         className="block rounded-sm focus-visible:outline-offset-4"
       >
-        <div className="relative flex aspect-[258/300] items-center justify-center bg-card px-1 max-md:aspect-auto max-md:rounded-[20px] max-md:bg-[#2a1a14] max-md:px-1 max-md:pt-1 max-md:pb-4">
-          <img
-            src={nft.image.src}
-            alt={nft.image.alt}
-            width={nft.image.width}
-            height={nft.image.height}
-            loading={priority ? 'eager' : 'lazy'}
-            decoding="async"
-            className={cn(
-              'aspect-square w-full rounded-[15px] object-cover transition-transform duration-300 motion-safe:group-hover:scale-[1.02]',
-              nft.soldOut && 'opacity-60 grayscale-[40%]',
-            )}
-          />
+        <div className="nft-card-frame relative flex aspect-[258/300] items-center justify-center bg-card px-1 max-md:aspect-auto max-md:rounded-[20px] max-md:bg-[#2a1a14] max-md:px-1 max-md:pt-1 max-md:pb-4">
+          {/* Zoom e reflexo (hover/foco) ficam dentro dos cantos arredondados. */}
+          <div className="nft-card-art w-full">
+            <img
+              src={nft.image.src}
+              alt={nft.image.alt}
+              width={nft.image.width}
+              height={nft.image.height}
+              loading={priority ? 'eager' : 'lazy'}
+              decoding="async"
+              className={cn(
+                'block aspect-square w-full rounded-[15px] object-cover',
+                nft.soldOut && 'opacity-60 grayscale-[40%]',
+              )}
+            />
+          </div>
           {rare && (
             <span className="absolute top-4 left-0 bg-primary px-2 py-1 text-xs font-bold text-primary-foreground uppercase">
               {nft.rarity}

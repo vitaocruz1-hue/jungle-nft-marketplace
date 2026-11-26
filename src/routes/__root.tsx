@@ -1,5 +1,11 @@
 import type { QueryClient } from '@tanstack/react-query'
-import { createRootRouteWithContext, HeadContent, Outlet } from '@tanstack/react-router'
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  Outlet,
+  useRouterState,
+} from '@tanstack/react-router'
+import { useEffect, useRef } from 'react'
 
 import { Container } from '@/components/layout/container'
 import { useMobileChrome } from '@/components/layout/mobile-chrome'
@@ -26,10 +32,36 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   ),
 })
 
+/**
+ * Fade curto do conteúdo ao trocar de página dentro do site. A 1ª carga não anima
+ * (não atrasa o LCP). Só opacidade: um transform faria os elementos "fixed" da página
+ * (ex.: barra de compra no celular) se moverem durante a animação.
+ */
+function usePageTransition() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const mainRef = useRef<HTMLElement>(null)
+  const firstRender = useRef(true)
+
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false
+      return
+    }
+    const main = mainRef.current
+    if (!main) return
+    main.classList.remove('page-enter')
+    void main.offsetWidth // reinicia a animação
+    main.classList.add('page-enter')
+  }, [pathname])
+
+  return mainRef
+}
+
 function RootLayout() {
   useSessionExpiryHandler()
   useRealtimeSync()
   const chrome = useMobileChrome()
+  const mainRef = usePageTransition()
 
   return (
     <>
@@ -42,7 +74,7 @@ function RootLayout() {
       </a>
       <SiteHeader className={cn(!chrome.header && 'max-md:hidden')} />
       {/* Altura mínima de uma tela: o rodapé não aparece (e depois "pula") enquanto o conteúdo carrega. */}
-      <main id="conteudo" tabIndex={-1} className="min-h-dvh outline-none">
+      <main ref={mainRef} id="conteudo" tabIndex={-1} className="min-h-dvh outline-none">
         <Outlet />
       </main>
       <SiteFooter

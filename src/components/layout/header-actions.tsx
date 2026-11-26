@@ -21,6 +21,7 @@ import {
 import { useLogout } from '@/features/auth/hooks'
 import { useSession } from '@/features/auth/session'
 import { useCart } from '@/features/cart/queries'
+import { useBumpOnIncrease } from '@/lib/use-bump'
 import { cn } from '@/lib/utils'
 
 /** Página atual, para voltar a ela depois do login. */
@@ -31,13 +32,14 @@ function useCurrentHref() {
 export function CartLink() {
   const { data } = useCart()
   const count = data?.itemCount ?? 0
+  const bumps = useBumpOnIncrease(data?.itemCount)
   const label =
     count > 0 ? `Carrinho, ${count} ${count === 1 ? 'item' : 'itens'}` : 'Carrinho vazio'
 
   return (
     <Button asChild variant="ghost" size="icon" className="relative hover:bg-secondary">
       <Link to="/carrinho" aria-label={label}>
-        <ShoppingCartIcon className="size-5" />
+        <ShoppingCartIcon key={bumps} className={cn('size-5', bumps > 0 && 'cart-bump')} />
         {count > 0 && (
           <span
             aria-hidden="true"

@@ -134,6 +134,112 @@
   }
 }
 
+/*
+ * Card de NFT: parado = Figma. Em hover (mouse) ou foco do teclado: sobe, ganha sombra e
+ * borda com brilho na cor de destaque; a arte dá zoom lento e um reflexo passa por ela.
+ */
+.nft-card-frame {
+  transition:
+    translate 250ms ease-out,
+    box-shadow 250ms ease-out;
+}
+
+.nft-card-art {
+  position: relative;
+  overflow: hidden;
+  border-radius: 15px;
+}
+
+.nft-card-art img {
+  transition: scale 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.nft-card-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / 0.2) 50%, transparent 65%);
+  translate: -120% 0;
+}
+
+@media (hover: hover) {
+  .nft-card:hover .nft-card-frame {
+    box-shadow:
+      0 18px 34px -16px rgb(0 0 0 / 0.8),
+      0 0 0 1px color-mix(in srgb, var(--highlight) 45%, transparent),
+      0 0 26px -8px color-mix(in srgb, var(--highlight) 55%, transparent);
+  }
+}
+
+.nft-card:has(:focus-visible) .nft-card-frame {
+  box-shadow:
+    0 18px 34px -16px rgb(0 0 0 / 0.8),
+    0 0 0 1px color-mix(in srgb, var(--highlight) 45%, transparent),
+    0 0 26px -8px color-mix(in srgb, var(--highlight) 55%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @media (hover: hover) {
+    .nft-card:hover .nft-card-frame {
+      translate: 0 -4px;
+    }
+
+    .nft-card:hover .nft-card-art img {
+      scale: 1.05;
+    }
+
+    .nft-card:hover .nft-card-art::after {
+      translate: 120% 0;
+      transition: translate 900ms ease-out;
+    }
+  }
+
+  .nft-card:has(:focus-visible) .nft-card-frame {
+    translate: 0 -4px;
+  }
+
+  .nft-card:has(:focus-visible) .nft-card-art img {
+    scale: 1.05;
+  }
+
+  .nft-card:has(:focus-visible) .nft-card-art::after {
+    translate: 120% 0;
+    transition: translate 900ms ease-out;
+  }
+
+  /* Clique: leve "aperto" em links e botões (os botões do shadcn têm o seu, um pouco maior). */
+  :is(a, button):not(:disabled):active {
+    scale: 0.98;
+  }
+}
+
+/* Troca de página (só navegação dentro do site, nunca na 1ª carga): fade curto. */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+  }
+}
+
+.page-enter {
+  animation: page-enter 200ms ease-out;
+}
+
+/* "Pulinho" do ícone do carrinho quando um item entra. */
+@keyframes cart-bump {
+  30% {
+    scale: 1.3;
+    translate: 0 -3px;
+  }
+  60% {
+    scale: 0.92;
+  }
+}
+
+.cart-bump {
+  animation: cart-bump 450ms cubic-bezier(0.3, 0.7, 0.4, 1.4);
+}
+
 @keyframes shimmer {
   from {
     background-position: 200% 0;
@@ -173,6 +279,13 @@
   @media (width < 48rem) {
     html {
       scroll-padding-bottom: 12rem;
+    }
+  }
+
+  /* A partir de 768 px o cabeçalho (68 px) fica preso no topo: âncoras e foco param abaixo dele. */
+  @media (width >= 48rem) {
+    html {
+      scroll-padding-top: 68px;
     }
   }
 }

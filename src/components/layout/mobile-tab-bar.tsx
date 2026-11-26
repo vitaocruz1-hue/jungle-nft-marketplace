@@ -3,6 +3,7 @@ import { HeartIcon, HomeIcon, ScanSearchIcon, ShoppingCartIcon, UserIcon } from 
 
 import { useSession } from '@/features/auth/session'
 import { useCart } from '@/features/cart/queries'
+import { useBumpOnIncrease } from '@/lib/use-bump'
 import { cn } from '@/lib/utils'
 
 const itemClass =
@@ -24,6 +25,7 @@ export function MobileTabBar() {
   const { user } = useSession()
   const { data: cart } = useCart()
   const count = cart?.itemCount ?? 0
+  const bumps = useBumpOnIncrease(cart?.itemCount)
 
   return (
     <nav aria-label="Navegação inferior" className="fixed inset-x-0 bottom-0 z-40 md:hidden">
@@ -77,7 +79,11 @@ export function MobileTabBar() {
             }
             className={itemClass}
           >
-            <ShoppingCartIcon aria-hidden="true" className="size-6" />
+            <ShoppingCartIcon
+              key={bumps}
+              aria-hidden="true"
+              className={cn('size-6', bumps > 0 && 'cart-bump')}
+            />
             {count > 0 && (
               <span
                 aria-hidden="true"
