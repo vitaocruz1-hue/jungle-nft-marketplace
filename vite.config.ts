@@ -1,4 +1,6 @@
-import { fileURLToPath, URL } from 'node:url'
+import { realpathSync } from 'node:fs'
+import { resolve } from 'node:path'
+
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
@@ -13,8 +15,11 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      // `@/algo` aponta para `src/algo` (o mesmo atalho está no tsconfig.app.json)
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // `@/algo` aponta para `src/algo` (o mesmo atalho está no tsconfig.app.json).
+      // Caminho "real" do disco, igual ao que o Vite usa para o index.html. No Windows,
+      // o terminal pode informar a letra do disco em outra caixa (c: × C:); com dois
+      // caminhos para o mesmo arquivo, o bundler carregava o React duas vezes.
+      '@': realpathSync.native(resolve('src')),
     },
   },
 })
