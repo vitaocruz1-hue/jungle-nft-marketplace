@@ -225,6 +225,39 @@ Segue os 6 frames mobile do Figma (414 px de largura), adaptados para 390 px.
   "Esgotado", "Favoritado", preço anterior riscado com rótulo) e skeletons estáticos com
   `prefers-reduced-motion`.
 
+### Polimento visual
+
+Regra: com a página parada, tudo segue o Figma. Os efeitos aparecem só em interação, ao rolar ou em
+elementos que flutuam sobre o conteúdo. Sem bibliotecas novas (Tailwind + `tw-animate-css`).
+
+- **Vidro:** utilitário `glass` (`src/index.css`): fundo translúcido, `backdrop-filter: blur` e
+  borda clara. Sem suporte a `backdrop-filter` (ou `color-mix`), o fundo é sólido. Usado na barra
+  de abas, gavetas, diálogos (busca, zoom), avisos e painel de cenários.
+- **Cabeçalho:** a partir de 768 px fica preso no topo. No topo é igual ao Figma; ao rolar vira
+  vidro, com uma linha clara feita por sombra (não muda a altura). `scroll-padding-top: 69px`
+  mantém âncoras e foco abaixo dele.
+- **Cards:** em hover (só em dispositivos com mouse) ou foco do teclado, a moldura sobe 4 px e
+  ganha sombra e borda com brilho laranja; a arte dá zoom lento e um reflexo passa por ela. O foco
+  usa `.nft-card-link:focus-visible` (sem `:has()`, mais barato no recálculo de estilos).
+- **Movimento:** "aperto" de 2% ao clicar em links e botões; gavetas em 250/200 ms, diálogos em
+  200 ms, avisos em 250 ms; fade de 200 ms ao trocar de página (só navegação interna, nunca na
+  1ª carga, e só opacidade, para não mover elementos fixos); "pulinho" no ícone do carrinho quando
+  um item entra; destaque do preço que mudou em tempo real.
+- **`prefers-reduced-motion`:** deslocamentos e zoom ficam desligados (`motion-safe`/media
+  query) e as animações duram 0,01 ms; o destaque de preço vira um contorno parado.
+- **Fidelidade ao Figma (desktop):** medido nas exportações (posição de cada linha de texto e
+  bloco) e corrigido no cabeçalho, no rodapé (todas as páginas) e na Início inteira. A Início
+  passou de 3843 px para 3666 px de altura (Figma: 3668), com as seções nas mesmas alturas. As
+  medidas exatas valem a partir de 1024/1280 px; abaixo disso, o layout fluido anterior continua.
+- **Diferenças que ficaram:** "Mais desta coleção"/"Colecionadores também viram" são uma faixa
+  com rolagem lateral (o Figma mostra 5 cards maiores com bolinhas); no 1º banner o título quebra
+  em outro ponto; os demais frames desktop (detalhe, carrinho, pagamento, perfil) não tiveram
+  ajuste fino além de cabeçalho e rodapé.
+- **Lighthouse:** um A/B com execuções intercaladas (mobile, Início) não mostrou diferença além do
+  ruído entre antes e depois do polimento (medianas 66 × 65; as execuções
+  individuais variaram de 63 a 72).
+  Retirar o vidro da barra de abas não melhorou a nota.
+
 ## Performance
 
 Medianas de 3 execuções (detalhes em `lighthouse/reports/summary.md`): desktop 97/98;
@@ -237,7 +270,7 @@ receber os dados simulados. O TBT vem da avaliação do React e do MSW e das ren
 
 **O que foi feito:** carregamento do app em paralelo com o MSW, com a rede aguardando o mock;
 `socket.io-client` sob demanda; code splitting por rota; imagens WebP com dimensões declaradas e
-`fetchpriority` no LCP; fonte local; altura mínima do conteúdo (CLS 0,197 → até 0,016).
+`fetchpriority` no LCP; fonte local; altura mínima do conteúdo (CLS 0,197 → abaixo de 0,05).
 
 **Tentativas descartadas (medidas):** carregamento sequencial (MSW → app) e preload da fonte e
 da imagem do destaque. No 4G simulado os preloads disputaram banda com o JavaScript, e nenhuma
