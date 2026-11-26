@@ -118,13 +118,25 @@ mesmos controles estão em `window.__kurioMocks`.
 
 ## Testes
 
-- **E2E** (`npm run test:e2e`): 63 cenários × desktop e mobile, cobrindo os 12 itens do enunciado
+- **E2E** (`npm run test:e2e`): 68 cenários × desktop e mobile, cobrindo os 12 itens do enunciado
   (catálogo, detalhe, conta, favoritos, carrinho, compra, falhas, perfil/carteiras, tempo real,
   eventos duplicados/desconexão, teclado/foco e skeletons/recuperação), além das telas de
   favoritos e pedidos (estados, isolamento entre usuários, status ao vivo), dos avisos de tempo
   real e da resiliência (service worker ignorado via CDP, HTML e JSON inválido em `/api`). Cada teste roda em um
   contexto isolado (armazenamento limpo); tempo real passa pelo `socket.io-client` e REST pelos
   handlers MSW.
+- **Sem rolagem horizontal** (`e2e/overflow.spec.ts`): todas as rotas, públicas e logadas (inclusive o
+  recibo de um pedido), em 390, 768 e 1440 px, conferindo `scrollWidth <= clientWidth`.
+- **Relógio controlado** (`page.clock` do Playwright): os cenários que dependem de tempo avançam o
+  relógio em vez de esperar. A API simulada roda na própria página e usa o mesmo relógio, então o
+  "servidor" e a tela concordam sobre a hora.
+
+  | Cenário                             | Arquivo            | Como usa o relógio                                                 |
+  | ----------------------------------- | ------------------ | ------------------------------------------------------------------ |
+  | Cotação vence em 5 min              | `checkout.spec.ts` | `fastForward('05:01')`: aviso, compra travada, "Atualizar cotação" |
+  | Destaque do preço dura 1,6 s        | `realtime.spec.ts` | `runFor(1600)`: o destaque some sem esperar o tempo real           |
+  | Sessão vence em 30 min (pelo tempo) | `account.spec.ts`  | `fastForward('30:01')`: a próxima ação avisa e leva ao login       |
+
 - **Regressão visual** (`npm run test:visual`): baselines em `e2e/visual.spec.ts-snapshots/`. A
   renderização de fontes muda por sistema operacional, então cada sistema tem as suas, pelo sufixo:
   `-darwin` (macOS), `-linux` e `-win32` (Windows). As de macOS e Linux são geradas no GitHub

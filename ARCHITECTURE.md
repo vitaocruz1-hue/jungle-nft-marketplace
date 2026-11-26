@@ -264,6 +264,14 @@ Segue os 6 frames mobile do Figma (414 px de largura), adaptados para 390 px.
   "Esgotado", "Favoritado", preço anterior riscado com rótulo) e skeletons estáticos com
   `prefers-reduced-motion`.
 
+### Tablet (768 a 1023 px)
+
+O Figma tem só desktop (1440) e celular (414). No tablet, o menu principal divide a linha com busca,
+coração, carrinho e o chip da conta; com o nome do usuário no chip, o cabeçalho passava 32 px da
+tela (rolagem horizontal em todas as páginas logadas). Nessa faixa o chip mostra só a inicial; o
+nome continua no `aria-label` ("Conta de …") e volta a aparecer a partir de 1024 px. O teste
+`e2e/overflow.spec.ts` confere 390, 768 e 1440 px em todas as rotas.
+
 ### Polimento visual
 
 Regra: com a página parada, tudo segue o Figma. Os efeitos aparecem só em interação, ao rolar ou em
