@@ -5,7 +5,6 @@ import { toast } from 'sonner'
 
 import { FormField } from '@/components/form-field'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
   AVATAR_MAX_BYTES,
@@ -175,7 +174,9 @@ function AvatarField({ user }: { user: User }) {
             <ImageIcon aria-hidden="true" className="size-6 text-highlight" />
           )}
         </span>
-        <Input
+        {/* <input> simples: o `w-full` do componente Input vencia o `sr-only` e o campo
+            invisível ficava com a largura da tela (rolagem horizontal na página). */}
+        <input
           ref={inputRef}
           id="perfil-avatar"
           type="file"
