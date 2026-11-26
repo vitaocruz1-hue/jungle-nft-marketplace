@@ -10,9 +10,11 @@ import { useEffect, useRef } from 'react'
 import { Container } from '@/components/layout/container'
 import { useMobileChrome } from '@/components/layout/mobile-chrome'
 import { MobileTabBar } from '@/components/layout/mobile-tab-bar'
+import { NetworkNotice } from '@/components/layout/network-notice'
 import { SiteFooter } from '@/components/layout/site-footer'
 import { SiteHeader } from '@/components/layout/site-header'
 import { NotFound } from '@/components/not-found'
+import { RootErrorPage } from '@/components/route-error'
 import { Toaster } from '@/components/ui/sonner'
 import { useSessionExpiryHandler } from '@/features/auth/hooks'
 import { useRealtimeSync } from '@/features/realtime/use-realtime-sync'
@@ -25,6 +27,8 @@ export interface RouterContext {
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({ meta: [{ title: 'Kurio · Marketplace de NFTs' }] }),
   component: RootLayout,
+  // Erro no próprio layout: página de erro do site (nunca a tela genérica do roteador).
+  errorComponent: RootErrorPage,
   notFoundComponent: () => (
     <Container>
       <NotFound />
@@ -72,6 +76,7 @@ function RootLayout() {
       >
         Pular para o conteúdo
       </a>
+      <NetworkNotice />
       <SiteHeader className={cn(!chrome.header && 'max-md:hidden')} />
       {/* Altura mínima de uma tela: o rodapé não aparece (e depois "pula") enquanto o conteúdo carrega. */}
       <main ref={mainRef} id="conteudo" tabIndex={-1} className="min-h-dvh outline-none">

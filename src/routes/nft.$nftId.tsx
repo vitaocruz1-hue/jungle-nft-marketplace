@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute, notFound, useRouter } from '@tanstack/react-router'
+import { createFileRoute, notFound, type ErrorComponentProps } from '@tanstack/react-router'
 import { MailIcon, StarIcon } from 'lucide-react'
 
 import { LinkedinIcon, TwitterIcon } from '@/components/brand-icons'
@@ -7,7 +7,7 @@ import { BackButton } from '@/components/back-button'
 import { Breadcrumb } from '@/components/breadcrumb'
 import { Container } from '@/components/layout/container'
 import { NotFound } from '@/components/not-found'
-import { QueryError } from '@/components/query-error'
+import { RouteError } from '@/components/route-error'
 import { RatingStars } from '@/components/rating-stars'
 import { nftDetailQueryOptions, relatedNftsQueryOptions } from '@/features/catalog/queries'
 import { FavoriteButton } from '@/features/favorites/components/favorite-button'
@@ -53,15 +53,10 @@ export const Route = createFileRoute('/nft/$nftId')({
   component: NftDetailPage,
 })
 
-function DetailError({ error }: { error: unknown }) {
-  const router = useRouter()
+function DetailError(props: ErrorComponentProps) {
   return (
-    <Container className="py-16">
-      <QueryError
-        title="Não foi possível carregar este NFT"
-        error={error}
-        onRetry={() => void router.invalidate()}
-      />
+    <Container>
+      <RouteError {...props} title="Não foi possível carregar este NFT" />
     </Container>
   )
 }

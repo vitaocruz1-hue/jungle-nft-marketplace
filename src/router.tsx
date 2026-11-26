@@ -1,6 +1,8 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { createRouter } from '@tanstack/react-router'
 
+import { RouteErrorPage } from '@/components/route-error'
+
 import { routeTree } from './routeTree.gen'
 
 export function createAppRouter(queryClient: QueryClient) {
@@ -13,6 +15,9 @@ export function createAppRouter(queryClient: QueryClient) {
     // Quem decide se o dado está "velho" é o TanStack Query, não o Router.
     defaultPreloadStaleTime: 0,
     scrollRestoration: true,
+    // Erro em qualquer rota: página de erro do site, em português, com
+    // "Tentar novamente" e "Restaurar dados de demonstração".
+    defaultErrorComponent: RouteErrorPage,
   })
 }
 
