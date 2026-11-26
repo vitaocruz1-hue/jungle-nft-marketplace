@@ -21,11 +21,12 @@ test.describe('Tempo real visível', () => {
     await waitForSocket(page)
 
     await mocks(page, (m) => m.changeNftPrice('emerald-ape-042', '2.50'))
+    // O destaque dura ~1,6 s e o aviso ~4 s: confere primeiro o que some antes.
+    await expect(price).toHaveClass(/price-flash/)
+    await expect(price).toContainText('2.50 ETH')
     await expect(
       toasts(page).filter({ hasText: 'Preço do Emerald Ape #042 mudou de 1.19 para 2.50 ETH.' }),
     ).toBeVisible()
-    await expect(price).toContainText('2.50 ETH')
-    await expect(price).toHaveClass(/price-flash/)
     // O destaque é breve: some sozinho.
     await expect(price).not.toHaveClass(/price-flash/, { timeout: 5_000 })
   })
