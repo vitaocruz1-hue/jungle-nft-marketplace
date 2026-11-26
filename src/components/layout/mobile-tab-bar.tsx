@@ -29,7 +29,7 @@ export function MobileTabBar() {
 
   return (
     <nav aria-label="Navegação inferior" className="fixed inset-x-0 bottom-0 z-40 md:hidden">
-      <ul className="relative mx-auto flex h-[76px] items-center justify-around rounded-t-[28px] border-t glass px-4 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_rgb(0_0_0/0.35)]">
+      <ul className="relative mx-auto flex h-[76px] items-center justify-around rounded-t-[28px] border-t glass px-4 pb-[env(safe-area-inset-bottom)] shadow-[0_-10px_30px_rgb(0_0_0/0.45)]">
         <li>
           <Link
             to="/"

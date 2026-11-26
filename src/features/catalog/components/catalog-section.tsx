@@ -72,7 +72,7 @@ export function CatalogSection() {
           unavailable={filtersUnavailable}
           className="bg-transparent"
         />
-        <SheetFooter className="sticky bottom-0 border-t glass [--glass-tint:var(--background)]">
+        <SheetFooter className="sticky bottom-0 border-t glass">
           <Button onClick={() => setFiltersSheetOpen(false)} className="h-10">
             Ver {data ? resultsLabel(data.totalItems) : 'resultados'}
           </Button>

@@ -7,6 +7,8 @@ import { useLiveNft } from '@/features/realtime/realtime-store'
 import { displayEth } from '@/lib/eth'
 import { cn } from '@/lib/utils'
 
+import { resetCardTilt, tiltCard } from '../card-tilt'
+
 interface NftCardProps {
   nft: NftSummary
   priority?: boolean
@@ -23,7 +25,11 @@ export function NftCard({ nft, priority = false, favoriteButton = 'mobile' }: Nf
   const priceFlash = useLiveNft(nft.id)
 
   return (
-    <article className="nft-card group relative">
+    <article
+      className="nft-card group relative"
+      onPointerMove={tiltCard}
+      onPointerLeave={resetCardTilt}
+    >
       <Link
         to="/nft/$nftId"
         params={{ nftId: nft.id }}

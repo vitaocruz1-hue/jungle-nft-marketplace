@@ -72,12 +72,12 @@
  */
 @utility glass {
   background-color: var(--glass-tint, var(--card));
-  border-color: rgb(255 255 255 / 0.09);
+  border-color: rgb(255 255 255 / 0.16);
 
   @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    background-color: color-mix(in srgb, var(--glass-tint, var(--card)) 74%, transparent);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    backdrop-filter: blur(20px) saturate(160%);
+    background-color: color-mix(in srgb, var(--glass-tint, var(--card)) 60%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(170%);
+    backdrop-filter: blur(18px) saturate(170%);
   }
 }
 
@@ -98,12 +98,13 @@
 
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   :root {
-    --toast-bg: color-mix(in srgb, var(--popover) 74%, transparent);
+    --toast-bg: color-mix(in srgb, var(--popover) 60%, transparent);
   }
 
   [data-sonner-toast][data-styled='true'] {
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(170%);
+    backdrop-filter: blur(18px) saturate(170%);
+    box-shadow: 0 12px 32px -12px rgb(0 0 0 / 0.7);
   }
 }
 
@@ -135,13 +136,23 @@
 }
 
 /*
- * Card de NFT: parado = Figma. Em hover (mouse) ou foco do teclado: sobe, ganha sombra e
- * borda com brilho na cor de destaque; a arte dá zoom lento e um reflexo passa por ela.
+ * Card de NFT: parado = Figma. Em hover (mouse) ou foco do teclado: sobe 8 px, ganha brilho
+ * laranja, a arte dá zoom (1,08) e uma faixa de luz atravessa a imagem. Com mouse, inclina até
+ * ~6° seguindo o ponteiro (--tilt-x/--tilt-y, gravadas por card-tilt.ts).
  */
+.nft-card {
+  --card-glow:
+    0 26px 48px -20px rgb(0 0 0 / 0.9),
+    0 0 0 1px color-mix(in srgb, var(--highlight) 80%, transparent),
+    0 0 34px 2px color-mix(in srgb, var(--highlight) 45%, transparent),
+    0 0 70px -6px color-mix(in srgb, var(--highlight) 30%, transparent);
+}
+
 .nft-card-frame {
   transition:
-    translate 250ms ease-out,
-    box-shadow 250ms ease-out;
+    translate 300ms ease-out,
+    box-shadow 300ms ease-out,
+    transform 300ms ease-out;
 }
 
 .nft-card-art {
@@ -151,66 +162,83 @@
 }
 
 .nft-card-art img {
-  transition: scale 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: scale 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
+/* Faixa diagonal de luz, fora da imagem enquanto parado. */
 .nft-card-art::after {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / 0.2) 50%, transparent 65%);
-  translate: -120% 0;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgb(255 255 255 / 0.12) 42%,
+    rgb(255 255 255 / 0.6) 50%,
+    rgb(255 255 255 / 0.12) 58%,
+    transparent 70%
+  );
+  translate: -130% 0;
 }
 
 @media (hover: hover) {
   .nft-card:hover .nft-card-frame {
-    box-shadow:
-      0 18px 34px -16px rgb(0 0 0 / 0.8),
-      0 0 0 1px color-mix(in srgb, var(--highlight) 45%, transparent),
-      0 0 26px -8px color-mix(in srgb, var(--highlight) 55%, transparent);
+    box-shadow: var(--card-glow);
   }
 }
 
 .nft-card-link:focus-visible .nft-card-frame {
-  box-shadow:
-    0 18px 34px -16px rgb(0 0 0 / 0.8),
-    0 0 0 1px color-mix(in srgb, var(--highlight) 45%, transparent),
-    0 0 26px -8px color-mix(in srgb, var(--highlight) 55%, transparent);
+  box-shadow: var(--card-glow);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   @media (hover: hover) {
     .nft-card:hover .nft-card-frame {
-      translate: 0 -4px;
+      translate: 0 -8px;
     }
 
     .nft-card:hover .nft-card-art img {
-      scale: 1.05;
+      scale: 1.08;
     }
 
     .nft-card:hover .nft-card-art::after {
-      translate: 120% 0;
-      transition: translate 900ms ease-out;
+      translate: 130% 0;
+      transition: translate 1s ease-out;
+    }
+  }
+
+  /* Inclinação 3D só com mouse (desktop). Transição curta enquanto acompanha o ponteiro. */
+  @media (hover: hover) and (pointer: fine) {
+    .nft-card:hover .nft-card-frame {
+      transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+      transition:
+        translate 300ms ease-out,
+        box-shadow 300ms ease-out,
+        transform 120ms ease-out;
     }
   }
 
   .nft-card-link:focus-visible .nft-card-frame {
-    translate: 0 -4px;
+    translate: 0 -8px;
   }
 
   .nft-card-link:focus-visible .nft-card-art img {
-    scale: 1.05;
+    scale: 1.08;
   }
 
   .nft-card-link:focus-visible .nft-card-art::after {
-    translate: 120% 0;
-    transition: translate 900ms ease-out;
+    translate: 130% 0;
+    transition: translate 1s ease-out;
   }
 
-  /* Clique: leve "aperto" em links e botões (os botões do shadcn têm o seu, um pouco maior). */
-  :is(a, button):not(:disabled):active {
+  /* Clique: "aperto" perceptível nos botões e leve nos links. */
+  a:not([data-slot='button']):active {
     scale: 0.98;
+  }
+
+  :is(button, [data-slot='button']):not(:disabled):active {
+    scale: 0.96;
   }
 }
 
