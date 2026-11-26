@@ -101,7 +101,7 @@ export function NftGallery({ images, name }: { images: NftImage[]; name: string 
               <SearchIcon className="size-5" />
             </button>
           </DialogTrigger>
-          <DialogContent className="max-w-[min(92vw,720px)] bg-background p-3 sm:max-w-[min(92vw,720px)]">
+          <DialogContent className="max-w-[min(92vw,720px)] p-3 sm:max-w-[min(92vw,720px)]">
             <DialogTitle className="sr-only">{name}</DialogTitle>
             <DialogDescription className="sr-only">{current.alt}</DialogDescription>
             <img

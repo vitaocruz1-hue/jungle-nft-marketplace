@@ -38,7 +38,7 @@ export function ScenarioPanel() {
       {open ? (
         <section
           aria-labelledby="painel-cenarios-titulo"
-          className="max-h-[80vh] w-72 overflow-y-auto rounded-md border border-[#5c4030] bg-[#140d0a] p-3 shadow-2xl"
+          className="max-h-[80vh] w-72 overflow-y-auto rounded-md border glass p-3 shadow-2xl [--glass-tint:#140d0a]"
         >
           <div className="flex items-center justify-between">
             <h2 id="painel-cenarios-titulo" className="text-sm font-bold">

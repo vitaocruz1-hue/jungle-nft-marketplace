@@ -86,13 +86,19 @@ interface CatalogFiltersProps {
    * está sendo repetida), não há o que carregar: mostra um aviso em vez do skeleton.
    */
   unavailable?: boolean
+  className?: string
 }
 
 /** Painel de filtros (coluna lateral no desktop, gaveta no celular). */
-export function CatalogFilters({ facets, search, unavailable = false }: CatalogFiltersProps) {
+export function CatalogFilters({
+  facets,
+  search,
+  unavailable = false,
+  className,
+}: CatalogFiltersProps) {
   if (!facets && unavailable) {
     return (
-      <div className="bg-card px-5 py-6">
+      <div className={cn('bg-card px-5 py-6', className)}>
         <p role="status" className="text-sm text-muted-foreground">
           Filtros indisponíveis no momento. Eles voltam junto com o catálogo.
         </p>
@@ -101,7 +107,7 @@ export function CatalogFilters({ facets, search, unavailable = false }: CatalogF
   }
 
   return (
-    <div className="space-y-8 bg-card px-5 py-6">
+    <div className={cn('space-y-8 bg-card px-5 py-6', className)}>
       {hasActiveFilters(search) && (
         <Link
           from="/"

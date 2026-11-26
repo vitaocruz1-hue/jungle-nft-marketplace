@@ -1,6 +1,6 @@
 import { Link, useRouterState } from '@tanstack/react-router'
 import { MenuIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { notifyComingSoon } from '@/lib/coming-soon'
 import { Button } from '@/components/ui/button'
@@ -74,14 +74,41 @@ function MainNav({ className, onNavigate }: { className?: string; onNavigate?: (
   )
 }
 
+/** A página saiu do topo? (o cabeçalho fixo vira vidro). */
+function useScrolled(threshold = 8) {
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const update = () => setScrolled(window.scrollY > threshold)
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    return () => window.removeEventListener('scroll', update)
+  }, [threshold])
+  return scrolled
+}
+
 export function SiteHeader({ className }: { className?: string }) {
+  const scrolled = useScrolled()
   const [menuOpen, setMenuOpen] = useState(false)
   const closeMenu = () => setMenuOpen(false)
 
   return (
-    <header className={className}>
+    <header
+      className={cn(
+        // A partir de 768 px fica preso no topo. No topo: igual ao Figma. Ao rolar: vidro.
+        // A linha clara do vidro é uma sombra de 1 px: não muda a altura do cabeçalho.
+        'z-40 transition-[background-color,box-shadow] duration-200 md:sticky md:top-0',
+        scrolled &&
+          'md:glass md:shadow-[0_1px_0_rgb(255_255_255/0.09)] md:[--glass-tint:var(--background)]',
+        className,
+      )}
+    >
       <Container>
-        <div className="flex h-[68px] items-center justify-between gap-4 border-b border-[#8b5b33]/70">
+        <div
+          className={cn(
+            'flex h-[68px] items-center justify-between gap-4 border-b border-[#8b5b33]/70 transition-colors duration-200',
+            scrolled && 'md:border-transparent',
+          )}
+        >
           <Link
             to="/"
             className="text-base font-bold tracking-wide"
@@ -106,7 +133,7 @@ export function SiteHeader({ className }: { className?: string }) {
                   <MenuIcon className="size-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-72 bg-background">
+              <SheetContent side="right" className="w-72">
                 <SheetHeader>
                   <SheetTitle>Menu</SheetTitle>
                   <SheetDescription className="sr-only">Navegação principal</SheetDescription>

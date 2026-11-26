@@ -65,6 +65,48 @@
   --animate-shimmer: shimmer 1.6s linear infinite;
 }
 
+/*
+ * Vidro (estilo Apple) para o que flutua sobre o conteúdo: cabeçalho ao rolar, barra de
+ * abas, gavetas, diálogos, avisos e painéis. Sem suporte a backdrop-filter, fica sólido.
+ * --glass-tint escolhe a cor de fundo (padrão: a dos painéis).
+ */
+@utility glass {
+  background-color: var(--glass-tint, var(--card));
+  border-color: rgb(255 255 255 / 0.09);
+
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    background-color: color-mix(in srgb, var(--glass-tint, var(--card)) 74%, transparent);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+  }
+}
+
+/* Avisos (sonner): mesmo vidro; o fundo vem de --toast-bg (ver components/ui/sonner.tsx). */
+:root {
+  --toast-bg: var(--popover);
+}
+
+/* O sonner usa a fonte do sistema; aqui os avisos usam a Roboto Mono do site. */
+[data-sonner-toaster] {
+  font-family: var(--font-sans);
+}
+
+/* Entrada/saída dos avisos mais curta (o padrão do sonner é 400 ms). */
+[data-sonner-toaster] [data-sonner-toast] {
+  transition-duration: 250ms;
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --toast-bg: color-mix(in srgb, var(--popover) 74%, transparent);
+  }
+
+  [data-sonner-toast][data-styled='true'] {
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+  }
+}
+
 /* Preço que acabou de mudar em tempo real: brilho laranja que se apaga (~1,6 s). */
 @keyframes price-flash {
   0%,

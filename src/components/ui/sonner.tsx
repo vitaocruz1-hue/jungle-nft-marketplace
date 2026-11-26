@@ -24,9 +24,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       style={
         {
-          '--normal-bg': 'var(--popover)',
+          // Vidro: --toast-bg é translúcido onde há backdrop-filter (src/index.css).
+          '--normal-bg': 'var(--toast-bg)',
           '--normal-text': 'var(--popover-foreground)',
-          '--normal-border': 'var(--border)',
+          '--normal-border': 'rgb(255 255 255 / 0.09)',
           '--border-radius': 'var(--radius)',
         } as React.CSSProperties
       }

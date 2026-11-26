@@ -55,7 +55,7 @@ export function CatalogSection() {
 
   const filtersSheet = (
     <Sheet open={filtersOpen} onOpenChange={setFiltersSheetOpen}>
-      <SheetContent side="left" className="w-[320px] gap-0 overflow-y-auto bg-background p-0">
+      <SheetContent side="left" className="w-[320px] gap-0 overflow-y-auto p-0">
         <SheetHeader className="px-5">
           <SheetTitle>Filtros</SheetTitle>
           <SheetDescription className="sr-only">Refine o catálogo de NFTs</SheetDescription>
@@ -66,8 +66,13 @@ export function CatalogSection() {
           className="px-5 pb-4 md:hidden"
           triggerClassName="flex-1 justify-between border border-border bg-card"
         />
-        <CatalogFilters facets={data?.facets} search={search} unavailable={filtersUnavailable} />
-        <SheetFooter className="sticky bottom-0 bg-background">
+        <CatalogFilters
+          facets={data?.facets}
+          search={search}
+          unavailable={filtersUnavailable}
+          className="bg-transparent"
+        />
+        <SheetFooter className="sticky bottom-0 border-t glass [--glass-tint:var(--background)]">
           <Button onClick={() => setFiltersSheetOpen(false)} className="h-10">
             Ver {data ? resultsLabel(data.totalItems) : 'resultados'}
           </Button>
