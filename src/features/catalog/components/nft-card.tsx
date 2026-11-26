@@ -27,7 +27,7 @@ export function NftCard({ nft, priority = false, favoriteButton = 'mobile' }: Nf
       <Link
         to="/nft/$nftId"
         params={{ nftId: nft.id }}
-        className="block rounded-sm focus-visible:outline-offset-4"
+        className="nft-card-link block rounded-sm focus-visible:outline-offset-4"
       >
         <div className="nft-card-frame relative flex aspect-[258/300] items-center justify-center bg-card px-1 max-md:aspect-auto max-md:rounded-[20px] max-md:bg-[#2a1a14] max-md:px-1 max-md:pt-1 max-md:pb-4 md:items-start md:pt-[12%]">
           {/* Zoom e reflexo (hover/foco) ficam dentro dos cantos arredondados. */}

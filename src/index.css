@@ -172,7 +172,7 @@
   }
 }
 
-.nft-card:has(:focus-visible) .nft-card-frame {
+.nft-card-link:focus-visible .nft-card-frame {
   box-shadow:
     0 18px 34px -16px rgb(0 0 0 / 0.8),
     0 0 0 1px color-mix(in srgb, var(--highlight) 45%, transparent),
@@ -195,15 +195,15 @@
     }
   }
 
-  .nft-card:has(:focus-visible) .nft-card-frame {
+  .nft-card-link:focus-visible .nft-card-frame {
     translate: 0 -4px;
   }
 
-  .nft-card:has(:focus-visible) .nft-card-art img {
+  .nft-card-link:focus-visible .nft-card-art img {
     scale: 1.05;
   }
 
-  .nft-card:has(:focus-visible) .nft-card-art::after {
+  .nft-card-link:focus-visible .nft-card-art::after {
     translate: 120% 0;
     transition: translate 900ms ease-out;
   }
